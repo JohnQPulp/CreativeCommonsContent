@@ -7,44 +7,40 @@
 
 <h2 class='center'>Free!</h2>
 
-<p>Public domain books are already all free, so the visual novels should be too why not.</p>
-
-<p>You can read them all online here: no payment, no account, no nothing required.</p>
+<p>Books in the public domain are free, so its visual novels should be too. You can read them all here: no payment, no account, no nothing required.</p>
 
 
 <h2 class='center'>Open Source!</h2>
 
-<p>Each visual novel on this site has its own corresponding public Github repo. You can clone and build them yourself and read them offline if you like — they're all just static html pages.</p>
+<p>Each visual novel on this site has its own corresponding public Github repo. You can clone them and build them and read them offline. (They're all just static html pages!)</p>
 
-<p>The website's code is all MIT-0 licensed, and the website's written and image contents are all CC0 licensed.</p>
+<p>The <a href="https://github.com/JohnQPulp/PublicDomainPulp">website's code</a> is all MIT-0 licensed, and its text and image contents are all CC0 licensed.</p>
 
 
 <h2 class='center'>Entertaining!</h2>
 
-<p>Regular books are <b>boring</b>. And <b>stupid</b>.</p>
-
-<p>Visual novels are <b>fun</b>.</p>
+<p>Regular books are <b>boring</b>. Visual novels are <b>fun</b>.</p>
 
 
 <h2 class='center'>The Best Prose!</h2>
 
-<p>On this website, I steal from the best (and also Steinbeck).</p>
+<p>On this website, I steal from the best. (And also Steinbeck.)</p>
 
-<p>When you read visual novels here, you're getting all the books' original writings: no simplifying, shortening, or bowdlerizing of the authors' prose. Experience all the greatness of the classics without having to remember all the assholes' names.</p>
+<p>All visual novels here keep the original text of their respective books. There's no modifying, simplifying, or bowdlerizing of prose — only the unimpeachable greatness of the classics.</p>
 
 
 <h2 class='center'>Heavy Editorializing!</h2>
 
-<p>So sometimes just because a book is old, doesn't mean it's good. And really, even the literary greats have their questionable moments. (Looking at you, Tolstoy.)</p>
+<p>Okay, so maybe sometimes even the classics have their questionable moments. (Looking at you, Tolstoy.)</p>
 
-<p>As a solution, Public Domain Pulp's visual novels contain editor's notes: ostensibly there for adding context to the writing and visuals where necessary, but actually there mostly for me to complain about the prose I don't like.</p>
+<p>As a solution, Public Domain Pulp's visual novels contain highly opinionated editor's notes: ostensibly there for adding context, but mostly there for pointing-and-laughing and the authors' writing choices.</p>
 
 
-<h2 class='center'>Blog Posts!</h2>
+<h2 class='center'>Blog Posts.</h2>
 
-<p>The site also has blog posts. A lot of them also involve me complaining about books' writing.</p>
+<p>There's also blog posts (yay…). Many of them also involve pointing-and-laughing.</p>
 
-<p>As a matter of fact the rest of this about page is basically a blog post. Read on if you want to learn more about the idea and technical details behind the website:</p>
+<p>Actually, the rest of this about page is basically just a blog post. Read on if boring details interest you:</p>
 
 <hr>
 
@@ -59,29 +55,29 @@
 
 <p>The situation is that all existing visual novels have terrible prose. Therefore, a visual novel with good or even average prose would be a standout.</p>
 
-<p>At the same time, regular novels are boring, being the inherently least interesting medium. They make up for this by being the best-written medium, but that advantage has only slowed their inevitable and ongoing decline.</p>
+<p>At the same time, regular novels are boring — books being the inherently least interesting medium. They make up for this by being the best-written medium, but that advantage has only slowed their inevitable and ongoing decline.</p>
 
-<p>However, if we could combine the goodness of books with non-boringness of visual novels, we could have a pareto improvement on both. In some sense, this is just describing the concept of a book adaptation. But where movies and TV shows almost never can retain the original prose of their adapted novels, visual novel "adaptations" can. And it's in this way that they have the opportunity to represent true pareto improvements.</p>
+<p>However, if we could combine the goodness of books with non-boringness of visual novels, we could have a pareto improvement on both. Since unlike your typical movie or TV adaptation, visual novels can retain all the original good prose.</p>
 
 
 <h2>The Prerequisites</h2>
 
 <p>Getting the good prose is an easily solved problem: I steal it from <a href="https://standardebooks.org/">Standard Ebooks</a>. Not only do they have all the public domain classics — their em dashes are nicely formatted as well.</p>
 
-<p>The "visual" part of the "visual novel" is harder. In fact, it was strictly uneconomical prior to 2025. See, while AI models existed before then, they simply weren't good enough in a number of ways for what a visual novel requires:</p>
+<p>The "visual" part of the "visual novel" is harder. In fact, it was strictly uneconomical prior to 2025. See, while AI models existed before then, they simply weren't good enough for what visual novels require:</p>
 
 <ul>
 <li>Hundreds of images — sprites and backgrounds — all drawn in the same style.</li>
-<li>Sets of variations on the same image (e.g., different sprites for the same character) requiring self-consistency.</li>
+<li>Self-consistent variations on the same image (e.g., different sprites for the same character).</li>
 <li>Images to all be period- and setting- and description-accurate to both the book as a whole and the particular contexts around individual scenes.</li>
 </ul>
 
-<p>But the AI progress was (and still is) continuous, such that 2025 was the tipping point where the models became sufficiently smart and accurate that creating a visual novel out of an existing non-VN became doable.</p>
+<p>But the AI progress was (and still is) continuous, and 2025 was the tipping point. The models are now sufficiently smart and accurate that VN-adaptations at scale are practical.</p>
 
 
 <h2>The Implementation</h2>
 
-<p>Once you've got the writing and the images for the writing, you need to smush them together somehow. For a complete visual novel, you need metadata specifying all of:</p>
+<p>Once you've got the writing and the images, you need to smush them together somehow. For a complete visual novel, you need metadata specifying all of:</p>
 
 <ul>
 <li>Line break positions.</li>
@@ -101,39 +97,35 @@
 <li>What name to display for each speaker (which might change over the course of the book).</li>
 </ul>
 
-<p>The solution for containing all this structured metadata is… a text file! (Since if it's 2025 and you aren't using text files as your main documentation format, what are you even doing?)</p>
+<p>The solution for containing all this structured metadata is… a text file! (Since if you aren't using plain text in &lt;current-year&gt;, what are you doing?)</p>
 
-<p>This is the pulp.txt text file that exists in all the visual novel repos (alongside the book.txt file that contains the original unstructured text). The metadata-enhanced pulp.txt file controls everything about the visual novel. It's what gets read in by the <a href="https://github.com/JohnQPulp/Pulpifier">Pulpifier</a> to convert text into html.</p>
+<p>The metadata-enhanced pulp.txt file controls all of the above, living alongside the book.txt file (the original text) in all the VN Github repos. Both files are read in by <a href="https://github.com/JohnQPulp/Pulpifier">the Pulpifier</a> as part of converting text to static html.</p>
 
-<p>And that output, along with the image directory of generated backgrounds and sprites and objects, is it all it takes to "run" the static-html visual novel.</p>
+<p>And that output, along with all the images in the image/ directory, is all it takes to "run" the visual novels.</p>
 
 <p>(TODO: In the future, create and link to a blog post explaining the pulp.txt metadata format in more detail.)</p>
 
 
 <h2>The Goal</h2>
 
-<p>Ideally all public domain books could metadata-annotated and image-generated in this way to form visual novels. But there are thousands upon thousands of public domain titles, which is far too many to all convert. Unless the VN-conversion pipeline can be fully automated, which… maybe! (In the not-too-distant AI future.)</p>
+<p>Ideally, all public domain texts could be converted automatically into VNs. And in theory, a sufficiently advanced (and well-funded) LLM+T2I pipeline would be able to do so.</p>
 
-<p>But for now, each of the visual novels take a sizeable chunk of time to convert, so I'll prioritize the heavy-hitters of literature. I think eventually reaching the hundreds of titles would be a respectable number. But getting there depends a lot on:</p>
+<p>For now though, full automation isn't yet practical, for a variety of reasons. Aside from the "drawing" of the individual images, the VN conversion process is still largely manual.</p>
+
+<p>But this doesn't change the goal: the adaptation of all the classics of the public domain into VNs. It just means that it will take time to get there, and that it'll be dependent on:</p>
 
 
 <h2>The Monetization</h2>
 
-<p>Ultimately the site does need a source of revenue.</p>
+<p>Ultimately the site does need a source of revenue, since the building of the catalog is costly: there's the server ($32/month), and there's also the image-generation API credits (~$100/book, but with big error bars based on book size).</p>
 
-<p>Part of that's for running the server, although that's only $32/month; and part of that's for generating the visual novel images, which might run about $100 in API credits per book (with big error bars based on book size).</p>
+<p>But the biggest cost is opportunity cost, what with the VNs taking significant time to create. They currently take about a full week's worth of work (again with big error bars for book size) in the reading, editing, re-reading, generating, re-editing, re-re-reading, and re-re-editing.</p>
 
-<p>But mainly it's opportunity cost, since the visual novels take significant time to create: about a week's worth of work (again with big error bars for book size) in the reading, editing, re-reading, generating, re-editing, re-re-reading, and re-re-editing.</p>
+<p>(TODO: In the future, create and link to a blog post explaining the VN-conversion process in more detail.)</p>
 
-<p>Since I quit my real job in order to try out this project (good riddance enterprise development!), I'm on ticking timer of dwindling savings in order to make the site not a total cost sink.</p>
+<p>In order for the site to be a successful full-time endeavor, it needs a revenue strategy. The current plan is that I'll incorporate Amazon affiliate links to books. I reference books ad nauseum anyway, so such links should slot unobtrusively in. (At least, in comparison to regular ads.) Plus, who wouldn't benefit from owning more books?</p>
 
-<p>But I have a plan. My idea is that I'll incorporate Amazon affiliate links for buying books throughout the site, since I reference books ad nauseum in my notes anyway, such that I'll get some percentage of the book sales for each purchase. And that seems like a win-win to me: I get money, and readers get more books for their shelves — always a good purchase. (I may have been a bit hyperbolic in my earlier criticism of boring regular books.)</p>
-
-<p>And that would keep the site free for reading and also ad-free.</p>
-
-<p>We will see if this strategy works. So long as it does, I'll keep making the VNs until the better part of the public domain has been exhausted.</p>
-
-<p>(The other potential option would be donation links, but I dunno… I think if you're going to donate to anyone, just do <a href="https://standardebooks.org/donate">Standard Ebooks</a> — they're the ones whose books I steal.)</p>
+<p>Course, this is all tentative. If this plan doesn't work out, I may switch to another. (Soliciting donations is always an option, but for now, I don't have anything set up. So just donate to <a href="https://standardebooks.org/donate">Standard Ebooks</a> instead.)</p>
 
 
 </div>
