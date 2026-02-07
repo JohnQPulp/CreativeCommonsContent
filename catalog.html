@@ -13,6 +13,8 @@
 #vns {
   min-width: min(95vw, 600px);
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 #blogs {
   min-width: min(95vw, 400px);
@@ -54,6 +56,15 @@ th, td {
   border-bottom: 1px solid black;
   background-repeat: no-repeat;
 }
+#sprite.ed {
+  background-image: url(/vn/PuddnheadWilson/images/c-percy-a35-xdab.webp);
+  animation: mirror-flip 1s infinite;
+}
+@keyframes mirror-flip {
+  0%, 45% { transform: scaleX(1); }
+  50%, 95% { transform: scaleX(-1); }
+  0% { transform: scaleX(1); }
+}
 </style>
 <div id='vns'>
   <h2 class='title'>Visual Novels</h2>
@@ -64,7 +75,7 @@ th, td {
   <div id='tabledivider' class='ed'></div>
   <div id='tabledivider' class='ned'></div>
   <h2 class='title'><small>Upcoming Visual Novels</small></h2>
-  <table>
+  <table class='ed'>
     <tr><th>Title</th><th>Author</th><th>Words</th></tr>
     <tr><td><i>Schoolgirl</i></td><td>Osamu&nbsp;Dazai</td><td class='tr'>14,548</td></tr>
     <tr><td><i>Schoolgirl Rivals</i></td><td>Brenda&nbsp;Page</td><td class='tr'>44,404</td></tr>
@@ -73,6 +84,12 @@ th, td {
     <tr><td><i>A Harum-Scarum Schoolgirl</i></td><td>Angela&nbsp;Brazil</td><td class='tr'>68,417</td></tr>
     <tr><td><i>Pro .NET Memory Management: For Better Code, Performance, and Scalability</i></td><td>Konrad&nbsp;Kokosa</td><td class='tr'>276,235</td></tr>
   </table>
+  <table class='ned'>
+    <tr><th>Title</th><th>Author</th><th>Words</th></tr>
+    <tr><td><i>The Strange Case of Dr. Jekyll and Mr. Hyde</i></td><td>Robert&nbsp;Louis&nbsp;Stevenson</td><td class='tr'>25,664</td></tr>
+    <tr><td><i>The Great Gatsby</i></td><td>F.&nbsp;Scott&nbsp;Fitzgerald</td><td class='tr'>48,465</td></tr>
+    <tr><td><i>Frankenstein</i></td><td>Mary&nbsp;Shelley</td><td class='tr'>77,898</td></tr>
+  </table>
 </div>
 <div id='blogs'>
   <h2 class='title'>Blog Posts</h2>
@@ -80,5 +97,6 @@ th, td {
     <tr><th>Title</th><th>Date</th></tr>
     <!--blogs-->
   </table>
-  <div id='sprite'></div>
+  <div id='sprite' class='ned'></div>
+  <div id='sprite' class='ed'></div>
 </div>
