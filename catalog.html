@@ -58,12 +58,12 @@ th, td {
 }
 #sprite.ed {
   background-image: url(/vn/PuddnheadWilson/images/c-percy-a35-xdab.webp);
-  animation: mirror-flip 1s infinite;
+  animation: dab 1s infinite;
+  animation-timing-function: steps(1, end);
 }
-@keyframes mirror-flip {
-  0%, 45% { transform: scaleX(1); }
-  50%, 95% { transform: scaleX(-1); }
-  0% { transform: scaleX(1); }
+@keyframes dab {
+  0% { transform: scale(1.25) translate(-10%, -10%);  }
+  50% { transform: scale(-1.25, 1.25) translate(10%, -10%); }
 }
 </style>
 <div id='vns'>
