@@ -109,28 +109,28 @@ s=concierge1;e:concierge1=happy
 <p>Note how the <code>pulp.txt</code> file:</p>
 
 <ul>
-<li>Alternates text line, metadata line, blank line; repeat. So a 3-cycle instead of <code>book.txt</code>'s 2-cycle.</li>
+<li>Alternates text line, metadata line, blank line; repeat. So a 3-cycle instead of <code>book.txt</code>'s 2-cycle. Together, we'll call each of these 3-cycle groupings a slide.</li>
 <li>Contains the exact<a href="#quote-handling">*</a> same text content, including the same markdown, as <code>book.txt</code>. (One of the functions of the Pulpifier is to check the combined text contents of <code>pulp.txt</code> against <code>book.txt</code> to make sure no transcription or editing mistakes accidentally changed the original text.)</li>
-<li>Contains more lines than the original <code>book.txt</code>, despite containing the same overall text. For while <code>book.txt</code>'s lines represent whole paragraphs, <code>pulp.txt</code>'s lines represent individual slides of the visual novel. Thus, for visual presentation purposes, we want long paragraphs split up.</li>
+<li>Contains more slides than the original <code>book.txt</code>, despite containing the same overall text. For while <code>book.txt</code>'s contents represent whole paragraphs, <code>pulp.txt</code>'s represent individual slides of the visual novel. Thus, for visual presentation purposes, we want long paragraphs split up.</li>
 </ul>
 
 <p>The text lines and their associated metadata define all aspects of the visual novel's presentation. In this case, one example slide looks like this:</p>
 
 <img alt="Visual novel example slide" src="/images/slide.webp" />
 
-<p>This fifth line of the example snippet can be explained as a combination of the text of that particular line along with its line metadata and the 4 lines of metadata before it. Walking through this specific example will help give a high-level overview of how the <code>pulp.txt</code> format with its metadata tags works, before going into the specific documentation of each tag.</p>
+<p>This fifth slide of the example snippet can be explained as a combination of the text of that particular text line along with its metadata line and the 4 lines of metadata before it. Walking through this specific example will help give a high-level overview of how the <code>pulp.txt</code> format with its metadata tags works, before going into the specific documentation of each tag.</p>
 
 <ul>
-<li>The first line's <code>r=title</code> uses the (r)eset tag to reset most metadata to its default state. This is important because certain metadata carries over from line-to-line, and so you'll usually see the resets at the beginning of each chapter, as those act as clear refresh points. The <code>=title</code> part is the tag telling the VN to use the title-card background for the chapter header line.</li>
-<li>The second line's <code>b=flat-concierge-int</code> uses the (b)ackground tag to set the VN to the interior flat lobby background. (r)eset and (b)ackground both set a background, but (b)ackground only sets the background — it doesn't affect any other metadata. Either way, once the background has been set, it stays with that background until changed again. So since none of the subsequent lines change the background, it's that same background that the 5th line will end up using.</li>
-<li>The third line's <code>n:concierge1=Concierge;c=concierge1;e:concierge1=happy</code> uses three new tags (separated by semicolons, which act as the tags' dividors) to do the following things:
+<li>The first slide's <code>r=title</code> uses the (r)eset tag to reset most metadata to its default state. This is important because certain metadata carries over from slide-to-slide, and so you'll usually see the resets at the beginning of each chapter, as those act as clear refresh points. The <code>=title</code> part is the tag telling the VN to use the title-card background for the chapter header slide.</li>
+<li>The second slide's <code>b=flat-concierge-int</code> uses the (b)ackground tag to set the VN to the interior flat lobby background. (r)eset and (b)ackground both set a background, but (b)ackground only sets the background — it doesn't affect any other metadata. Either way, once the background has been set, it stays with that background until changed again. So since none of the subsequent slides change the background, it's that same background that the 5th slide will end up using.</li>
+<li>The third slide's <code>n:concierge1=Concierge;c=concierge1;e:concierge1=happy</code> uses three new tags (separated by semicolons, which act as the tags' dividors) to do the following things:
 <ul>
-<li><code>n:concierge1=Concierge</code> uses the (n)ame tag to define a new character with the ID <code>concierge1</code> with the user-displayed name of "Conierge".</li>
+<li><code>n:concierge1=Concierge</code> uses the (n)ame tag to define a new character with the ID <code>concierge1</code> with the user-displayed name of "Concierge".</li>
 <li><code>c=concierge</code> uses the (c)haracter tag to set <code>concierge1</code> as the on-screen character.</li>
 <li><code>e:concierge1=happy</code> uses the (e)xpression tag to set <code>concierge1</code>'s state to <code>happy</code>, such that while on-screen, her appearance will use her "happy" sprite set.</li>
 </ul>
 </li>
-<li><code>s=concierge1</code> uses the (s)peaker tag to set the speaker to <code>concierge1</code>. During this line, her name will appear on-screen as the speaker and her character will use a speaking sprite (<code>c-concierge-ehappy-s.webp</code>, taking into account the previous line).</li>
+<li><code>s=concierge1</code> uses the (s)peaker tag to set the speaker to <code>concierge1</code>. During this slide, her name will appear on-screen as the speaker and her character will use a speaking sprite (<code>c-concierge-ehappy-s.webp</code>, taking into account the previous slide).</li>
 <li><code>s=jake</code> updates the speaker to <code>jake</code>, a character defined in a previous chapter (who therefore doesn't need to be redefined). Since his character isn't on-screen, he'll appear in the lower-left corner "speaker box", where he can be seen in his neutral speaking expression, since no specific expression was set.</li>
 </ul>
 
@@ -158,7 +158,7 @@ s=concierge1;e:concierge1=happy
 
 <h2>(b)ackground</h2>
 
-<p><code>b</code> accepts exactly one argument, setting the background like <code>b=flat-ext</code>. This presumes the existance of a background image file named <code>b-flat-ext.webp</code>.</p>
+<p><code>b</code> accepts exactly one argument, setting the background like <code>b=flat-ext</code>. This presumes the existence of a background image file named <code>b-flat-ext.webp</code>.</p>
 
 <p>The set background will remain the active background until changed by a subsequent <code>b</code> or <code>r</code> tag.</p>
 
@@ -196,13 +196,13 @@ s=concierge1;e:concierge1=happy
 
 <h2>(s)peaker</h2>
 
-<p><code>s</code> accepts zero or one argument, defining the active speaker like <code>s=jake</code> if ther is one, or setting the speaker to no one like <code>s=</code> or <code>s=none</code>.</p>
+<p><code>s</code> accepts zero or one argument, defining the active speaker like <code>s=jake</code> if there is one, or setting the speaker to no one like <code>s=</code> or <code>s=none</code>.</p>
 
 <p>When a character is speaking, they'll appear on-screen. Where they appear depends on if they're already on-screen as a <code>c</code> tag argument. If they are already part of that set of on-screen characters, they'll appear speaking as they are, whichever slot <code>c</code> has positioned them in. If they aren't already on-screen though, they'll appear in the lower-left corner speaker box.</p>
 
 <p>When a character is speaking, their associated image file will have a suffix like <code>-s</code> or <code>-s2</code> or <code>-s3</code>. This combines with the above three tags to form full file names like <code>c-belmonte-aold-xcapeless-xlongjaw-eserious-s.webp</code>. As you can see, these files can get quite long all put together, which is why it's useful to have these four tags all settable separately, and leave the actual specific file name construction to the Pulpifier, rather than having to set a full file name for each sprite update to any of the character characteristics.</p>
 
-<p>The <code>-s</code>, <code>-s2</code>, and <code>-s3</code> thing is from a feature of the Pulpifier whereby if a character speaks for multiple lines without changing their expression, the displayed sprite image file will swap between different speaker variations, such that you don't have the same static image file across large swathes of dialogue. Visually, while a character is speaking, it's nice to have their sprite change with each line, even if only slightly, so as to indicate the active speaker status.</p>
+<p>The <code>-s</code>, <code>-s2</code>, and <code>-s3</code> thing is from a feature of the Pulpifier whereby if a character speaks for multiple slides without changing their expression, the displayed sprite image file will swap between different speaker variations, such that you don't have the same static image file across large swathes of dialogue. Visually, while a character is speaking, it's nice to have their sprite change with each slide, even if only slightly, so as to indicate the active speaker status.</p>
 
 <p>The pattern for the speaker suffix variations is the following sequence: <code>-s</code> to <code>-s2</code> to <code>-s</code> to <code>-s2</code> to <code>-s3</code> to <code>-s</code> to <code>-s3</code> to <code>-s2</code>. And then it repeats.</p>
 
@@ -235,8 +235,8 @@ t=henry
 
 <ul>
 <li><code>margin</code>: Causes the text display to have padding on either side, as a sort of quasi-blockqoute effect.</li>
-<li><code>joined</code>: Causes text from the current line to feed into the next line.</li>
-<li><code>nospace</code>: Causes text from the current line to not have an automatic space appended onto it when building the next line.</li>
+<li><code>joined</code>: Causes text from the current text line to feed into the next slide.</li>
+<li><code>nospace</code>: Causes text from the current text line to not have an automatic space appended onto it when building the next slide.</li>
 </ul>
 
 <h2>(h)eader</h2>
@@ -277,7 +277,7 @@ We watched her cross the street.
 
 <p>Note how the pulp text lines don't end in spaces, even though in the original text, there are spaces between sentences. The Pulpifier inserts spaces automatically when building up the comparison string to make sure that the overall text is identical.</p>
 
-<p>Also note how the second pulp text line has multiple sentences still together. It's perfectly acceptable for a single line to have multiple sentences, and in that case they stay spaced the same. The only thing that isn't acceptable is inserting line breaks in-between sentences, like putting a break between "Frances Clyne was coming toward" and "us from across the street." — this would cause a parsing error. (However, the Pulpifier does allow splitting of sentences by characters such as em dashes, semicolons, colons, and even commas. Generally, this is undesirable — it's preferable to not split up single sentences in this way — but sometimes it can be unavoidable from a presentation perspective, and so if a split does need to happen, it should at least happen with the grammar.)</p>
+<p>Also note how the second slide's pulp text line has multiple sentences still together. It's perfectly acceptable for a single line to have multiple sentences, and in that case they stay spaced the same. The only thing that isn't acceptable is inserting line breaks in-between sentences, like putting a break between "Frances Clyne was coming toward" and "us from across the street." — this would cause a parsing error. (However, the Pulpifier does allow splitting of sentences by characters such as em dashes, semicolons, colons, and even commas. Generally, this is undesirable — it's preferable to not split up single sentences in this way — but sometimes it can be unavoidable from a presentation perspective, and so if a split does need to happen, it should at least happen with the grammar.)</p>
 
 <h2 id="quote-handling">Quote Handling</h2>
 
@@ -310,7 +310,7 @@ e:frances=happy
 “So now he’s going out and get some new material. Well, I hope he gets something frightfully interesting.”
 </pre>
 
-<p>Note how while in the original text, the dialogue had only two opening quotes and no closing quotes, the pulp text has a opening and closing quote on each line. This is a necessary change in order to accomodate the visual novel format in a way that isn't confusing. Since we can't see the full dialogue all at once, we can't really follow the same literary quotation rules as books do. Otherwise we'd end up with lines with no quotes around them, even though they're dialogue.</p>
+<p>Note how while in the original text, the dialogue had only two opening quotes and no closing quotes, the pulp text has a opening and closing quote on each text line. This is a necessary change in order to accommodate the visual novel format in a way that isn't confusing. Since we can't see the full dialogue all at once, we can't really follow the same literary quotation rules as books do. Otherwise we'd end up with lines with no quotes around them, even though they're dialogue.</p>
 
 <p>In a book format, putting quotes around each individual line would change the effective speaker, since at that point the reader would interpret the dialogue as switching back-and-forth. In a visual novel though, this isn't a problem, because the speaker always appears with their name and sprite on-screen while talking — there's never any ambiguity. Therefore, adding additional quotes should never change the effective reading experience.</p>
 
@@ -331,7 +331,7 @@ s=brett;e:brett=happy
 
 <h2>Html Handling</h2>
 
-<p>Generally, most pulp lines don't need any particular custom html handling. The Pulpifier automatically converts *italics* and **uppercase** and ## Headers all to their appropriate html.</p>
+<p>Generally, most text lines don't need any particular custom html handling. The Pulpifier automatically converts *italics* and **uppercase** and ## Headers all to their appropriate html.</p>
 
 <p>However, custom html is supported in the form of adding spans with class names as-needed for special cases. For example, the following pulp text is valid:</p>
 
@@ -346,7 +346,7 @@ It had been forwarded from Paris:
 
 <h2>Editor's Notes</h2>
 
-<p>Lastly, pulp lines can contain "Editor's Notes" formatted like:</p>
+<p>Lastly, text lines can contain "Editor's Notes" formatted like:</p>
 
 <pre>
 “I reverse the order. For Bryan’s sake. As a tribute to the Great Commoner. First the chicken; then the egg.”&lt;e&gt;Based William Jennings Bryan reference.&lt;/e&gt;
