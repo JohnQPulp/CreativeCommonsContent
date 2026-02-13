@@ -219,48 +219,138 @@ t=henry
 
 <h2>(z)oom</h2>
 
-<p></p>
+<p><code>z</code> accepts a name and then one or three additional arguments like <code>z:swordguy=97</code> or <code>z:critic=90,49,5</code>. The first number is either case represents the character's zoom level — how large they should appear on-screen, where 100 is the default. Since all character sprites are the same size — 1376x768 pixels — this sizing metadata is necessary for changing the effective height of characters to appropriate relative levels. The latter two numeric arguments represent the horizontal and vertical positioning of the character when in the speaker box.</p>
 
 <h2>(v)iew</h2>
 
-<p></p>
+<p><code>v</code> sets the horizontal spacing and vertical sizing of characters while on-screen like <code>v=90,125</code>. Both values again default to 100, where lowering the first value squeezes characters closer together and raising the first value moves them further apart. Lowering the second value decreases the size of sprites and raising it increases their size.</p>
 
 <h2>(f)ilter</h2>
 
-<p></p>
+<p><code>f</code> is a tag that can be applied to either a character (e.g., <code>f:c:jake=blur(5px)</code>) or a background (e.g., <code>f:b:flat-ext=brightness(85%)</code>) to set a css filter on that character's sprites or the background image.</p>
 
 <h2>(m)odifier</h2>
 
-<p></p>
+<p><code>m</code> is a tag that allows the activation/deactivation of various parsing modifiers. For example, setting <code>m=</code> disables all modifiers (the default) and setting <code>m=joined;m=margin</code> enables the joined and margin modifiers. The available modifiers are:</p>
+
+<ul>
+<li><code>margin</code>: Causes the text display to have padding on either side, as a sort of quasi-blockqoute effect.</li>
+<li><code>joined</code>: Causes text from the current line to feed into the next line.</li>
+<li><code>nospace</code>: Causes text from the current line to not have an automatic space appended onto it when building the next line.</li>
+</ul>
 
 <h2>(h)eader</h2>
 
-<p></p>
+<p><code>h</code> is a tag similar to <code>m</code> in that it changes parsing behavior. However, unlike <code>m</code>, headers are meant to only be set once, at the beginning of the visual novel, and then don't ever change. Currently there's only one header:</p>
+
+<ul>
+<li><code>no-speaker-counter</code>: Causes speaker sprites to not swap between <code>-s2</code> and <code>-s3</code> variations.</li>
+</ul>
 
 <h2>(r)eset</h2>
 
-<p></p>
+<p><code>r</code> is a tag that is used the same way as background, accepting exactly one background image argument (e.g., <code>r=flat-ext</code>), but which also has a host of other effects. Essentially, <code>r</code> is for cleaning the slate of most of the above tags, setting them back to their default, making it easier to keep track of what is and isn't active when starting a new chapter or scene.</p>
+
+<p>The only tags that <code>r</code> doesn't reset are the three permanent ones: <code>n</code>, <code>h</code>, and <code>z</code>; and then also the <code>a</code> tag, since while we don't expect a character's expression to persist between scenes, their current age generally should.</p>
 
 <h1>The Text Lines</h1>
 
-<p></p>
-
-<h2>Line Formats</h2>
-
-<p></p>
+<p>Like the metadata lines, the text lines occupy every third line of the <code>pulp.txt</code> file format (though the 3N+1 lines instead of the 3N+2 lines). Text lines are never blank, but always have some text in them representing what should be on-screen for the current slide of the VN. The Pulpifier expects that the text on these lines adds up to exactly match the text of the original <code>book.txt</code> file, with a few important rules on how the "adding up" works.</p>
 
 <h2 id="line-break-rules">Line Break Rules</h2>
 
-<p></p>
+<p>Given an original book text paragraph like:</p>
+
+<pre>Frances Clyne was coming toward us from across the street. She was a very tall girl who walked with a great deal of movement. She waved and smiled. We watched her cross the street.</pre>
+
+<p>The <code>pulp.txt</code> file can choose to leave the text exactly as-is, or break it up into smaller chunks via sentence breaks e.g.:</p>
+
+<pre>
+Frances Clyne was coming toward us from across the street.
+
+
+She was a very tall girl who walked with a great deal of movement. She waved and smiled.
+e:frances=happy
+
+We watched her cross the street.
+</pre>
+
+<p>Note how the pulp text lines don't end in spaces, even though in the original text, there are spaces between sentences. The Pulpifier inserts spaces automatically when building up the comparison string to make sure that the overall text is identical.</p>
+
+<p>Also note how the second pulp text line has multiple sentences still together. It's perfectly acceptable for a single line to have multiple sentences, and in that case they stay spaced the same. The only thing that isn't acceptable is inserting line breaks in-between sentences, like putting a break between "Frances Clyne was coming toward" and "us from across the street." — this would cause a parsing error. (However, the Pulpifier does allow splitting of sentences by characters such as em dashes, semicolons, colons, and even commas. Generally, this is undesirable — it's preferable to not split up single sentences in this way — but sometimes it can be unavoidable from a presentation perspective, and so if a split does need to happen, it should at least happen with the grammar.)</p>
 
 <h2 id="quote-handling">Quote Handling</h2>
 
-<p></p>
+<p>When it comes to dialogue, things get slightly more complicated. Take for instance this book text:</p>
+
+<pre>
+“You mustn’t misunderstand, Jake, it was absolutely platonic with the secretary. Not even platonic. Nothing at all, really. It was just that she was so nice. And he did that just to please me. Well, I suppose that we that live by the sword shall perish by the sword. Isn’t that literary, though? You want to remember that for your next book, Robert.
+
+“You know Robert is going to get material for a new book. Aren’t you, Robert? That’s why he’s leaving me. He’s decided I don’t film well. You see, he was so busy all the time that we were living together, writing on this book, that he doesn’t remember anything about us. So now he’s going out and get some new material. Well, I hope he gets something frightfully interesting.
+</pre>
+
+<p>Split up in the pulp format, it looks like this:</p>
+
+<pre>
+“You mustn’t misunderstand, Jake, it was absolutely platonic with the secretary. Not even platonic. Nothing at all, really. It was just that she was so nice.”
+e:frances=smirking
+
+“And he did that just to please me. Well, I suppose that we that live by the sword shall perish by the sword.”
+e:frances=happy
+
+“Isn’t that literary, though? You want to remember that for your next book, Robert.”
+
+
+“You know Robert is going to get material for a new book. Aren’t you, Robert? That’s why he’s leaving me. He’s decided I don’t film well.”
+
+
+“You see, he was so busy all the time that we were living together, writing on this book, that he doesn’t remember anything about us.”
+
+
+“So now he’s going out and get some new material. Well, I hope he gets something frightfully interesting.”
+</pre>
+
+<p>Note how while in the original text, the dialogue had only two opening quotes and no closing quotes, the pulp text has a opening and closing quote on each line. This is a necessary change in order to accomodate the visual novel format in a way that isn't confusing. Since we can't see the full dialogue all at once, we can't really follow the same literary quotation rules as books do. Otherwise we'd end up with lines with no quotes around them, even though they're dialogue.</p>
+
+<p>In a book format, putting quotes around each individual line would change the effective speaker, since at that point the reader would interpret the dialogue as switching back-and-forth. In a visual novel though, this isn't a problem, because the speaker always appears with their name and sprite on-screen while talking — there's never any ambiguity. Therefore, adding additional quotes should never change the effective reading experience.</p>
+
+<p>It is still important to keep quotes around though, since they are necessary for lines with combined dialogue and non-dialogue parts e.g.:</p>
+
+<pre>
+“What’s his name?” asked Brett. “Veuve Cliquot?”
+s=brett
+
+“No,” said the count. “Mumms. He’s a baron.”
+s=count
+
+“Isn’t it wonderful,” said Brett. “We all have titles. Why haven’t you a title, Jake?”
+s=brett;e:brett=happy
+</pre>
+
+<p>The quotes here are still necessary for the reader to know what is and isn't being spoken. This is helped by bolding the text within the dialogue quotes, using the same font weight as the bold used for the speaker name text, so that it's visually obvious which parts are and aren't associated with the speaker.</p>
 
 <h2>Html Handling</h2>
 
-<p></p>
+<p>Generally, most pulp lines don't need any particular custom html handling. The Pulpifier automatically converts *italics* and **uppercase** and ## Headers all to their appropriate html.</p>
+
+<p>However, custom html is supported in the form of adding spans with class names as-needed for special cases. For example, the following pulp text is valid:</p>
+
+<pre>
+It had been forwarded from Paris:
+
+
+&lt;span class='uppercase'&gt;Could you come Hotel Montana Madrid am rather in trouble Brett.&lt;/span&gt;
+</pre>
+
+<p>The span html text is stripped from the text comparison with the original, such that it doesn't count as changing the text. Therefore, arbitrary css styling can be applied when needed.</p>
 
 <h2>Editor's Notes</h2>
 
-<p></p>
+<p>Lastly, pulp lines can contain "Editor's Notes" formatted like:</p>
+
+<pre>
+“I reverse the order. For Bryan’s sake. As a tribute to the Great Commoner. First the chicken; then the egg.”&lt;e&gt;Based William Jennings Bryan reference.&lt;/e&gt;
+s=bill
+</pre>
+
+<p>The Pulpifier automatically converts the custom e tags into span-html, and also removes the e tag text from the original text comparison. This allows arbitrary Editor's Note text (or even html, including scripts!) to be added, though the notes aren't visible by default.</p>
