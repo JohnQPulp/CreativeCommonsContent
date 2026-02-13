@@ -1,6 +1,6 @@
 <style>
-#b-right { background-image: url(/vn/TheSunAlsoRises/images/c-romero.webp),url(/vn/TheSunAlsoRises/images/c-author.webp); }
-#b-left { background-image: url(/vn/TheSunAlsoRises/images/c-author.webp),url(/vn/TheSunAlsoRises/images/c-romero-esmirking-s.webp); }
+#b-right { background-image: url(/vn/TheSunAlsoRises/images/c-romero.webp),url(/vn/TheSunAlsoRises/images/c-jake-esmirking-s.webp); }
+#b-left { background-image: url(/vn/TheSunAlsoRises/images/c-jake.webp),url(/vn/TheSunAlsoRises/images/c-romero-esmirking-s.webp); }
 #b-right.ed { background-image: url(/vn/TheSunAlsoRises/images/c-romero-xblack-xcapeless-ehappy-s.webp),url(/vn/TheSunAlsoRises/images/c-author-abased.webp); }
 #b-left.ed { background-image: url(/vn/TheSunAlsoRises/images/c-author-abased.webp),url(/vn/TheSunAlsoRises/images/c-romero-xblack-eserious.webp); }
 </style>
@@ -170,7 +170,7 @@ s=concierge1;e:concierge1=happy
 
 <h2>(c)haracters</h2>
 
-<p><code>c</code> accepts zero-to-five arguments, establishing which all characters are on-screen. If for example you set <code>c=jake</code>, then the VN will display the <code>c-jake.webp</code> sprite centered horizontally on top of the background.</p>
+<p><code>c</code> accepts zero-to-five arguments, establishing which all characters are on-screen, using previously declared character identifiers. If for example you set <code>c=jake</code>, then the VN will display the <code>c-jake.webp</code> sprite centered horizontally on top of the background.</p>
 
 <p>Providing zero arguments like <code>c=</code> removes all on-screen characters.</p>
 
@@ -182,23 +182,40 @@ s=concierge1;e:concierge1=happy
 
 <h2>(e)xpression</h2>
 
-<p></p>
+<p><code>e</code> accepts a required <code>name</code> argument (a previously declared character identifier) and an expression/emotion string e.g., <code>e:jake=happy</code>. This tells the VN to use the <code>c-jake-ehappy.webp</code> sprite when that character is on-screen. The expression state remains active on that character until changed.</p>
+
+<p>A character can be reset to their neutral state (e.g., <code>c-jake.webp</code>) by setting either <code>e:jake=</code> with no value or <code>e:jake=neutral</code> using the special <code>neutral</code> keyword value.</p>
 
 <h2>(a)ge</h2>
 
-<p></p>
+<p><code>a</code> works similarly to <code>e</code>, but acts as another dimension by which to set character traits. Also accepting an identifier and string like <code>a:robert=old</code>, this instructs the VN to use image files like <code>c-robert-aold.webp</code>; or, when combined with an active expression, like <code>c-robert-aold-eweary.webp</code>. (It can also be reset by setting <code>a:robert=</code>.)</p>
 
 <h2>e(x)tras</h2>
 
-<p></p>
+<p><code>x</code> works similarly to <code>e</code> and <code>a</code>, acting as a third dimension by which to set character traits. It accepts an identifier and zero or more extra modifiers like <code>x:belmonte=longjaw,capeless</code>, instructing the VN to use the sprite <code>c-belmonte-xcapeless-xlongjaw.webp</code> (note the alphabet sorting for different extra attributes). It combines with the other two above tags to form full sprite names like <code>c-belmonte-aold-xcapeless-xlongjaw-eserious.webp</code>. (<code>x</code> can also be reset by setting <code>x:belmonte=</code>.)</p>
 
 <h2>(s)peaker</h2>
 
-<p></p>
+<p><code>s</code> accepts zero or one argument, defining the active speaker like <code>s=jake</code> if ther is one, or setting the speaker to no one like <code>s=</code> or <code>s=none</code>.</p>
+
+<p>When a character is speaking, they'll appear on-screen. Where they appear depends on if they're already on-screen as a <code>c</code> tag argument. If they are already part of that set of on-screen characters, they'll appear speaking as they are, whichever slot <code>c</code> has positioned them in. If they aren't already on-screen though, they'll appear in the lower-left corner speaker box.</p>
+
+<p>When a character is speaking, their associated image file will have a suffix like <code>-s</code> or <code>-s2</code> or <code>-s3</code>. This combines with the above three tags to form full file names like <code>c-belmonte-aold-xcapeless-xlongjaw-eserious-s.webp</code>. As you can see, these files can get quite long all put together, which is why it's useful to have these four tags all settable separately, and leave the actual specific file name construction to the Pulpifier, rather than having to set a full file name for each sprite update to any of the character characteristics.</p>
+
+<p>The <code>-s</code>, <code>-s2</code>, and <code>-s3</code> thing is from a feature of the Pulpifier whereby if a character speaks for multiple lines without changing their expression, the displayed sprite image file will swap between different speaker variations, such that you don't have the same static image file across large swathes of dialogue. Visually, while a character is speaking, it's nice to have their sprite change with each line, even if only slightly, so as to indicate the active speaker status.</p>
+
+<p>The pattern for the speaker suffix variations is the following sequence: <code>-s</code> to <code>-s2</code> to <code>-s</code> to <code>-s2</code> to <code>-s3</code> to <code>-s</code> to <code>-s3</code> to <code>-s2</code>. And then it repeats.</p>
 
 <h2>(t)hinker</h2>
 
-<p></p>
+<p><code>t</code> is similar to <code>s</code> in its format (e.g., <code>t=jake</code>) and that it puts characters in the speaker box if not on-screen. However, unlike <code>s</code>, that's all <code>t</code> does — it doesn't also update their status/file to be speaking. <code>t</code> is therefore mainly used for the cases where an author says that a character is thinking something, but does so while still using dialogue-type quotes e.g.:</p>
+
+<pre>
+"The most human of all human traits is inconsistency," he thought.
+t=henry
+</pre>
+
+<p>Both <code>s</code> and <code>t</code> while active cause the character's name to appear on-screen as e.g., "Henry" and "Henry (thinking)" respectively. Also, text without quotes is bolded while either tag is active, to make it visually easier to tell the dialogue from non-dialogue.</p>
 
 <h2>(z)oom</h2>
 
