@@ -146,6 +146,8 @@ s=concierge1;e:concierge1=happy
 
 <p><code>k</code> is the tag key, a single-letter identifier for which tag is being set e.g., <code>b</code> for background or <code>c</code> for characters. Some tags like background accept a single value argument (you can only set one background at-a-time), whereas others like characters can accept one or many or even zero (e.g., <code>c=belmonte,romero,marcial</code> sets three characters to be on-screen at once).</p>
 
+<p class='ed'>Why are tag keys limited to only one character, you ask? Well, that's a good question. Anyway…</p>
+
 <p>Some tags like <code>e</code> (expression) take a required <code>name</code> parameter as the first argument, written like <code>e:romero=happy</code>. These name-requiring parameters tags can also set multiple values, like the <code>z</code> (zoom) tag for setting character sprite positioning metadata e.g., <code>z:hubertfather=94,49,3</code>. Functionally, there isn't really difference between the name-requiring and non-name-requiring tags except insofar as how they're written. Theoretically the format could instead be <code>e=romero,happy</code> and <code>z=hubertfather,94,49,3</code>, and they'd still just be tags accepting arguments like the others, but having the names be a visually distinct first parameter helps improve readability.</p>
 
 <p>Metadata lines are made up of sets of metadata tags, ranging from zero to many per line, separated by semicolons. A valid metadata line might be completely blank, or it might have lots of delimited tags like:</p>
@@ -175,6 +177,8 @@ s=concierge1;e:concierge1=happy
 <p>Providing zero arguments like <code>c=</code> removes all on-screen characters.</p>
 
 <p>Providing more than one argument like <code>c=jake,brett</code> positions characters using a slot system where, given N arguments, the character in slot X is positioned at X/(N+1) of the way horizontally on the screen. In this case, <code>jake</code> in slot 1 is positioned at the 1/3 horizontal position, and <code>brett</code> in slot 2 is set at the 2/3 position. With five slots, any fractional position up to denominator of 6 is allowed. It's even possible to leave slots empty like <code>c=,,brett</code>, which puts <code>brett</code> at the 3/4 position, leaving the 1/4 and 2/4 positions unfilled. In this way, along with the <code>v</code> tag, the positioning of on-screen characters can be controlled.</p>
+
+<p class='ed'>Now you might think this scheme of combining the character on-screen status and positioning metadata into one tag with "blank slots" is utterly confusing and stupid.</span>
 
 <h2>(o)bject</h2>
 
@@ -255,7 +259,9 @@ t=henry
 
 <h1>The Text Lines</h1>
 
-<p>Like the metadata lines, the text lines occupy every third line of the <code>pulp.txt</code> file format (though the 3N+1 lines instead of the 3N+2 lines). Text lines are never blank, but always have some text in them representing what should be on-screen for the current slide of the VN. The Pulpifier expects that the text on these lines adds up to exactly match the text of the original <code>book.txt</code> file, with a few important rules on how the "adding up" works.</p>
+<p>The text lines are the other half of the <code>pulp.txt</code> format in the overall "Text Line → Metadata Line → Blank Line" slide 3-cycle.</p>
+
+<p>Text lines are never blank, but always have some text in them representing what should be on-screen for the current slide of the VN. The Pulpifier expects that the text on these lines adds up to exactly match the text of the original <code>book.txt</code> file, with a few important rules on how the "adding up" works.</p>
 
 <h2 id="line-break-rules">Line Break Rules</h2>
 
@@ -312,9 +318,11 @@ e:frances=happy
 
 <p>Note how while in the original text, the dialogue had only two opening quotes and no closing quotes, the pulp text has a opening and closing quote on each text line. This is a necessary change in order to accommodate the visual novel format in a way that isn't confusing. Since we can't see the full dialogue all at once, we can't really follow the same literary quotation rules as books do. Otherwise we'd end up with lines with no quotes around them, even though they're dialogue.</p>
 
-<p>In a book format, putting quotes around each individual line would change the effective speaker, since at that point the reader would interpret the dialogue as switching back-and-forth. In a visual novel though, this isn't a problem, because the speaker always appears with their name and sprite on-screen while talking — there's never any ambiguity. Therefore, adding additional quotes should never change the effective reading experience.</p>
+<p class='ed'>On the topic, I'll just voice my opinion and say: the way literature handles dialogue spanning multiple paragraphs? Really dumb. But hey, all the more opportunity for visual novels to be superior.</p>
 
-<p>It is still important to keep quotes around though, since they are necessary for lines with combined dialogue and non-dialogue parts e.g.:</p>
+<p>In a book format, putting quotes around each individual line would change the effective speaker, since at that point the reader would interpret the dialogue as switching back-and-forth. In a visual novel though, this isn't a problem, because the speaker always appears with their name and sprite on-screen while talking — there's never any ambiguity. Therefore, adding additional quotes should never change the effective reading experience. The Pulpifier is also smart enough to know how to merge the extra quotes when rebuilding paragraphs for the comparison, and performs additional checks per each pulp text line to make sure the opening and closing quotes match.</p>
+
+<p>The reason we care to still keep around quotes at all is that they're still needed for lines with combined dialogue and non-dialogue parts e.g.:</p>
 
 <pre>
 “What’s his name?” asked Brett. “Veuve Cliquot?”
