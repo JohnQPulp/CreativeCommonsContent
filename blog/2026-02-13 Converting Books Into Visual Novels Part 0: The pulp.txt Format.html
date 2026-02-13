@@ -127,11 +127,11 @@ s=concierge1;e:concierge1=happy
 <ul>
 <li><code>n:concierge1=Concierge</code> uses the (n)ame tag to define a new character with the ID <code>concierge1</code> with the user-displayed name of "Conierge".</li>
 <li><code>c=concierge</code> uses the (c)haracter tag to set <code>concierge1</code> as the on-screen character.</li>
-<li><code>e:concierge1=happy</code> uses the (e)motion tag to set <code>concierge1</code>'s state to <code>happy</code>, such that while on-screen, her appearance will use her "happy" sprite set.</li>
+<li><code>e:concierge1=happy</code> uses the (e)xpression tag to set <code>concierge1</code>'s state to <code>happy</code>, such that while on-screen, her appearance will use her "happy" sprite set.</li>
 </ul>
 </li>
 <li><code>s=concierge1</code> uses the (s)peaker tag to set the speaker to <code>concierge1</code>. During this line, her name will appear on-screen as the speaker and her character will use a speaking sprite (<code>c-concierge-ehappy-s.webp</code>, taking into account the previous line).</li>
-<li><code>s=jake</code> updates the speaker to <code>jake</code>, a character defined in a previous chapter (who therefore doesn't need to be redefined). Since his character isn't on-screen, he'll appear in the lower-left corner "speaker box", where he can be seen in his neutral speaking expression, since no specific emotion was set.</li>
+<li><code>s=jake</code> updates the speaker to <code>jake</code>, a character defined in a previous chapter (who therefore doesn't need to be redefined). Since his character isn't on-screen, he'll appear in the lower-left corner "speaker box", where he can be seen in his neutral speaking expression, since no specific expression was set.</li>
 </ul>
 
 <p>All together, you can see how the relatively simple metadata annotations of the <code>pulp.txt</code> file can fully control the appearance of the book's visual novel.</p>
@@ -140,25 +140,47 @@ s=concierge1;e:concierge1=happy
 
 <p>So jumping off from this example, let's go through each <code>pulp.txt</code> metadata tag in detail:</p>
 
-<h1>The Tags</h1>
+<h1>The Metadata Tag Lines</h1>
+
+<p>The overall format for the metadata tags is <code>k=value</code> or <code>k:name=value</code> or <code>k=val1,val2,…,valN</code> or <code>k:name=val1,val2,…,valN</code>.</p>
+
+<p><code>k</code> is the tag key, a single-letter identifier for which tag is being set e.g., <code>b</code> for background or <code>c</code> for characters. Some tags like background accept a single value argument (you can only set one background at-a-time), whereas others like characters can accept one or many or even zero (e.g., <code>c=belmonte,romero,marcial</code> sets three characters to be on-screen at once).</p>
+
+<p>Some tags like <code>e</code> (expression) take a required <code>name</code> parameter as the first argument, written like <code>e:romero=happy</code>. These name-requiring parameters tags can also set multiple values, like the <code>z</code> (zoom) tag for setting character sprite positioning metadata e.g., <code>z:hubertfather=94,49,3</code>. Functionally, there isn't really difference between the name-requiring and non-name-requiring tags except insofar as how they're written. Theoretically the format could instead be <code>e=romero,happy</code> and <code>z=hubertfather,94,49,3</code>, and they'd still just be tags accepting arguments like the others, but having the names be a visually distinct first parameter helps improve readability.</p>
+
+<p>Metadata lines are made up of sets of metadata tags, ranging from zero to many per line, separated by semicolons. A valid metadata line might be completely blank, or it might have lots of delimited tags like:</p>
+
+<pre>s=bill;e:bill=;c=bill;v=100,115;z:bill=103</pre>
+
+<p>The tags are read left-to-right, and processed in that order, so if for whatever reason a metadata line sets the same tag twice like <code>s=bill;s=jake</code>, it's the second value that wins out. (Though there isn't any reason to do this in practice, and I might change it to just be a parsing error later on.)</p>
+
+<p>Now let's go through all the individual tags and explain how they work and how they relate to each other and the text lines:</p>
 
 <h2>(b)ackground</h2>
 
-<p></p>
+<p><code>b</code> accepts exactly one argument, setting the background like <code>b=flat-ext</code>. This presumes the existance of a background image file named <code>b-flat-ext.webp</code>.</p>
+
+<p>The set background will remain the active background until changed by a subsequent <code>b</code> or <code>r</code> tag.</p>
 
 <h2>(n)ame</h2>
 
-<p></p>
+<p><code>n</code> accepts two arguments, a character identifier and a display name e.g., <code>n:mike=Michael Campbell</code>. This acts as the declaration of a new character, allowing the identifier to be used in subsequent tags. (Which otherwise throw undeclared identifier errors.)</p>
+
+<p>An identifier cannot be undeclared, but the display name can be changed over time, if for example a character's name is revealed in stages. You might have the display start off as <code>n:jake=?</code> for an unnamed character, then switch to <code>n:jake=Jake</code> once you learn their first name, and then finally <code>n:jake=Jake Barnes</code>.</p>
 
 <h2>(c)haracters</h2>
 
-<p></p>
+<p><code>c</code> accepts zero-to-five arguments, establishing which all characters are on-screen. If for example you set <code>c=jake</code>, then the VN will display the <code>c-jake.webp</code> sprite centered horizontally on top of the background.</p>
+
+<p>Providing zero arguments like <code>c=</code> removes all on-screen characters.</p>
+
+<p>Providing more than one argument like <code>c=jake,brett</code> positions characters using a slot system where, given N arguments, the character in slot X is positioned at X/(N+1) of the way horizontally on the screen. In this case, <code>jake</code> in slot 1 is positioned at the 1/3 horizontal position, and <code>brett</code> in slot 2 is set at the 2/3 position. With five slots, any fractional position up to denominator of 6 is allowed. It's even possible to leave slots empty like <code>c=,,brett</code>, which puts <code>brett</code> at the 3/4 position, leaving the 1/4 and 2/4 positions unfilled. In this way, along with the <code>v</code> tag, the positioning of on-screen characters can be controlled.</p>
 
 <h2>(o)bject</h2>
 
-<p></p>
+<p><code>o</code> accepts zero or one arguments, placing an object sprite on screen like <code>o=trout</code> for <code>o-trout.webp</code>. Unlike backgrounds, objects don't cover the whole screen, but sit, horizontally centered, on top of both the background and characters. Like with backgrounds, they stay on-screen until another <code>o</code> tag is set, either switching to a different object, or removing any object via <code>o=</code>.</p>
 
-<h2>(e)motion</h2>
+<h2>(e)xpression</h2>
 
 <p></p>
 
@@ -202,7 +224,7 @@ s=concierge1;e:concierge1=happy
 
 <p></p>
 
-<h1>The Parsing</h1>
+<h1>The Text Lines</h1>
 
 <p></p>
 
