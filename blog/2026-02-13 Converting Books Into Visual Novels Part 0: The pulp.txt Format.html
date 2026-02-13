@@ -1,0 +1,227 @@
+<style>
+#b-right { background-image: url(/vn/TheSunAlsoRises/images/c-romero.webp),url(/vn/TheSunAlsoRises/images/c-author.webp); }
+#b-left { background-image: url(/vn/TheSunAlsoRises/images/c-author.webp),url(/vn/TheSunAlsoRises/images/c-romero-esmirking-s.webp); }
+#b-right.ed { background-image: url(/vn/TheSunAlsoRises/images/c-romero-xblack-xcapeless-ehappy-s.webp),url(/vn/TheSunAlsoRises/images/c-author-abased.webp); }
+#b-left.ed { background-image: url(/vn/TheSunAlsoRises/images/c-author-abased.webp),url(/vn/TheSunAlsoRises/images/c-romero-xblack-eserious.webp); }
+</style>
+
+<p>This will be the first in a series of posts explaining my processes for how I convert books into visual novels.</p>
+
+<p>The post date above represents the publication date of this entry's first draft, but I intend the posts of this series to all be living documents, continually updated over time as I figure out better and more efficient techniques, both on the manual and automation side of things.</p>
+
+<p>For this first entry, I'll go into not the processes themselves, but the prerequisite for understanding them: the <code>pulp.txt</code> file, the "code" underlying each visual novel.</p>
+
+<img alt="Example Visual Novel Github repo" src="/images/github.webp" />
+
+<p>Each visual novel repo contains a <code>pulp.txt</code> file and a <code>book.txt</code> file, which are together consumed by the <a href="https://github.com/JohnQPulp/Pulpifier">Pulpifier</a> in order to build the VN-formatted html output.</p>
+
+<p>The <code>book.txt</code> is essentially just the original text of the book, the output of pandoc-converting a Standard Ebooks .epub into a .txt file. (Using the <code>gfm-raw_html</code> target format, along with some other flags, and also some manual cleanup, that I'll all describe in more detail in the next part.)</p>
+
+<p>Here's a <code>book.txt</code> example snippet:</p>
+
+<pre>
+### VII
+
+As I started up the stairs the concierge knocked on the glass of the door of her lodge, and as I stopped she came out. She had some letters and a telegram.
+
+“Here is the post. And there was a lady here to see you.”
+
+“Did she leave a card?”
+
+“No. She was with a gentleman. It was the one who was here last night. In the end I find she is very nice.”
+
+“Was she with a friend of mine?”
+
+“I don’t know. He was never here before. He was very large. Very, very large. She was very nice. Very, very nice. Last night she was, perhaps, a little﻿—” She put her head on one hand and rocked it up and down. “I’ll speak perfectly frankly, Monsieur Barnes. Last night I found her not so *gentille*. Last night I formed another idea of her. But listen to what I tell you. She is *très, très gentille*. She is of very good family. It is a thing you can see.”
+
+“They did not leave any word?”
+
+“Yes. They said they would be back in an hour.”
+
+“Send them up when they come.”
+
+“Yes, Monsieur Barnes. And that lady, that lady there is someone. An eccentric, perhaps, but *quelqu’une, quelqu’une*!”
+</pre>
+
+<p>The main features to note are that:</p>
+
+<ul>
+<li>The file alternates between text lines and blank lines.</li>
+<li>Each text line represents one paragraph.</li>
+<li>Raw markdown symbols are included, such as <code>*italics*</code> and <code>## Headings</code>.</li>
+</ul>
+
+<p>The <code>book.txt</code> file is the reference file — the source of truth that the Pulpifier compares the <code>pulp.txt</code> file against. The corresponding <code>pulp.txt</code> snippet for this chunk is:</p>
+
+<pre>
+### VII
+r=title
+
+As I started up the stairs the concierge knocked on the glass of the door of her lodge, and as I stopped she came out.
+b=flat-concierge-int
+
+She had some letters and a telegram.
+n:concierge1=Concierge;c=concierge1;e:concierge1=happy
+
+“Here is the post. And there was a lady here to see you.”
+s=concierge1
+
+“Did she leave a card?”
+s=jake
+
+“No. She was with a gentleman. It was the one who was here last night. In the end I find she is very nice.”
+s=concierge1;e:concierge1=happy
+
+“Was she with a friend of mine?”
+s=jake
+
+“I don’t know. He was never here before. He was very large. Very, very large.”
+s=concierge1
+
+“She was very nice. Very, very nice.”
+
+
+“Last night she was, perhaps, a little—”
+e:concierge1=thinking
+
+She put her head on one hand and rocked it up and down.
+s=none;c=
+
+“I’ll speak perfectly frankly, Monsieur Barnes. Last night I found her not so *gentille*. Last night I formed another idea of her.”
+s=concierge1;e:concierge1=serious;c=concierge1
+
+“But listen to what I tell you. She is *très, très gentille*. She is of very good family. It is a thing you can see.”
+e:concierge1=happy
+
+“They did not leave any word?”
+s=jake;e:jake=contemplative
+
+“Yes. They said they would be back in an hour.”
+s=concierge1
+
+“Send them up when they come.”
+s=jake
+
+“Yes, Monsieur Barnes. And that lady, that lady there is someone. An eccentric, perhaps, but *quelqu’une, quelqu’une*!”
+s=concierge1;e:concierge1=happy
+</pre>
+
+<p>Note how the <code>pulp.txt</code> file:</p>
+
+<ul>
+<li>Alternates text line, metadata line, blank line; repeat. So a 3-cycle instead of <code>book.txt</code>'s 2-cycle.</li>
+<li>Contains the exact<a href="#quote-handling">*</a> same text content, including the same markdown, as <code>book.txt</code>. (One of the functions of the Pulpifier is to check the combined text contents of <code>pulp.txt</code> against <code>book.txt</code> to make sure no transcription or editing mistakes accidentally changed the original text.)</li>
+<li>Contains more lines than the original <code>book.txt</code>, despite containing the same overall text. For while <code>book.txt</code>'s lines represent whole paragraphs, <code>pulp.txt</code>'s lines represent individual slides of the visual novel. Thus, for visual presentation purposes, we want long paragraphs split up.</li>
+</ul>
+
+<p>The text lines and their associated metadata define all aspects of the visual novel's presentation. In this case, one example slide looks like this:</p>
+
+<img alt="Visual novel example slide" src="/images/slide.webp" />
+
+<p>This fifth line of the example snippet can be explained as a combination of the text of that particular line along with its line metadata and the 4 lines of metadata before it. Walking through this specific example will help give a high-level overview of how the <code>pulp.txt</code> format with its metadata tags works, before going into the specific documentation of each tag.</p>
+
+<ul>
+<li>The first line's <code>r=title</code> uses the (r)eset tag to reset most metadata to its default state. This is important because certain metadata carries over from line-to-line, and so you'll usually see the resets at the beginning of each chapter, as those act as clear refresh points. The <code>=title</code> part is the tag telling the VN to use the title-card background for the chapter header line.</li>
+<li>The second line's <code>b=flat-concierge-int</code> uses the (b)ackground tag to set the VN to the interior flat lobby background. (r)eset and (b)ackground both set a background, but (b)ackground only sets the background — it doesn't affect any other metadata. Either way, once the background has been set, it stays with that background until changed again. So since none of the subsequent lines change the background, it's that same background that the 5th line will end up using.</li>
+<li>The third line's <code>n:concierge1=Concierge;c=concierge1;e:concierge1=happy</code> uses three new tags (separated by semicolons, which act as the tags' dividors) to do the following things:
+<ul>
+<li><code>n:concierge1=Concierge</code> uses the (n)ame tag to define a new character with the ID <code>concierge1</code> with the user-displayed name of "Conierge".</li>
+<li><code>c=concierge</code> uses the (c)haracter tag to set <code>concierge1</code> as the on-screen character.</li>
+<li><code>e:concierge1=happy</code> uses the (e)motion tag to set <code>concierge1</code>'s state to <code>happy</code>, such that while on-screen, her appearance will use her "happy" sprite set.</li>
+</ul>
+</li>
+<li><code>s=concierge1</code> uses the (s)peaker tag to set the speaker to <code>concierge1</code>. During this line, her name will appear on-screen as the speaker and her character will use a speaking sprite (<code>c-concierge-ehappy-s.webp</code>, taking into account the previous line).</li>
+<li><code>s=jake</code> updates the speaker to <code>jake</code>, a character defined in a previous chapter (who therefore doesn't need to be redefined). Since his character isn't on-screen, he'll appear in the lower-left corner "speaker box", where he can be seen in his neutral speaking expression, since no specific emotion was set.</li>
+</ul>
+
+<p>All together, you can see how the relatively simple metadata annotations of the <code>pulp.txt</code> file can fully control the appearance of the book's visual novel.</p>
+
+<p>And simplicity is the main goal of the format: text files are simple to read, simple to edit, simple to commit and diff, and simple to <i>generate</i>. (In subsequent parts, I'll discuss the role of LLMs in visual novel creation.)</p>
+
+<p>So jumping off from this example, let's go through each <code>pulp.txt</code> metadata tag in detail:</p>
+
+<h1>The Tags</h1>
+
+<h2>(b)ackground</h2>
+
+<p></p>
+
+<h2>(n)ame</h2>
+
+<p></p>
+
+<h2>(c)haracters</h2>
+
+<p></p>
+
+<h2>(o)bject</h2>
+
+<p></p>
+
+<h2>(e)motion</h2>
+
+<p></p>
+
+<h2>(a)ge</h2>
+
+<p></p>
+
+<h2>e(x)tras</h2>
+
+<p></p>
+
+<h2>(s)peaker</h2>
+
+<p></p>
+
+<h2>(t)hinker</h2>
+
+<p></p>
+
+<h2>(z)oom</h2>
+
+<p></p>
+
+<h2>(v)iew</h2>
+
+<p></p>
+
+<h2>(f)ilter</h2>
+
+<p></p>
+
+<h2>(m)odifier</h2>
+
+<p></p>
+
+<h2>(h)eader</h2>
+
+<p></p>
+
+<h2>(r)eset</h2>
+
+<p></p>
+
+<h1>The Parsing</h1>
+
+<p></p>
+
+<h2>Line Formats</h2>
+
+<p></p>
+
+<h2 id="line-break-rules">Line Break Rules</h2>
+
+<p></p>
+
+<h2 id="quote-handling">Quote Handling</h2>
+
+<p></p>
+
+<h2>Html Handling</h2>
+
+<p></p>
+
+<h2>Editor's Notes</h2>
+
+<p></p>
