@@ -123,7 +123,7 @@ s=concierge1;e:concierge1=happy
 <ul>
 <li>The first slide's <code>r=title</code> uses the (r)eset tag to reset most metadata to its default state. This is important because certain metadata carries over from slide-to-slide, and so you'll usually see the resets at the beginning of each chapter, as those act as clear refresh points. The <code>=title</code> part is the tag telling the VN to use the title-card background for the chapter header slide.</li>
 <li>The second slide's <code>b=flat-concierge-int</code> uses the (b)ackground tag to set the VN to the interior flat lobby background. (r)eset and (b)ackground both set a background, but (b)ackground only sets the background — it doesn't affect any other metadata. Either way, once the background has been set, it stays with that background until changed again. So since none of the subsequent slides change the background, it's that same background that the 5th slide will end up using.</li>
-<li>The third slide's <code>n:concierge1=Concierge;c=concierge1;e:concierge1=happy</code> uses three new tags (separated by semicolons, which act as the tags' dividors) to do the following things:
+<li>The third slide's <code>n:concierge1=Concierge;c=concierge1;e:concierge1=happy</code> uses three new tags (separated by semicolons, which act as the tags' dividers) to do the following things:
 <ul>
 <li><code>n:concierge1=Concierge</code> uses the (n)ame tag to define a new character with the ID <code>concierge1</code> with the user-displayed name of "Concierge".</li>
 <li><code>c=concierge</code> uses the (c)haracter tag to set <code>concierge1</code> as the on-screen character.</li>
@@ -238,7 +238,7 @@ t=henry
 <p><code>m</code> is a tag that allows the activation/deactivation of various parsing modifiers. For example, setting <code>m=</code> disables all modifiers (the default) and setting <code>m=joined;m=margin</code> enables the joined and margin modifiers. The available modifiers are:</p>
 
 <ul>
-<li><code>margin</code>: Causes the text display to have padding on either side, as a sort of quasi-blockqoute effect.</li>
+<li><code>margin</code>: Causes the text display to have padding on either side, as a sort of quasi-blockquote effect.</li>
 <li><code>joined</code>: Causes text from the current text line to feed into the next slide.</li>
 <li><code>nospace</code>: Causes text from the current text line to not have an automatic space appended onto it when building the next slide.</li>
 </ul>
