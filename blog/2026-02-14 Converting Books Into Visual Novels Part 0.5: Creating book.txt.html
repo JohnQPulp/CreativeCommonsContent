@@ -39,6 +39,8 @@ This book is for **Hadley** and for **John Hadley Nicanor**
 Robert Cohn was once middleweight boxing champion of Princeton…
 </pre>
 
+<p class='ed'>That'll show you, Standard Ebooks, for trying to tell me not to do evil in your Uncopyright.</p>
+
 <p>That's what the final cleaned-up product looks like. However, there are several markdown shenanigans that can crop up in the pandoc conversion that need special handling. For instance, sometimes chapters generate with custom html annotations like:</p>
 
 <pre>
@@ -129,6 +131,8 @@ Rise from bed 6:00 a.m.&lt;br&gt;Dumbbell exercise and wall-scaling 6:15﻿–�
 
 General ResolvesNo wasting time at Shafters or [a name, indecipherable]&lt;br&gt;No more smokeing or chewing.&lt;br&gt;Bath every other day&lt;br&gt;Read one improving book or magazine per week&lt;br&gt;Save $5.00 [crossed out] $3.00 per week&lt;br&gt;Be better to parents
 </pre>
+
+<p class='ed'>God it's stupid having br-tags in the <code>book.txt</code>. It really would be so much cleaner to make custom html formatting entirely take place within the <code>pulp.txt</code> files, but that would necessarily increase parsing complexity in some way, since you'd be breaking the main 2-cycle assumption of paragraph line -> blank line -> repeat, which would be a long-term maintenance annoyance. But this current setup is also annoying. Ah well.</span>
 
 <p>…With the necessary html div and span classes added in matching <code>pulp.txt</code> file, which happens later on, but ultimately ends up looking like:<p>
 
