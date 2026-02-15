@@ -1,0 +1,86 @@
+<style>
+#b-left { background-image: url(/vn/TheSunAlsoRises/images/c-belmonte.webp),url(/vn/TheSunAlsoRises/images/c-count-ehappy-s.webp); }
+#b-right { background-image: url(/vn/TheSunAlsoRises/images/c-count-ehappy.webp),url(/vn/TheSunAlsoRises/images/c-belmonte.webp); }
+#b-left.ed { background-image: url(/vn/TheSunAlsoRises/images/c-belmonte-xcapeless-xlongjaw.webp),url(/vn/TheSunAlsoRises/images/c-count-ehappy-s.webp); }
+#b-right.ed { background-image: url(/vn/TheSunAlsoRises/images/c-count-xroses-ehappy.webp),url(/vn/TheSunAlsoRises/images/c-belmonte-xcapeless-xlongjaw.webp); }
+</style>
+
+<p>This is the second in a series of posts explaining my processes for how I convert books into visual novels. Links:</p>
+
+<ul>
+  <li><a href='/blog/2026-02-13'>Converting Books Into Visual Novels Part 0: The pulp.txt Format</a></li>
+  <li>Converting Books Into Visual Novels Part 1: The First Edit</li>
+</ul>
+
+<p>The overall process I've settled on has four main steps: the first edit, the second edit, the image generation, and the third edit. This post will walk through the first edit, where we go from a standard .epub to a parsable <code>pulp.txt</code> file with name metadata, speaker metadata, expression metadata, and line breaks.</p>
+
+<h2>From .epub to <code>book.txt</code></h2>
+
+<p>Before starting off on creating a <code>pulp.txt</code> file, we need a <code>book.txt</code>: the contents of the source novel in plain text form (with basic markdown annotations). As mentioned in Part 0, this file is what the Pulpifier will use as a reference when building the html from the <code>pulp.txt</code> file, as a check to make sure no accidental text-changing changes were made in the editing process. This is <code>book.txt</code>'s main long-term role, but in the short-term, it's also what we use to create the starter <code>pulp.txt</code> file, with LLM assistance.</p>
+
+<p>I use <a href="https://standardebooks.org/">Standard Ebooks</a> .epub files as the basis for all book texts on this site. This isn't a strict requirement — source texts could come from anywhere — but it's convenient to use a single source, where I know the markdown formatting will be consistent: *single asterisks* for italics, **doubled asterisks* for uppercased, ## some number of pound signs for different header levels, etc.</p>
+
+<p>Standard Ebooks doesn't provide .txt files directly, but their .epubs are easily convertable with the command <code>pandoc book.epub -t gfm-raw_html --strip-comments --wrap=none -o book.txt</code>. The <code>--wrap=none</code> flag is for making paragraphs take up whole single lines instead of being split up past some character limit. The <code>--strip-comments</code> I'm not sure is strictly necessary, but I set it just in case it applies to the highlights I make while reading. And then the main flag is the <code>-t gfm-raw_html</code>, which gives us the format with the nice markdown.</p>
+
+<p>Well, mostly nice markdown. There is some manual cleanup work that needs to be done, since the Pulpifier can't automatically convert all types of markdown symbols to html, with some of them requiring case-by-case decisions to be made on how best to translate good book formatting into good visual novel formatting. Here are some of the cleanup steps:</p>
+
+<p>First, as great as Standard Ebooks is as an organization, their giant Imprint headers and Colophon/Uncopyright footers are always the first thing that needs to go. I do credit them for each book with a link to the source .epub, but the right place for that link is not in the <code>book.txt</code> file itself.</p>
+
+<p>Second, sometimes the chapter headers have custom html annotations that looks like:</p>
+
+<pre>
+&lt;hgroup&gt;
+
+## II
+
+The Milkman Sets Out on His Travels
+
+&lt;/hgroup&gt;
+</pre>
+
+<p>These need to be collapsed into single lines like:</p>
+
+<pre>## II The Milkman Sets Out on His Travels</pre>
+
+<p>There are also a variety of different formatting situations that put carets at the start of lines, sometimes with additional html, e.g.:</p>
+
+<pre>
+&gt; Dear Jake,
+&gt;
+&gt; We got here Friday, Brett passed out on the train, so brought her here for 3 days rest with old friends of ours. We go to Montoya Hotel Pamplona Tuesday, arriving at I don’t know what hour. Will you send a note by the bus to tell us what to do to rejoin you all on Wednesday. All our love and sorry to be late, but Brett was really done in and will be quite all right by Tues. and is practically so now. I know her so well and try to look after her but it’s not so easy. Love to all the chaps,
+&gt;
+&gt; &lt;footer role="presentation"&gt;
+&gt;
+&gt; Michael.
+&gt;
+&gt; &lt;/footer&gt;
+</pre>
+
+<p>Sometimes the carets represent text with blockquote margins, and sometimes they represent centered text. Since they aren't consistent, I always just remove them, and then later on, as part of editing the <code>pulp.txt</code> file, add in spans with helper classes like <code>'center'</code> or <code>'fright'</code>, which the Pulpifier is smart enough to strip out when it comes to the sameness comparison. There are also some custom modifier tags that can be added to metadata that affect presentation. This just comes down to choosing the css that most closely matches the original .epub book look from within the constraints of the visual novel format.</p>
+
+<p>Sometimes the text, caret or otherwise, is generated without line breaks between lines e.g.,</p>
+
+<pre>
+&gt; “One thing’s sure and nothing’s surer  
+&gt; The rich get richer and the poor get﻿—children.  
+&gt; In the meantime,  
+&gt; In between time﻿—”
+</pre>
+
+<p>Since the Pulpifier expects a strict text line -> blank line -> repeat 2-cycle sequence for <code>book.txt</code>'s formatting, these need to either have line breaks added, if separate VN-slides are okay, or else merged onto a single line, but with custom <code>&lt;br&gt;</code> tags added in <code>pulp.txt</code>.</p>
+
+<p>Another minor fixup is removing any backslashes that got added — which seem to sometimes appear before dollar signs and square brackets — since they aren't necessary in text form.</p>
+
+<p>And then the .epub-to-.txt conversion seems to like to represent section breaks with absurdly long dash lines, like <code>------------------------------------------------------------------------</code>. These I just consolidate down to a single em dash, which the Pulpifier knows to display as a long dash for that line.</p>
+
+<p>There are some other minor miscallaneous fixups that need addressing case-by-case with other weird niche formattings. For example, <book>The Great Gatsby</book>'s <code>book.txt</code> generated with a table, which needed custom equivalent span handling. Again, it's a matter of picking what's right css-wise without changing the original text, which usually just involves stripping out the markdown from the <code>book.txt</code> file and moving the work to <code>pulp.txt</code>.</p>
+
+<p>Lastly, I always add a header line to each <code>book.txt</code> file with the title and author name, as a replacement for the stripped Standard Ebooks header.</p>
+
+<p>And with all that, <code>book.txt</code> is ready for processing.</p>
+
+<h2>The Goals of the First Edit</h2>
+
+
+
+<h2>The First Edit LLM Loop</h2>
