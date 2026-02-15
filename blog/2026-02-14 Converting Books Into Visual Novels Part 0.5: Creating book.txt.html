@@ -5,18 +5,13 @@
 #b-right.ed { background-image: url(/vn/TheSunAlsoRises/images/c-count-xroses-ehappy.webp),url(/vn/TheSunAlsoRises/images/c-belmonte-xcapeless-xlongjaw.webp); }
 </style>
 
-<p>This is the second in a series of posts explaining my processes for how I convert books into visual novels. Links:</p>
+<p>This is the second in a series of posts explaining my processes for how I convert books into visual novels. See the full series links over on the <a href='https://github.com/JohnQPulp/PublicDomainPulp?tab=readme-ov-file#contributing'>website's README.md</a>.</p>
 
-<ul>
-  <li><a href='/blog/2026-02-13'>Converting Books Into Visual Novels Part 0: The pulp.txt Format</a></li>
-  <li>Converting Books Into Visual Novels Part 1: The First Edit</li>
-</ul>
-
-<p>The overall process I've settled on has four main steps: the first edit, the second edit, the image generation, and the third edit. This post will walk through the first edit, where we go from a standard .epub to a parsable <code>pulp.txt</code> file with name metadata, speaker metadata, expression metadata, and line breaks.</p>
+<p>The overall process I've settled on has four main steps: the first edit, the second edit, the image generation, and the third edit. This post will walk through… none of those, since before we can even start generating a <code>pulp.txt</code> file, we need a good <code>book.txt</code> reference file.</p>
 
 <h2>From .epub to <code>book.txt</code></h2>
 
-<p>Before starting off on creating a <code>pulp.txt</code> file, we need a <code>book.txt</code>: the contents of the source novel in plain text form (with basic markdown annotations). As mentioned in Part 0, this file is what the Pulpifier will use as a reference when building the html from the <code>pulp.txt</code> file, as a check to make sure no accidental text-changing changes were made in the editing process. This is <code>book.txt</code>'s main long-term role, but in the short-term, it's also what we use to create the starter <code>pulp.txt</code> file, with LLM assistance.</p>
+<p><code>book.txt</code> is the contents of the to-be-converted source novel in plain text form (with basic markdown annotations). As mentioned in Part 0, this file is what the Pulpifier will use as a reference when building the html from the <code>pulp.txt</code> file, as a check to make sure no accidental text-changing changes were made in the editing process. This is <code>book.txt</code>'s main long-term role, but in the short-term, it's also what we use in the first edit pass to create the starter <code>pulp.txt</code> file.</p>
 
 <p>I use <a href="https://standardebooks.org/">Standard Ebooks</a> .epub files as the basis for all book texts on this site. This isn't a strict requirement — source texts could come from anywhere — but it's convenient to use a single source, where I know the markdown formatting will be consistent: *single asterisks* for italics, **doubled asterisks* for uppercased, ## some number of pound signs for different header levels, etc.</p>
 
@@ -77,10 +72,4 @@ The Milkman Sets Out on His Travels
 
 <p>Lastly, I always add a header line to each <code>book.txt</code> file with the title and author name, as a replacement for the stripped Standard Ebooks header.</p>
 
-<p>And with all that, <code>book.txt</code> is ready for processing.</p>
-
-<h2>The Goals of the First Edit</h2>
-
-
-
-<h2>The First Edit LLM Loop</h2>
+<p>And with all that, <code>book.txt</code> is ready for processing — ready for turning into an actual visual novel.</p>
