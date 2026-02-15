@@ -15,7 +15,7 @@
 
 <p>I use <a href="https://standardebooks.org/">Standard Ebooks</a> .epub files as the basis for all book texts on this site. This isn't a strict requirement — source texts could come from anywhere — but it's convenient to use a single source, where I know the markdown formatting will be consistent: <code>*single asterisks*</code> for italics, <code>**doubled asterisks**</code> for uppercased, <code>## some number of pound signs</code> for different header levels, etc.</p>
 
-<p>Standard Ebooks doesn't provide .txt files directly, but their .epubs are easily convertable with the command <code>pandoc book.epub -t gfm-raw_html --strip-comments --wrap=none -o book.txt</code>. The <code>--wrap=none</code> flag is for making paragraphs take up whole single lines instead of being split up past some character limit. The <code>--strip-comments</code> I'm not sure is strictly necessary, but I set it just in case it applies to the highlights I make while reading. And then the main flag is the <code>-t gfm-raw_html</code>, which gives us the format with the nice markdown.</p>
+<p>Standard Ebooks doesn't provide .txt files directly, but their .epubs are easily convertible with the command <code>pandoc book.epub -t gfm-raw_html --strip-comments --wrap=none -o book.txt</code>. The <code>--wrap=none</code> flag is for making paragraphs take up whole single lines instead of being split up past some character limit. The <code>--strip-comments</code> I'm not sure is strictly necessary, but I set it just in case it applies to the highlights I make while reading. And then the main flag is the <code>-t gfm-raw_html</code>, which gives us the format with the nice markdown.</p>
 
 <p>Well, mostly nice markdown. There is some manual cleanup work that needs to be done, since the Pulpifier can't automatically convert all types of markdown symbols to html, with some of them requiring case-by-case decisions to be made on how best to translate good book formatting into good visual novel formatting. Here are some of the cleanup steps:</p>
 
@@ -90,7 +90,7 @@ The Milkman Sets Out on His Travels
 “One thing’s sure and nothing’s surer&lt;br&gt;The rich get richer and the poor get—children.&lt;br&gt;In the meantime,&lt;br&gt;In between time—”
 </pre>
 
-<p>Some other miscallaneous minor fixups that are needed:</p>
+<p>Some other miscellaneous minor fixups that are needed:</p>
 
 <p>Sometimes backslashes appear before certain characters, like dollar signs and square brackets, in the generated text file. These aren't needed, and can all just be deleted.</p>
 
