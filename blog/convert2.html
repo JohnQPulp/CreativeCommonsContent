@@ -1,0 +1,135 @@
+<style>
+#b-left { background-image: url(/vn/DrJekyllAndMrHyde/images/c-author.webp),url(/vn/DrJekyllAndMrHyde/images/c-author.webp); }
+#b-right { background-image: url(/vn/DrJekyllAndMrHyde/images/c-author.webp),url(/vn/DrJekyllAndMrHyde/images/c-author.webp); }
+#b-left.ed { background-image: url(/vn/DrJekyllAndMrHyde/images/c-author-abased.webp),url(/vn/DrJekyllAndMrHyde/images/c-author-abased.webp); }
+#b-right.ed { background-image: url(/vn/DrJekyllAndMrHyde/images/c-author-abased.webp),url(/vn/DrJekyllAndMrHyde/images/c-author-abased.webp); }
+</style>
+
+<p>This is the third in a series of posts explaining my processes for how I convert books into visual novels. See the full series links over on the <a href='https://github.com/JohnQPulp/PublicDomainPulp?tab=readme-ov-file#contributing'>website's README.md</a>.</p>
+
+<p>In this post, we'll go into the first "edit" of the conversion process, wherein we create the starter <code>pulp.txt</code> file with its starter metadata annotations.</p>
+
+<p>This is the step where we'll leverage LLM-based text processing to the maximum extent possible, automating what can be automated.</p>
+
+<h1>What Can't Be Automated</h1>
+
+<p>As described in the <a href="/blog/2026-02-13">Part 0</a> post about the breakdown of all the metadata aspects of the <code>pulp.txt</code> format, there are a lot of metadata tags that we'll end up using throughout the full conversion process. But, not all of them make sense to LLM-generate.</p>
+
+<p>As described in more detail in <a href="/blog/2026-03-06">constraints blog post</a>, we <i>do not</i> want the LLM to be in charge of assigning backgrounds. The difficult constraints that backgrounds operate under with respect to the text and with respect to themselves is simply too context-demanding a task for even the best LLMs, at least at the moment. The generated results simply wouldn't be good and would require more time to manually fix through editings and reworking as compared to assigning the backgrounds manually, thinking through at each one a rough idea of what the backgrounds will need to look like, and generating them from there. Course, even that process still ends up requiring rather significant re-editing and re-working and re-thinking, but still less so than trying to reason through LLM-outputted results. Basically, LLM output won't save us any time here as compared to just annotating the background tags from scratch.</p>
+
+<p>So, we will not instruct our LLM converter to generate any <code>b</code> background tags or its related <code>r</code> reset-to-background tags. And by "not instruct", I mean we just won't even tell the LLM that these tags exist in its eventual boilerplate prompt.</p>
+
+<p>And the same will apply to many other of the metadata tag types too, whose reasons for not being good automatic-generation targets fall into one of three categories:</p>
+
+<p>First, if a tag's metadata is dependent on knowing what the visuals are going to look like, we can't generate it at this stage, since we obviously don't have the actual images yet. This rules out the <code>c</code> character tags, because we can't reason about whether a character sprite should be active if we don't know whether the background they'll be against even has a foreground. It also rules out the <code>v</code> viewport tag (for sizing active sprites) and the <code>z</code> zoom tag (for sizing characters relative to each other and to the speaker box).</p>
+
+<p>Second, we don't want to automatically generate any of the tags whose use cases are too niche. The reasoning is that, the more rarely used a tag is, the higher the ratio of false-positives to good-outputs we'll end up seeing. Remember that the whole point of automatic generation is to save us work in the conversion process, but if the LLM spits out a bunch of bad metadata attributes that we then have to review and clean up, we'll end up just creating more work for ourselves. This becomes less true the smarter the LLMs become, but as of time-of-writing, I think can fairly be applied to all these tags:</p>
+
+<ul>
+<li>The <code>o</code> object tag only comes up a handful of times per book, and has the complexity involved in reasoning about visuals and visual relationships. Therefore, the noise value of generating would be high.</li>
+<li>The <code>a</code> age and <code>x</code> extra tags for modifying sprites are also used relatively infrequently, and also involve reasoning about how those changes will affect sprite appearances. This is in theory somewhat less complex of a task, but still presents the potential problem of over-annotating, introducing too many sprite variations that aren't really needed, those complicating generation, forcing either more time than necessary to be spent there, or more time spent in metadata cleanup.</li>
+<li>The <code>t</code> thinker tag is the rarely-used cousin tag to the <code>s</code> speaker tag. In typical books, character thoughts presented as dialogue are infrequent enough that this isn't work muddying the waters of potentially generating <code>t</code> tags where <code>s</code> tags should go.</li>
+<li>The <code>f</code> filter tag for applying image filters like <code>blur()</code> or <code>brightness()</code> to images is also not too common, and often requires knowing what images will look like beforehand. Often, but not always, surprisingly, since we can reason that if a background is being applied in a flashback context that it can make sense to apply a blur to it, even before knowing what the background actually looks like. Still, that's not universal, nor is it a tool worth giving the LLM to generate.</li>
+<li>Lastly, the <code>m</code> modifier and <code>h</code> header tags, which affect the Pulpifier processing in various ways both have high enough complexity-to-use-case ratios as to be worth skipping.</li>
+</ul>
+
+<p>And lastly, we generally want to avoid generating tags whose metadata need to be carried over between chapters. The reason for this has to do with the fact that, in the course of processing, we break up the book into chapter-lengths, and process those one-at-a-time. We <i>do not</i> feed any of the other chapters' text of any of the previously generated <code>pulp.txt</code> metadata into the LLM when doing the generation. This may seem like a bad idea, but the reasoning behind this is explored in more detail in the Splitting Text section further below, and it has to do with what works well with current-generation LLMs and more importantly, what tags we're dealing with in the generations. But the important point for here is that it means that, even if e.g., backgrounds were something we wanted to try generating, we'd have to do additional scripting work to carry over the background tag values between chapters. And this applies to all metadata tags whose values can span chapters, which further disincentivizes generating many of them.</p>
+
+<p>As you can see, we've eliminated almost all the tag types in the above qualifications. But that's <i>types</i>, not <i>volume</i>. And the two most commonly used tags are very much automatable, so let's discuss what metadata there is left to generate:<p>
+
+
+<h1>What Can Be Automated</h1>
+
+<p>Flipping the script from above, the tags we <i>do</i> want to generate are those that are common, easy to verify and/or clean, and which are the least complex to understand. (Since again, less complexity = fewer mistakes = less manual cleanup.)</p>
+
+<p>This leaves three tags to generate, and one additional non-tag aspect of the metadata. Going from least-to-most common:</p>
+
+<h2>The (n)ame Tag</h2>
+
+<p>Every character we want to assign sprites too (which in general, is usually roughly the same set as the characters with speaking roles in text) needs a <code>n</code> metadata tag to assign the character's ID and speaker display name.</p>
+
+<p>This is the least common of the tags to generate, since in general most characters only need one name declaration. Some might need more than one if the know parts of their name change over the course of the story (or if their name itself just changes over the course of the story through e.g., marriage), but even with this bit of additional complexity, the LLM-generated results for this are still quite good. Not fully free of needing cleanup, especially sometimes around some of the minor characters, but still good enough that the cleanup is less time than assigning the names manually.</p>
+
+<p>Now, previously I said we don't want to automatically generate metadata whose values need to carry over between chapters. And the name metadata certainly does, or rather its IDs do, since we need those in any chapter that that character appears. And because the idea is that we're going to be generating one chapter at a time, this means we'll need to do a bit of extra manual work between each chapter to keep the name metadata list provided to the LLM complete. However, because name tags are uncommon, and also easy to validate, and also easily understood by the LLM, this isn't a big deal, as compared to if we tried to do the same with background tags: which are way more common, and much more likely to change, and much more likely to be misinterpreted by the LLM vs what we intended.</p>
+
+
+<h2>The (s)peaker Tag</h2>
+
+<p>Next, we'll want the LLM to automatically assign <code>s</code> speaker tags, using the name IDs generated and continually fed in from above, to attribute the correct characters to each line of dialogue. (And then also to set the speaker back to <code>none</code> whenver dialogue ends.)</p>
+
+<p>In general, the LLMs are very good at this task, tending to make fewer mistakes than a human would over the course of a long book. Fewer, but not none. And it is interesting to note that, like a human, they tend to make more mistakes when fewer dialogue cues are given, such as when authors have long blocks of back-and-forth dialogue unattributed from any "said"s, where you just have to keep track of who the speaker is by virtue of it being an even or odd paragraph.</p>
+
+<p>So proofreading is a necessity here, for making sure the speakers come out correct. But the good news is that the overall conversion process requires at least two subsequent full manual re-read edits anyway, and thus we get a good level of manual double-checking more-or-less baked in.</p>
+
+<p>We can also consider, for trickier texts that are more likely to have attribution mistakes, feeding the outputted <code>pulp.txt</code> back into another LLM, and have it double-double-check. Although in my experimenting with this, while it does work to catch some mistakes, in tends to throw up more false positives to sift through, so I wouldn't consider this an essential part of the process.</p>
+
+
+<h2>The (e)xpression Tag</h2>
+
+<p>The last tag we want the LLMs to automatically generated is the <code>e</code> expression tag.</p>
+
+<p>In theory, the expression tag should be at most as common as the number of speaker tags + thinker tags + active characters in the character tags. However, there's not really any downside to overproducing on our expression quotas, since an expression tag that doesn't cover any visible sprites just does nothing. Therefore, in our eventual LLM instructions, we won't say anything about limiting the expression to only when characters are on-screen, since the LLM isn't going to know the full scope of that anyway (it doesn't know what the thinker or character tags will be set to yet). This gives us flexibility to add and shuffle tags around later on, while still having a good basis for keeping the expressions reasonably accurate. The only downside is some extra level of unnecessary expression tag noise in the generated <code>pulp.txt</code> output, but this isn't a big deal.</p>
+
+<p>When it comes to generating expressions, any expression value is valid in terms of what the pulpifier accepts, whether it's set to <code>grinning</code> or <code>gesticulating</code> or <code>genuflecting</code> or whatever. But we don't want the LLM output to generate any arbitrary emotion — we want to constrain it to a pre-determined list of semi-automatically generatable emotions. This helps both make the emotions that are set easier to generate, and also means there will be fewer of them, since we'll be more likely to see sprite reuse when constrained to a smaller set.</p>
+
+<p>But we don't want the set to be <i>too</i> small, since we still want the sprites to portray a wide range of emotions. That current set that we instruct the LLM to pull from is this:</p>
+
+<ul>
+<li>neutral</li>
+<li>happy</li>
+<li>unhappy</li>
+<li>angry</li>
+<li>wary</li>
+<li>nervous</li>
+<li>upset</li>
+<li>suspicious</li>
+<li>confused</li>
+<li>thinking</li>
+<li>serious</li>
+<li>smirking</li>
+<li>weary</li>
+<li>fearful</li>
+<li>surprised</li>
+<li>annoyed</li>
+<li>scowling</li>
+<li>excited</li>
+<li>contemplative</li>
+<li>crying</li>
+</ul>
+
+<p>This list can easily be changed to add more expressions if emotional gaps occur, and can also be shrunk if too similar of emotions are being generated, causing essentially duplicate sprites.</p>
+
+<p>So how well does this work in practice in terms of emotional accuracy? Well there's a couple aspects to consider:</p>
+
+<p>First, the LLM isn't perfect about restricting the emotions it generates to just the above list. However, that's perfectly okay. A one-off special emotion to capture some special unique state can even be desirable, since that's exactly what we might also want to add in later in subsequent manual edits. And for those one-offs that we don't end up needing, it's easier to delete emotions or quickly swap them out than it is to write them up manually.</p>
+
+<p>Second, the accuracy of the emotion labeling is generally pretty good, but those are just the <i>labels</i>. The actual sprites that get generated for those emotions (and there can be more than one sprite per emotion per character+age+extra) might differ somewhat in the intended meaning from the LLMs labeling. This comes down to the selections we do in generating the sprites, later on. We do want to disgard and regenerate sprites that come out particularly bad, but in general, sprites emotions can be a little loose in matching their labels, since the interpretation of the emotions themselves can be fairly loose. Unlike speaker attributions, which have one correct answer that needs to be verified, there's no one right answer to what expression a character should be wearing on any given slide, and so we have a lot more leeway here in assignments. There can certainly still be <i>wrong</i> assignments, but we often can't say whether a particular expression is right or wrong at a given time until we can actually see it in its proper context, after the sprites and backgrounds have been generated. In that sense then, expression tags are a case where it's actually faster and easier to the LLM generate a close-enough initial draft of the metadata, which we can then fix and tweak as needed later on. For such a common tag, where loose interpretation is allowed, this saved a lot of time vs trying to do all the initial expression tagging ourselves. Either way, editing will need to follow afterwards, so it's fine to let the LLM have the first pass.</p>
+
+
+<h2>Line Breaks</h2>
+
+<p>Lastly, there's the insertion of line breaks themselves (and the subsequent necessary adjustment of quotes, as detailed in <a href="/blog/2026-02-13">Part 0</a>).</p>
+
+<p>This is similar to expression attribution in that, doing all the splitting ourselves would be highly tedious, as compared to just letting the LLM have the first pass, and making adjustments as needed. Like with the expression tags, there's no one right answer on where all line breaks should be inserted, although there are plenty of heuristics for where good line breaks should go, but we easily feed those into the LLM's instructions too.</p>
+
+<p>There are definitely <i>wrong</i> places for line breaks to be inserted, such as between two random words with no puncutation separating them, but this rarely happens, because we instruct the LLM not to do that, and also even when it does happen, this is the kind of mistake the Pulpifier can automatically check for when comparing with the original <code>book.txt</code> source. If it finds a misplaced line break (or bad handling of quotations across line breaks, or some other line break related mistakes), it can just throw an exception, and be fixed up via manual review).</p>
+
+<p>Ultimately, some manual adjustments around the breaks is always needed over the course of the editing process, and again sometimes the specific breaks we want don't become fully known to us until we can actually see all the visuals. But for the most part, this is another situation where letting the LLM do the first draft gets us 90+% of the way there, saving lots of manual editing time.</p>
+
+
+<h1>Splitting up the Text: Why and How</h1>
+
+<p></p>
+
+
+<p>A valid objection to this might be: if we're only feeding chapters in one-at-a-time, can we really expect the LLMs to assign accurate emotions to the characters, not knowing the full context of what came before in the story? You could even argue it might hurt the speaker tag generation accuracy as well, without the full context of how the character is referred too and tends to speak.</p>
+
+
+<h1>The Feeding Pipeline</h1>
+
+<p></p>
+
+
+
+<h2></h2>
+<p></p>
