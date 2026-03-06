@@ -116,7 +116,7 @@ s=concierge1;e:concierge1=happy
 
 <p>The text lines and their associated metadata define all aspects of the visual novel's presentation. In this case, one example slide looks like this:</p>
 
-<a href="/vn/TheSunAlsoRises?l=1016"><img alt="Visual novel example slide" src="/images/slide.webp" /></a>
+<a href="/vn/TheSunAlsoRises?l=1017"><img alt="Visual novel example slide" src="/images/slide.webp" /></a>
 
 <p>This fifth slide of the example snippet can be explained as a combination of the text of that particular text line along with its metadata line and the 4 lines of metadata before it. Walking through this specific example will help give a high-level overview of how the <code>pulp.txt</code> format with its metadata tags works, before going into the specific documentation of each tag.</p>
 
@@ -206,9 +206,16 @@ s=concierge1;e:concierge1=happy
 
 <p>When a character is speaking, their associated image file will have a suffix like <code>-s</code> or <code>-s2</code> or <code>-s3</code>. This combines with the above three tags to form full file names like <code>c-belmonte-aold-xcapeless-xlongjaw-eserious-s.webp</code>. As you can see, these files can get quite long all put together, which is why it's useful to have these four tags all settable separately, and leave the actual specific file name construction to the Pulpifier, rather than having to set a full file name for each sprite update to any of the character characteristics.</p>
 
+<h3>Suffix Variations</h3>
+
 <p>The <code>-s</code>, <code>-s2</code>, and <code>-s3</code> thing is from a feature of the Pulpifier whereby if a character speaks for multiple slides without changing their expression, the displayed sprite image file will swap between different speaker variations, such that you don't have the same static image file across large swathes of dialogue. Visually, while a character is speaking, it's nice to have their sprite change with each slide, even if only slightly, so as to indicate the active speaker status.</p>
 
 <p>The pattern for the speaker suffix variations is the following sequence: <code>-s</code> to <code>-s2</code> to <code>-s</code> to <code>-s2</code> to <code>-s3</code> to <code>-s</code> to <code>-s3</code> to <code>-s2</code>. And then it repeats.</p>
+
+<p>These variations on the speaker can also affect non-speaker sprites, if a character is the active character list, and their sprite exits dialogue, but stays in the same expression. In that case, a suffix is appended to match the speaker variation that just finished speaking: <code>-1</code> for <code>-s</code>, <code>-2</code> for <code>-s2</code>, and <code>-3</code> for <code>-s3</code>. The idea with this is that it's nice to keep a character in the same general pose after they've finished speaking, just updating their mouth to be closed, to prevent a character from continuing to bounce back to a single static non-speaking sprite, over the course of talking.</p>
+
+<p>Overall though, these variations are more of an implementation detail about what all sprites the Pulpifier processes its tags as, and so can be ignored for the purposes of just understanding the metadata tag attributions themselves.</p>
+
 
 <h2>(t)hinker</h2>
 
@@ -223,11 +230,22 @@ t=henry
 
 <h2>(z)oom</h2>
 
-<p><code>z</code> accepts a name and then one or three additional arguments like <code>z:swordguy=97</code> or <code>z:critic=90,49,5</code>. The first number is either case represents the character's zoom level — how large they should appear on-screen, where 100 is the default. Since all character sprites are the same size — 1376x768 pixels — this sizing metadata is necessary for changing the effective height of characters to appropriate relative levels. The latter two numeric arguments represent the horizontal and vertical positioning of the character when in the speaker box.</p>
+<p><code>z</code> accepts a name and then one then between one and four arguments, like <code>z:swordguy=97</code> or <code>z:critic=90,49,5</code>. Not all the arguments need to be populated, so <code>z:frances=,53,,97</code> is also a valid annotation, with the missing values staying as their default values.</p>
+
+<p>The first number is either case represents the character's zoom level — how large they should appear on-screen, where 100 is the default. Since all character sprites are the same size — 1376x768 pixels — this sizing metadata is necessary for changing the effective height of characters to appropriate relative levels.</p>
+
+<p>The second number represents the horizontal positioning of the character in their speaker box, where 50 is the default, and higher integers push the speaker to the left, and smaller integers push the speaker to the right. <span class='edi'>Why do the numbers work opposite to what you'd reasonably expect? Because backwards-compatibility stupidity.</span></p>
+
+<p>The third number represents the vertical positioning of the character in their speaker box, where 0 is the default, and higher integers push the sprite up, and negative integers push it down.</p>
+
+<p>The fourth character represents the character's zoom level within <i>just</i> the speaker box, where 100 is again the default. The way this works that if this value is unset, and the first value zoom is unset, the speaker box zoom is 100. If this fourth value is unset but the first value for the overall zoom is set, the speaker box zoom also uses that zoom level. So it's only when it's necessary to set the speaker box zoom to a different level than the overall zoom that this value is necessary.</p>
+
 
 <h2>(v)iew</h2>
 
-<p><code>v</code> sets the horizontal spacing and vertical sizing of characters while on-screen like <code>v=90,125</code>. Both values again default to 100, where lowering the first value squeezes characters closer together and raising the first value moves them further apart. Lowering the second value decreases the size of sprites and raising it increases their size.</p>
+<p><code>v</code> sets the horizontal spacing and vertical sizing and vertical spacing of characters while on-screen like <code>v=90,125,40</code>. Missing values are again allowed (e.g., <code>v=90,,40</code> or <code>v=90</code>), where they represent the defaults for those values.</p>
+
+<p>The first two arguments default to 100, where lowering the first value squeezes characters closer together and raising the first value moves them further apart. Lowering the second value decreases the size of sprites and raising it increases their size. The third value controls the vertical positions of the characters on-screen, with default 50, where higher values push the sprites down more, and lower ones raise them up.</p>
 
 <h2>(f)ilter</h2>
 
@@ -241,6 +259,9 @@ t=henry
 <li><code>margin</code>: Causes the text display to have padding on either side, as a sort of quasi-blockquote effect.</li>
 <li><code>joined</code>: Causes text from the current text line to feed into the next slide.</li>
 <li><code>nospace</code>: Causes text from the current text line to not have an automatic space appended onto it when building the next slide.</li>
+<li><code>allowbreak</code>: Allows a line break to be placed where it otherwise wouldn't be permitted by the <a href="#line-break-rules">rules described further below</a>.</li>
+<li><code>dialogue</code>: Causes text within quotes to be formatted bold, like dialogue, even if there isn't an active speaker or thinker.</li>
+<li><code>nocounter</code>: Causes sprites to not swap between suffix variations. See also the <code>no-speaker-counter</code> header below.</li>
 </ul>
 
 <h2>(h)eader</h2>
@@ -248,7 +269,7 @@ t=henry
 <p><code>h</code> is a tag similar to <code>m</code> in that it changes parsing behavior. However, unlike <code>m</code>, headers are meant to only be set once, at the beginning of the visual novel, and then don't ever change. Currently there's only one header:</p>
 
 <ul>
-<li><code>no-speaker-counter</code>: Causes speaker sprites to not swap between <code>-s2</code> and <code>-s3</code> variations.</li>
+<li><code>no-speaker-counter</code>: Causes speaker sprites to not swap between <code>-s2</code> and <code>-s3</code> variations. Likewise for post-speaker sprite <code>-1</code> and <code>-2</code> and <code>-3</code> variations.</li>
 </ul>
 
 <h2>(r)eset</h2>
