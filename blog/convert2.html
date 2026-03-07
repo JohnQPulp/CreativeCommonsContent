@@ -1,8 +1,8 @@
 <style>
-#b-left { background-image: url(/vn/DrJekyllAndMrHyde/images/c-author.webp),url(/vn/DrJekyllAndMrHyde/images/c-author.webp); }
-#b-right { background-image: url(/vn/DrJekyllAndMrHyde/images/c-author.webp),url(/vn/DrJekyllAndMrHyde/images/c-author.webp); }
-#b-left.ed { background-image: url(/vn/DrJekyllAndMrHyde/images/c-author-abased.webp),url(/vn/DrJekyllAndMrHyde/images/c-author-abased.webp); }
-#b-right.ed { background-image: url(/vn/DrJekyllAndMrHyde/images/c-author-abased.webp),url(/vn/DrJekyllAndMrHyde/images/c-author-abased.webp); }
+#b-left { background-image: url(/vn/DrJekyllAndMrHyde/images/c-jekyll.webp),url(/vn/DrJekyllAndMrHyde/images/c-author.webp); }
+#b-right { background-image: url(/vn/DrJekyllAndMrHyde/images/c-author.webp),url(/vn/DrJekyllAndMrHyde/images/c-jekyll-xdark-eweary-s.webp); }
+#b-left.ed { background-image: url(/vn/DrJekyllAndMrHyde/images/c-hyde-epoint-s.webp),url(/vn/DrJekyllAndMrHyde/images/c-author-abased.webp); }
+#b-right.ed { background-image: url(/vn/DrJekyllAndMrHyde/images/c-author-abased.webp),url(/vn/DrJekyllAndMrHyde/images/c-hyde-escowling.webp); }
 </style>
 
 <p>This is the third in a series of posts explaining my processes for how I convert books into visual novels. See the full series links over on the <a href='https://github.com/JohnQPulp/PublicDomainPulp?tab=readme-ov-file#contributing'>website's README.md</a>.</p>
@@ -10,6 +10,9 @@
 <p>In this post, we'll go into the first "edit" of the conversion process, wherein we create the starter <code>pulp.txt</code> file with its starter metadata annotations.</p>
 
 <p>This is the step where we'll leverage LLM-based text processing to the maximum extent possible, automating what can be automated.</p>
+
+<p>If you want to skip ahead to just the specific commands and LLM instructions used in the process, you can start reading from the <a href="#feeding">The Feeding Pipeline</a> section. But before getting there, these sections will help explain why the pipeline and instructions and set up the way that they are:</p>
+
 
 <h1>What Can't Be Automated</h1>
 
@@ -33,7 +36,7 @@
 <li>Lastly, the <code>m</code> modifier and <code>h</code> header tags, which affect the Pulpifier processing in various ways both have high enough complexity-to-use-case ratios as to be worth skipping.</li>
 </ul>
 
-<p>And lastly, we generally want to avoid generating tags whose metadata need to be carried over between chapters. The reason for this has to do with the fact that, in the course of processing, we break up the book into chapter-lengths, and process those one-at-a-time. We <i>do not</i> feed any of the other chapters' text of any of the previously generated <code>pulp.txt</code> metadata into the LLM when doing the generation. This may seem like a bad idea, but the reasoning behind this is explored in more detail in the Splitting Text section further below, and it has to do with what works well with current-generation LLMs and more importantly, what tags we're dealing with in the generations. But the important point for here is that it means that, even if e.g., backgrounds were something we wanted to try generating, we'd have to do additional scripting work to carry over the background tag values between chapters. And this applies to all metadata tags whose values can span chapters, which further disincentivizes generating many of them.</p>
+<p>And lastly, we generally want to avoid generating tags whose metadata need to be carried over between chapters. The reason for this has to do with the fact that, in the course of processing, we break up the book into chapter-lengths, and process those one-at-a-time. We <i>do not</i> feed any of the other chapters' text of any of the previously generated <code>pulp.txt</code> metadata into the LLM when doing the generation. This may seem like a bad idea, but the reasoning behind this is explored in more detail in the Text Feeding Approaches section further below, and it has to do with what works well with current-generation LLMs and more importantly, what tags we're dealing with in the generations. But the important point for here is that it means that, even if e.g., backgrounds were something we wanted to try generating, we'd have to do additional scripting work to carry over the background tag values between chapters. And this applies to all metadata tags whose values can span chapters, which further disincentivizes generating many of them.</p>
 
 <p>As you can see, we've eliminated almost all the tag types in the above qualifications. But that's <i>types</i>, not <i>volume</i>. And the two most commonly used tags are very much automatable, so let's discuss what metadata there is left to generate:<p>
 
@@ -117,19 +120,158 @@
 <p>Ultimately, some manual adjustments around the breaks is always needed over the course of the editing process, and again sometimes the specific breaks we want don't become fully known to us until we can actually see all the visuals. But for the most part, this is another situation where letting the LLM do the first draft gets us 90+% of the way there, saving lots of manual editing time.</p>
 
 
-<h1>Splitting up the Text: Why and How</h1>
+<h1>Text Feeding Approaches</h1>
 
-<p></p>
+<p>We've established what all metadata we want the LLMs to generate, and we know that we'll have to feed the book text into the LLM somehow to get the metadata back out.</p>
+
+<p>The most obvious approach for how to do this then would be to feed in the full <code>book.txt</code> text, and ask the LLM to output the full <code>pulp.txt</code>. However, this doesn't work.</p>
+
+<p>On the input side, current LLMs can handle book lengths texts just fine. One way you can verify this is to feed in an entire book, ask a specific question, one detailed enough that the text needs to be referenced directly, and observe the (usually correct) result it spits out. In fact, this ability to quickly answer any question about a book's texts by scanning the whole book comes in very handy later on when it comes to checking character and background descriptions and image representations for mistakes.</p>
+
+<p>The problem is on the output side. Even if we consider only a novella-length book of 30k words, at the current generally accepted ratio of 4:3 for tokens:words, that's 40k tokens just to spit the text back out. And we need the LLM to spit the text back out, because formatting the metadata and line breaks within the text is part of the LLM's job. Line breaks themselves are additional output tokens, as are all the new metadata annotations, though I'm not sure how high exactly this pushes up the output ratio to.</p>
+
+<p>But what matters is that, from observations in practice of seeing what the top-tier LLMs can handle (and we need the smartest LLMs for the greatest accuracy, even if ones with longer output tokens exist), the ability to accurately spit back out the text with good line breaks and metadata annotations does drop as output text lengths increase. And eventually, the text either goes completey awry, or the LLM just errors out.</p>
+
+<p>We can re-roll bad text generation outputs, but ideally we want to do this as infrequently as possible, and as the requested output length increases, the probability of eventually ending up with bad results approaches… if not one, then something close enough to it.</p>
+
+<p>Now, the next thing to try would be to feed in the whole book text, but only ask it to convert one chapter at-a-time. Then, feed the previously converter chapter metadata (the rolling <code>pulp.txt</code> generation) back into the LLM, either replacing the <code>book.txt</code> portions already converted, or else just adding to them. The point of feeding the already-converted metadata back in is that we need the character IDs generated by previous chapters' name tags in order to correctly add additional name, speaker, and expression tags.</p>
+
+<p>Overall, this approach works better, but the bad generation frequency is still too high, and the results still subpar. Even though the LLM can ingest the whole book, and even the whole book repeated again with added metadata annotations, there's still quality drop-off with the increased input context. It dilutes the LLM's capabilities.</p>
+
+<p>Third attempted approach then: feed in just the particular chapter text an LLM needs at any given time, plus all previously generated metadata-annoted text. This works better still, but still starts to collapse in later chapters of longer texts, as the full weight of the ever-growing <code>pulp.txt</code> text crowds the input context. While the LLMs can very well understand the <code>pulp.txt</code> in small doses, observations with the current ones show that they really start to choke the more that gets fed in.</p>
+
+<p>But the good news is that we don't really need to fill in all the previous metadata. Remember, there are four things we want the LLM to do: of these, the line breaks don't require any previous context, and the three metadata tags just need the small set of previously declared name tags. Therefore, rather than feed in the full <code>pulp.txt</code> with all its superfluous breaks and speaker attributions and expressions, we can just grep out just the name tags, append just that small text set to our prompt for each chapter, and then feed the chapters in one-at-a-time.</p>
+
+<p>This, finally, works pretty well, with the results outputted being fairly accurate on average in terms of adherence to desired line break formatting, correct speaker attributions, correct strict adherence to the source text, and good expression attributions.</p>
+
+<p>And, even when the results aren't good, doing things one chapter a time makes re-rolling for better results much easier. Though the probabilistic nature of LLMs means that we can't depend on them to always spit out good results, it also means that re-running a prompt with the exact same input can magically convert bad results into good ones.</p>
+
+<p>Now, a valid objection to all this might be: if we're only feeding chapters in one-at-a-time, can we really expect the LLMs to assign accurate emotions to the characters, not knowing the full context of what came before in the story? You could even argue it might hurt the speaker tag generation accuracy as well, without the full context of how the character is referred too and tends to speak.</p>
+
+<p>The answer is that, in practice, this doesn't seem to be much of a concern, for a few reasons.</p>
+
+<p>First, the accuracy benefits of having smaller input and output context sizes pretty well dwarf any other effects in terms of getting the most accurate results. Again, this is just the way the current limitation of current LLMs seem to be, and it could very well be that in the not-so-distant-future this limitation goes away. But for now, it's the biggest text limitation we have to work around.</p>
+
+<p>Second, as far as expressions go, the outputs we want are so heavily heuristic-driven anyway that any subtleties lost in cross-chapter emotional statuses are almost certainly going to have insignificant effects in the overall expression output quality, especially when the almost always the expression you really want is found in the immediate text at-hand of each particular chapter. And with expressions being pretty fuzzy anyway, combined with subsequent tweaks being necessary no matter what once we actually see what the generated sprites look like, being "good enough" at this stage is plenty good enough. On the other hand, speaker attribution has much more rigid right-and-wrong answers, but in practice, the LLMs seem plenty good enough reasoning just chapter-by-chapter to correctly label the speakers, even when their full names aren't restated in each chapter. Partially this is down to us feeding in the full names as part of the name attribution metadata, and part of it comes down to:</p>
+
+<p>The third factor: for the types of stories being processed on Public Domain Pulp — the literary classics — the LLMs essentially have a good understanding of the overall story to begin with, even without the source text being fed in. This is demonstratably true by virtue of working with the image generators: ask them to generate a character sprite of a character from a book like <i>The Great Gatsby</i> without any particular details, and they'll tend to do a reasonably accurate job of it. Not as good a job as when the specific details we want are packaged into the prompt, mind you, but certainly good enough that I have no worries that, when it comes to doing the text processing, that the LLMs will somehow lose the plots of the stories they're converting when they're only allowed to see one chapter at-a-time.</p>
+
+<p>An interesting question is: would this be more of a problem for if we wanted to convert lesser-known works? In practice, I still don't think so, since I think the LLM would still be able to get good results out of the chapter-length contexts still given to them for the limited set of metadata we want back out. But, without any real obscure texts attempted yet, it is still somewhat of an open question.</p>
 
 
-<p>A valid objection to this might be: if we're only feeding chapters in one-at-a-time, can we really expect the LLMs to assign accurate emotions to the characters, not knowing the full context of what came before in the story? You could even argue it might hurt the speaker tag generation accuracy as well, without the full context of how the character is referred too and tends to speak.</p>
+<h1 id="feeding">The Feeding Pipeline</h1>
+
+<p>We've established the <code>pulp.txt</code> format and its metadata attributes in detail.</p>
+
+<p>We've established what specific subset of the metadata we want out from this initial conversion process.</p>
+
+<p>We've established the overall strategy we're going to use for this conversion process: feeding in one chapter at-a-time, along with a rolling list of the previously generated name tags.</p>
+
+<p>Now, we're finally ready to actually do the conversion.</p>
+
+<h2>Prepping the Source Text</h2>
+
+<p>The first thing we need to do is split up the source <code>book.txt</code> into chapter-length segments. To have an example to work with, we'll use <i>Dr. Jekyll and Mr. Hyde</i> as our example source text.</p>
+
+<p>The bash command to split up the chapters looks like this:</p>
+
+<pre>csplit -z -f 'chapter_' -b '%02d.txt' book.txt '/^## /' '{*}'</pre>
+
+<p>Where we're using <code>## </code> as the chapter header matcher, since that's what that particular book uses. But note that other books might require three pounds, or either two <i>or</i> three pounds, or some other handling, to get the splits. We might not even necessarily want to break on every possible chapter/section divider for some books, if the outputted chunk lengths are too small in their finest form. We can see for example that the chapter lengths for this basic split of <i>Jekyll and Hyde</i> produced some wildly different word count lengths, some of which are very short:</p>
+
+<pre>
+$ wc -w chapter_*.txt
+    13 chapter_00.txt
+  2402 chapter_01.txt
+  2939 chapter_02.txt
+   800 chapter_03.txt
+  1669 chapter_04.txt
+  1638 chapter_05.txt
+  1496 chapter_06.txt
+   555 chapter_07.txt
+  4369 chapter_08.txt
+  2800 chapter_09.txt
+  6942 chapter_10.txt
+ 25623 total
+</pre>
+
+<p>Although there's an order of magnitude difference between the longest and shortest chapter here (note that <code>chapter_00.txt</code> just contains the book header, and so doesn't count), that's mostly fine for the purposes of what we're doing — we can still just feed things in one-at-a-time as-is. But note that we could always combine smaller chapters or split larger ones if we wanted a more strictly even breakdown. While there's no hard limit for these inputs, I think maybe ~10k words is where I'd consider stepping in to split things, so as to avoid the earlier-mentioned accuracy problems of long inputs and outputs.</p>
+
+<h2>Feeding the Chapters</h2>
+
+<p>Now, we start feeding in chapters, staring with <code>chapter_01.txt</code>. We do this alongside the long boilerplate prompt created for this initial conversion process, which I've included the current version of as reference in the Github repo: https://github.com/JohnQPulp/CreativeCommonsContent/tree/main/reference/vn-prompt.txt.</p>
+
+<p>The prompt itself is pretty long, almost nine-thousand words, but input tokens are relatively cheap, and we need the long boilerplate to include the full explanation as to what the task is, the details of how exactly we want the line-splitting to happen, what the three types of metadata are, how to generate each, and then a long example of <code>book.txt</code> input paired with the draft <code>pulp.txt</code> output. And then finally: the title of the book we want, the current running list of characters (empty for the first chapter), and the chapter header start we want.</p>
+
+<p>Then we can finally let it roll, copy append the resulting output into our rolling <code>pulp.txt</code> file, and begin the examination process.</p>
 
 
-<h1>The Feeding Pipeline</h1>
+<h2>The Failure Modes</h2>
 
-<p></p>
+<p>There are several ways the conversion process can go wrong. As mentioned previously, the probability of it going wrong is some function of the chapter length, but not a linear one, and bad results can come from any length of chapter, even if less likely from the shorter ones.</p>
+
+<p>Re-rolling the output for better results is the go-to response if we encounter any of these worst failure modes:</p>
+
+<p>First off, the most entertaining conversion problem that can happen in this process is that the LLM will lose the plot of the original text it's meant to be converting, and just start writing its own continuation of the story. It seems the the LLM can usually recover from simple one-word transcription errors, but sometimes these spiral into just complete fabulizing off of the source text, essentially turning into fanfiction, or I suppose an alternate retelling of part of the story. It's funny that these "spinoff" sequences tend to markedly poorer written that the original text, which I suppose on one hand makes sense, since they're up against the greats of the classics, though on the other hand I would expect the smartest LLMs to do better at creative writing at this point, though on the other other hand, I suppose they are being asked to do two things at once by that point, since they still also tend to spit out metadata against their fake story continuations.</p>
+
+<p>The other main big failure mode is problems around line breaks. Sometimes the LLM will decide to only insert a single line break between two text lines without any metadata, which is incorrect, since we want a 3-cycle sequence. Other times they'll insert one <i>extra</i> line break, turning it into a 4-cycle. And other times still, they'll fail at the quote-handling part of the line breaks, not adding new quotes where they're necessary for the <code>pulp.txt</code> format. These are all fixable mistakes given effort, but we want to be able to put in the minimal effort, and so the best approach is just re-rolling.</p>
+
+<p>Then, there are the smaller mistakes:</p>
+
+<p>As mentioned above, sometimes the LLM just transcribes one particular token wrong. Often this is the LLM "fixing" what it sees as a mistake, like normalizing an uncommon spelling. This isn't what we want, but such mistakes are easily identified by the Pulpifier in its text comparison between the original text and the new output, and so point mistakes like that can just be manually fixed.</p>
+
+<p>Another thing the LLM likes to do is split up lines via semicolons, which is usually not where we want line breaks. Though we <i>sometimes</i> want it, which means that the Pulpifier does allow line breaks via semicolons, which means these don't show up as compilation errors. However, we can pretty easily remove all the semicolon-based line breaks with some find/replace regexes in gedit.</p>
+
+<p>This one captures line breaks on lines ending in semicolons, are recombines both the text lines into one and metadata lines into one:</p>
+
+<pre>
+   Find: \n\n([^\n]*;)”?\n([^\n]*)\n\n“?([^\n]*)\n([^\n]*)
+Replace: \n\n\1 \3\n\2;\4
+</pre>
+
+<p>Combining the metadatas into one can lead to some new attribution mistakes, so the replace results from this do need to be quickly manually checked, though usually there aren't <i>too</i> many to go through. Merging the metadatas also results in there being lots of redundant semicolons, but these can be cleaned up with more replaces:</p>
+
+<pre>
+   Find: \n;
+Replace: \n
+
+   Find: ;\n
+Replace: \n
+
+   Find: ;;
+Replace: ;
+</pre>
+
+<p>Note that for all of these, you'll want to hit the "Replace All" button multiple times until it de-highlights, since doing these replaces can create new cases to replace.</p>
+
+<p>The conversion process can also put line breaks in places that are valid, but just suboptimal for how we want the VN to be ready. Sometimes this is having lines that are too long, or too many lines in-a-row that are too short, or lines that combine multiple settings, or lines that combine dialogue and non-dialogue. Part of this initial first edit process requires scanning the outputted results anyway, and if mistakes such as these are noticed, they can be quickly fixed, though in general it's fine to leave these to the second edit.</p>
+
+<p>Speaker attributions are somewhat similar, although their mistakes can be a little trickier to identify if left for later, since we'll often end up needing to go back and reference the original source text to see how the quotes were formatted there to know if back-and-forth dialogue is labeled correctly, since we lose the original paragraph markers. But at least for speakers, mistakes tend to be much rarer, and usually still catchable in the second edit, or if not then, then the third.</p>
+
+<p>Name attribution mistakes essentially never happen, though sometimes we'll want to tweak the display names of characters, or remove redundant name declarations, or add in additional ones for renaming, so as to not reveal a character's full name right away, or for whatever other reason. Since name tags are the least common, and the most important to get right, since we'll be feeding them forward, we don't want to review all of them individually, correcting them if needed, as part of the first edit.</p>
+
+<p>This regex can be used to quickly round up all the declared names:</p>
+
+<pre>grep -Eo 'n:[^=]*=[^;]*' pulp.txt</pre>
+
+<p>Note that throughout all this, we'll want to keep checking the compilation status of the new <code>pulp.txt</code> contents by running the <code>PulpifierCLI</code> tool against it. This identifies all the errors that can be automatically identified. Assuming the chapter has no remaining compilation errors within itself, the <code>PulpifierCLI</code> will still show an error if the chapter isn't the last chapter, showing a mismatch on the expected header of the following chapter. And that's how we know that the chapter is fully Pulpifier-ready.</p>
 
 
+<h2>Feeding Forward</h2>
 
-<h2></h2>
-<p></p>
+<p>After we've gotten our chapter all nice and converted, we move on to the next one. But before we try feeding it in, we need to update the rolling character list. We can use the same regex sa included above for the name tag cleanup to pull the names out, and then copy them into the end of the boilerplate prompt, along with updating the desired target chapter header, and selecting the next chapter file for our conversion.</p>
+
+<p>Note that we don't necessarily want to carry every last character over between chapters, since some of them might be one-offs that have no bearing, and might have generic identifiers like <code>waiter</code> or <code>policeman</code> that we wouldn't want to get reused in subsequent chapters. (In fact, it's often beneficial to swap the IDs for these to ones like <code>waiter1</code> or <code>policeman1</code> to help make sure they don't get accidentally reused between chapters.)</p>
+
+<p>But those minor prompt tweaks aside, it's basically just the same process again, and again and again, for each chapter, until we've gotten the whole book's <code>pulp.txt</code> out.</p>
+
+<h2>All Done (With the First Edit)</h2>
+
+<p>And with that, we've gotten our starter metadata-annotated text to build off of.</p>
+
+<p>Overall, while the process takes a lot of explanatory setup to show why it is as it is, the actual conversion itself is not so bad, with the first edit being by far the shortest of the edit steps, or of any of the steps really. It just has a lot to talk about.</p>
+
+<p>But while the second edit, where we finish the metadata rough draft by adding in the rest of the metadata tags, is a much longer process, since it's all manual, it's conceptually rather simpler, even if it does hold some interesting discussion topics.</p>
+
+<p>But the explanation will have to wait for the next part: The Second Edit.</p>
+
