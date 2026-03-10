@@ -5,48 +5,73 @@
 #b-left.ed { background-image: url(/vn/DrJekyllAndMrHyde/images/c-author-abased.webp),url(/vn/DrJekyllAndMrHyde/images/c-lanyon-xdying-eserious-s.webp); }
 </style>
 
-<p>This is the third in a series of posts explaining my processes for how I convert books into visual novels. See the full series links over on the <a href='https://github.com/JohnQPulp/PublicDomainPulp?tab=readme-ov-file#contributing'>website's README.md</a>.</p>
+<p>This is a companion post to the Converting-Books-Into-Visual-Novels blog series I'm currently working on. It's not part of the series itself, because this post won't go into the <i>how</i> of the conversion process, but the <i>why</i>.</p>
 
-<p>Before going into the details of how books can be converted into visual novels, I think it makes sense to explore the constraints around the visual novel format itself. But before even getting into that, we can start with the constraints around the even simpler medium of books themselves, in their plain text form.</p>
+<p>Namely: I want to share some of my thoughts on what I consider to be the main constraint of book-converted visual novels — that of being non-contradictory — and how that affects how I approach the conversions.</p>
 
 
-<h1>Plain Text Constraints</h1>
+<h1>Contradictions in Text</h1>
 
-<p>With books, all we have is text. (We're considering only those books <i>without</i> illustrations for now.) In this context, the primary constraint we have is that the text must not contradict itself. An example of a contradiction would be:</p>
+<p>Before talking about visual novels, with their text <i>and</i> images, let's consider the strictly simpler format of regular novels — non-illustrated ones — where all we have is text.</p>
 
-<blockquote>Richard is wearing a green hat. Richard is wearing a red hat.</blockquote>
+<p>With novels, we have basic constraints like "Must be grammatically correct" and "Must convey meaning". These constraints don't apply to all possible texts, since the result of a monkey (or a postmodernist<span class='edi'> — anyone listed on <a href="https://en.wikipedia.org/wiki/Postmodern_literature">this Wikipedia article</a> really, especially Pynchon</span>) on a typewriter would still be <i>text</i>; however, random texts do not novels make.</p>
 
-<p>If this is the entire "story", then the text exists in a self-contradictory state, which we'll consider invalid. We'd have to remove one of the sentences to fix it.</p>
+<p>Similarly, for a text to function as a novel, it needs to be <i>non-contradictory</i>, and this is the constraint I want to explore.</p>
 
-<p>But we could also make the text non-contradictory by <i>adding</i> additional sentences:</p>
+<p>Consider the following text that features a direct contradiction:</p>
 
-<blockquote>Richard is wearing a green hat. Richard takes off his hat. Richard puts on a different hat. Richard is wearing a red hat.</blockquote>
+<blockquote>Richard is not wearing a hat. Richard is wearing a tophat.</blockquote>
 
-<p>Similarly, we could consider a pair of sentences that <i>indirectly</i> contradict each other by virtue of constructing an inconsistent world:</p>
+<p>Or this text, which contains an indirect contradiction:</p>
 
 <blockquote>Richard lives in medieval Europe. Richard is wearing a tophat.</blockquote>
 
-<p>And we could fix the "story" by again removing either line, or adding more explanatory detail:</p>
+<p>Neither of these texts are self-consistent. Therefore, they fail at being valid text-based story constructions.</p>
+
+<p>Now, both could be fixed via just removing one sentence each, or they could also both be fixed by adding <i>more</i> sentences:</p>
+
+<blockquote>Richard is not wearing a hat. Richards put on a hat. Richard is wearing a tophat.</blockquote>
 
 <blockquote>Richard lives in medieval Europe. He got there by travelling back in time. Richard is wearing a tophat.</blockquote>
 
-<p>In this way, the constraint of non-contradiction in text isn't a very difficult one to work around, which is part of the reason we don't usually think of storytelling as being "constrained" in this way.</p>
+<p>So it's not particularly difficult to fix contradictory texts, once we've spotted the inconsistency. And this is part of the reason why "non-contradiction" isn't usually thought of as a constraint in this way — since, to the the extent that the "constraint" exists, it can just be easily bypassed.</p>
 
 
 <h1>Text and Images Together</h1>
 
-<p>In any medium where text and images are paired together — illustrated novels, visual novels, graphic novels, comic strips, etc — the constraints multiply. If the text-only constraint was a one-by-one grid of just text vs text, where text must not contradict itself, text and images together form a two-by-two:</p>
+<p>Where things get trickier is when we consider those mediums that combine text <i>and</i> images in their storytelling — mediums including visual novels, but also illustrated novels, graphic novels, comic strips, and so on.</p>
+
+<p>If text by itself only had the one consistency constraint of "Text must not contradict itself", text and images together have <i>four</i>, but virtue of forming a two-by-two grid:</p>
 
 <img alt="Contradictions grid" src="/images/grid.webp" />
 
-<p>Let's consider each of these in the context of a visual novel, where we have two main types of images: background images and character sprites.</p>
+<p>Let's consider the three new sub-constraints:</p>
 
-<ul>
-<li>Text must not contradict itself: We've already covered this in the text-only context, but it still applies to visual novels. Same constraints.</li>
-<li>Text must not contradict images: If our visual novel is displaying a sunny background, then the text had better not say it's nighttime out. And if the current active character sprite of Richard is shown wearing a tophat, then the text had better not say he's wearing a bowler hat (or that he's living in medieval Europe).</li>
-<li>Images must not contradict text: This is the reverse of the above. If the text says it's sunny out, the background art needs to not look like night. And if the text says a character is wearing a tophat, the sprite for that character had better reflect that, if active.</li>
-<li>Images must not contradict themselves: Contradictions between images can take many forms. Sprites can contradict themselves if two different variations of the same character at the same age as different heights. Backgrounds can contradict themselves if we have two different shots of the same location that can't actually both physically exist in the same space. And many many more potential problems.</li>
-</ul>
+<h3>Images Must Not Contradict Text</h3>
+
+<p>Given a text like:</p>
+
+<blockquote>Richard is wearing a tophat.</blockquote>
+
+<p>Then, if we are to have an image of what's supposed to be Richard, the image needs to show him wearing that tophat, in order to be non-contradictory.</p>
+
+<p>Note that this doesn't mean we <i>need</i> to have an image of Richard. The constraint isn't "Images must reflect all details of text" — we're only concerned now with being <i>non-contradictory</i> with the text.</p>
+
+<p>So we can satisfy the constraint by either having our image(s) showing off Richard in his tophat, OR having no images of Richard at all.</p>
+
+<h3>Text Must Not Contradict Images</h3>
+
+<p>This is the reverse of the above. If we have an image of Richard in a tophat, our text can't say "Richard is not wearing a hat". Instead, the text can either omit mention of Richard's hatwear altogether, or just correctly identify it.</p>
+
+<p>It may seem redundant to consider this a separate constraint from the one above, but note there's a bit of an asymmetry here:</p>
+
+<p>Changing "Richard is not wearing a hat" to "Richard is wearing a tophat" is very easy, just as easy as deleting the sentence altogether. Whereas solving the contradiction from the image side — changing the image of Richard from tophat-wearing to hatless — is rather less easy.</p>
+
+<p>AI image-editing tools certainly make the problem easi<i>er</i> than would be the case years ago, but the easi<i>est</i> solution would still be to just not use the image. Since as established, from the perspective of fixing contradictions, deletion is just as effective as updating.</p>
+
+<h3>Images Must Not Contradict Themselves</h3>
+
+<p>Contradictions between images can take many forms. Sprites can contradict themselves if two different variations of the same character at the same age as different heights. Backgrounds can contradict themselves if we have two different shots of the same location that can't actually both physically exist in the same space. And many many more potential problems.</p>
 
 <p>It may seem redundant to consider both the top-right and bottom-left quadrants separately, when they just describe mirror constrains, but the distinction matters in the context of how we're converting books into visual novels. Because while normal visual novels can tweak both their text and their images to make them conform to each other, the self-imposed constraint of the Public Domain Pulp project is that <i>we do not ever change the original text</i> (except for inserting line breaks).</p>
 
