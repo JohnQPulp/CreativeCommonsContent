@@ -47,6 +47,18 @@
 
 <p>Let's consider the three new sub-constraints:</p>
 
+<h3>Images Must Not Contradict Themselves</h3>
+
+<p>Images must be consistent with their other images of the same story.</p>
+
+<p>An example of an <i>inconsistency</i> between images could be: one image illustrates the character of Richard as wearing no hat, whereas the other illustrates the character as wearing a tophat.<p>
+
+<p>Like with text, this isn't <i>necessarily</i> a contradiction if other images (or text) within the story can bridge the gap, explaining how we get from one state to the other. In this case, even the implicit passage of time from when one image is presented to when the next is could be sufficient. (Just like how, if "Richard is not wearing a hat" and "Richard is wearing a tophat" were separated by a scene change instead of being back-bo-back, it wouldn't necessarily be a text contradiction either.)</p>
+
+<p>A clearer example of a contradiction of images alone then would be in the depicting of something that definitely should not change without explanation, but does: for example, Richard's tophat's color changing from one image to the next. (Or, the contradiction could be of depicting something that definitely should change, yet doesn't.)</p>
+
+<p>Lastly, we can note that, if we only have the one image of Richard, then that sidesteps the image-consistency problem altogether, since at that point, there wouldn't be anything for the one depiction to contradict.</p>
+
 <h3>Images Must Not Contradict Text</h3>
 
 <p>Given a text like:</p>
@@ -69,46 +81,86 @@
 
 <p>AI image-editing tools certainly make the problem easi<i>er</i> than would be the case years ago, but the easi<i>est</i> solution would still be to just not use the image. Since as established, from the perspective of fixing contradictions, deletion is just as effective as updating.</p>
 
-<h3>Images Must Not Contradict Themselves</h3>
+<h1>Visual Novels</h1>
 
-<p>Contradictions between images can take many forms. Sprites can contradict themselves if two different variations of the same character at the same age as different heights. Backgrounds can contradict themselves if we have two different shots of the same location that can't actually both physically exist in the same space. And many many more potential problems.</p>
+<p>Let's switch away from generic text-and-image pairings and now start talking specifically about visual novels. Or rather, even more specifically: visual novels converted in unabridged form from books.</p>
 
-<p>It may seem redundant to consider both the top-right and bottom-left quadrants separately, when they just describe mirror constrains, but the distinction matters in the context of how we're converting books into visual novels. Because while normal visual novels can tweak both their text and their images to make them conform to each other, the self-imposed constraint of the Public Domain Pulp project is that <i>we do not ever change the original text</i> (except for inserting line breaks).</p>
+<p>The Public Domain Pulp project is all about taking public domain texts, breaking up those texts into shorter lines to accomodate the visual novel format, but otherwise leaving the text <i>unmodified</i>. The self-imposed rule is: we can add line breaks and we can adjust quotes to match the new line breaks, but we can't change any other aspect of the text.</p>
 
-<p>Therefore, although the constraints of the left half of the grid exist in theory, those constraints are moot. All we can do is create images, assigning them to parts of the text, doing so without introducing inconsistency.</p>
+<p>This means that, as we add images to the text and start to deal with the four different possible subcontradictions of the contradictions grid, we can only actually make changes from the images side of things.</p>
 
-<p>This is a difficult task, since it forces our visuals to warp at the whims of every last bit of text from the books we convert, no matter how inconvenient that source text may be, from the perspective of assigning images. We aren't allowed to nudge the the text in a more visualizable-friendly direction, even if the change wouldn't affect the informational value.</p>
+<p>A regular visual novel, upon finding it contained a contradiction between its text and images, could choose to adjust either the text <i>or</i> the images. It could attack the problem from either the "Text must not contradict images" angle or the "Images must not contradict text" one.</p>
 
-<p>This is a much bigger problem for backgrounds than it is for character sprites.</p>
+<p>But with converted visual novels, with their immutable texts, we can only change the images. So while the top half of the constraints grid still exists in theory, the two subconstraints there are therefore moot.</p>
 
-<p>Sprites exist in isolation, on transparent backgrounds, and importantly, not every slide needs to have sprites active on it. This makes them far easier to keep consistent with the text, since it mostly becomes a matter of generating base sprites for each character, figuring out when and how each character needs to be on-screen (which we have influence over), figuring out what age/clothing/expression/etc the character needs at each on-screen slide, and generating all the necessary sprite variations to match those requirements.</p>
+<p>And that's fine for the "Text must not contradict itself" square, since just by virtue of stealing texts whole<span class='edi'> (good texts that is — the best texts)</span>, that square is guaranteed to always stay in a stable state.</p>
 
-<p>Generating all the sprites may be somewhat tedious work, and we certainly end up with more sprites than backgrounds, but the constraint of non-contradiction isn't really difficult to satisfy per-se.</p>
+<p>But it's highly unfortunate for the "Text must not contradict images" square, since as established, it's easier to update text to match images than it is to adjust images to match text.</p>
 
-<p>Whereas backgrounds need to always be on-screen, always cover the whole screen, always represent a consistent environment that characters can exist and move around in, and contract neither any aspect of the text's scattered descriptions of the location nor any of the other backgrounds, some of which might also be depicting other aspects of the same location.</p>
+<p>Furthermore, it's not just about adjusting images if and when we notice inconsistencies with the text (although, in the editing process, inconsistences with the text are always found). It's also about: how do we even get the images in the first place, such that they have a chance of being consistent?</p>
 
-<p>The main saving grace of backgrounds is that the constraints we're operating under "only" require non-contradiction. They don't require that the background fully represents every detail of their respective locations. What this means is that we can often take refuge in either abstraction, or by just depicting only a portion of a described location. In either case: we lower the number of details present in the background, thus being less likely to create any contradiction.</p>
+<h3>Sprites</h3>
 
-<p>Take this to the extreme, and we get fully abstract backgrounds carrying zero informational value. If you just had one of these statically displayed for the entire visual novel, there wouldn't be any background contradictions possible — thus the constraint satisfied!</p>
+<p>With visuals, we have two main types of images: sprites and backgrounds.</p>
 
-<p>But of course, we <i>do</i> want the backgrounds to carry informational value, as well as looking nice. The more of both of these, the better. And the more backgrounds, the better, too. It's just the fundamental challenge that trying to increase any of these increases the surfaces for contradiction, thus making it increasingly difficult to get valid backgrounds.</p>
+<p>Sprites aren't so bad, all things considered. While all the sprites of the same character need to be kept consistent with each other, they generally exist in isolation otherwise, from a "Images must not contradict themselves" perspective. And with the sprites being rather standardized, they're also relatively easy to keep consistent with the text too.</p>
 
-<p>And because we're generating these backgrounds (and sprites), whether or not we get non-contradictory, good-looking results is always a roll of the dice. Now we can always re-roll any image as many times as needed, but the more constraints an image is under, the closer the probability of getting a non-contradictory result moves towards zero.</p>
+<p>The texts' descriptions do often require creating many sprite variations for the characters, updating based on and and clothing and expression and other changes, but this doesn't make them more difficult than the backgrounds, even if they are more numerous and tedious to generate.</p>
 
-<p>This is why the other extreme of visual novel image generation — creating a unique background for every slide — is essentially impossible, at least if we want to avoid contradictions, at least under the current capabilities of image generation AIs. The number of images we'd need to generate wouldn't scale O(N). The function probably wouldn't be all the way O(N^2), since not every image matters for every other image, but it would certainly be some super-linear function.</p>
+<p>Partially it's again down to them still being more systemized in creation, but there's another key factor: sprites don't always need to be on-screen.</p>
 
-<p>All this is to establish that: in the context of visual novels created here, the primary challenge is almost always the "art" of getting good backgrounds, which is downstream of minimizing the constrains the images are subjected to, balancing that with still trying to get good, detailed results. As a whole, this is the fundamental constraint of the Public Domain Pulp conversion process, and the reason the process is set up as it is is mostly downstream of this balance.</p>
+<p>Remember: being consistent with text can take the form of following its details exactly in image depictions, but the non-contradiction constraint is also satisfied by just not showing an image. Therefore, if we have a particularly tricky text to visualize with respect to a character, we have a lot of control over whether the visual even needs to be displayed.</p>
+
+<h3>Backgrounds</h3>
+
+<p>Backgrounds are painful because they lack all of the above aspects that make sprites easier to work with:</p>
+
+<p>Backgrounds need to always be on-screen and always cover the whole screen.</p>
+
+<p>Backgrounds also lack any standardization: whereas sprites will always be a single character standing vertical on transparency, backgrounds can depict anything — they <i>need</i> to be able to depict anything that the text throws at them. And remember: we're dealing with texts that were never designed to be put into visual novel form<span class='edi'>, even though its obvious superiority would be apparent to all public domain authors, were they only alive still today</span> — texts whose scattered descriptions are often not easy to wrangle into a cohesive picture.</p>
+
+<p>Lastly, as compared to the relative ease of creating sprite variations off of the same character, whose updates are targetted and semi-automatable, creating background variations — whether that be changes to a background to represent the same location at different times or different sublocations within a larger one — is almost always difficult to get right. With background variations, we have to mind both the already tricky "Images must not contradict text" contraint, but then also the "Images must not contradict themselves" constraint.</p>
+
+<p>Again, the fact that the constraint is only that of non-contradiction does help to make the task somewhat easier, since, although we do need to always display a background, the background images don't need to represent every last detail from the texts. And what this means is that we can often take refuge either in abstraction, or by just depicting only a portion of a described location. In either case: we lower the number of details to depict.</p>
+
+<p>(Taken to the extreme, this results in fully abstract backgrounds with zero informational value: non-contradictory, but not exactly nice to look at, or effectively using the visual medium.)</p>
+
+<h3>The Details Problem</h3>
+
+<p>The fundamental problem with having lots of detailed backgrounds that overlap with lots of other details backgrounds is that: the more details are present, the more constraints we have to satisfy with regard to both the "Images must not contradict text" and "Images must not contradict themselves" rules.</p>
+
+<p>And because this whole project is based on <i>generating</i> backgrounds, and because AI-generated images are <i>probabalistic</i>, the more non-contradiction constraints we have: the lower the likelihood of our generated images satisfying all the constraints (while also still looking good). And since violating even one of the constraints, whether that be from being inconsistent with another image or with some particularly detail from the text, is enough to be distracting to the point of it being better to have no image at all, you can hopefully see why detail-minimization is so critical.</p>
+
+<p>Or rather, superfluous detail minimization is perhaps the better way to put it. We obviously still want many backgrounds, and for those backgrounds present to as comprehensibly represent the original text as possible; but those desires have to be considered in the tradeoff of how practical it is to even get the backgrounds in the first place (and then, how practical they'll be to update, if necessary).</p>
+
+<p>While we can (and do) always re-roll any image prompt we want to generate for the best results, this doesn't avoid the limitation that, as the number of constraints increases, the closer the probability of getting a non-contradictory result moves towards zero.</p>
+
+<p>This is why the other extreme of visual novel image generation — creating a unique background for every slide — is essentially impossible, at least if we want to avoid contradictions under the current capabilities of image generation AIs. The number of images we'd need would scale O(N), but the number of generations we'd need would scale… if not O(N^2), then still at least some super-linear function.</p>
+
+<p>All this is to establish that: in the context of visual novels created here, the primary challenge is almost always the "art" of getting good backgrounds, which is downstream of minimizing the constraints the images are subjected to, balancing that minimization effort with the need to still have background variety and appeal.</p>
+
+<p>As a whole, this is the fundamental constraint of the Public Domain Pulp conversion process, getting this aspect of the conversion correct. And that's why the process needs to revolve so heavily around background planning.</p>
 
 
-<h1>Extra Thoughts</h1>
+<h1>Closing Thoughts</h1>
 
-<p>This has been a lot of talk about the constraints of specifically converting books to visual novels when we can't modify the original books' texts. It may seem like this puts the converted visual novels under uniquely difficult constraints, but there are two things to consider:</p>
+<p>For converted visual novels, where we can't change the text, the images must warp themselves to match the text, balancing the desire for detail with the need for consistency, often suffering in the process, as compared to a counterfactual project that would be able to modify both.</p>
 
-<p>First, the uniqueness of the constraint is somewhat questionable, since illustrated editions of books, when they don't abridge the books, have the same problem. Those too can't modify the text, and so any illustrations must just match whatever text there is. (And the illustrations must again match each other.) The main difference with that medium is that illustrations can be placed in select locations — they don't always have always-on requirement of visual novels. Technically I suppose you could consider abstract backgrounds in visual novels as an effective off-state of the images themselves, in which case there is some control over whether or not to display visuals, but in general this doesn't get you as far and can't be used as extensively.</p>
+<p>And yet, not modifying the source text is still the correct decision.</p>
 
-<p>Second, while it may sound all great for those mediums like normal visual novels where images and text can be developed and modified side-by-side, allowing text modification does reactive the left side of the of the constraints grid. And sometimes this can mean, rather than the Public Domain Pulp situation of forcing the visuals to warp in imperfect ways to match the needs of the text, in other visual novels, the text often warps in strange ways in order to match the visuals. This is part of the reason why visual novel writing can sometimes read strangely, including superfluous writing just to move characters or backgrounds from one state to another, or omitting writing that would make sense or just work as good additional prose, if it would contradict the visuals.</p>
+<p>First, illustrated editions of books exist, and they have the same constraints. The constraints aren't as tricky for that medium, with its generally fewer images, which can also be strategically placed<span class='edi'> (though I suppose you could consider abstract backgrounds in visual novels as an effective off-state of the images themselves)</span>, and also have the advantage of <i>not</i> being probabilistically generated. But even still, the constraints are still fundamentally the same, which helps validate the concept of applying images after text in the first place.</p>
 
-<p>Ideally neither the text nor the visuals would have to make sacrifices to meet the other, but in practice, for many of the same reasons described previously, this is very difficult. And so in those other visual novels, the prose can suffer for it. (This is on top of the average visual novel prose quality already being rather terrible.)</p>
+<p>Second, changing the Pulp rules to allow modifying text definitely wouldn't be all upside. Yes, it would make <i>some</i> tricky visualization problems easier (and it would also make some line formatting problems easier).</p>
 
-<p>Converted visual novels basically cheat their way around this problem by always just stealing prose from the classics, which guarantees that at least one aspect of the visual novel — the text — will always be consistently good. And while that does introduce the tradeoff of constraining the images, which probabalistically reduces their average quality, I personally think that's a good tradeoff. (Obviously, since that's why I'm pursuing the project.)</p>
+<p>But: the key advantage of the non-modification is that, the text never needs to make any sacrifices to accomodate the images. The images may be required to warp, but the text never has to do so.</p>
+
+<p>When reading non-converted visual novels, the prose is very often strange, unnatural, and clunky; and I believe a lot of this is down to the strategy of making the text fit the visuals, rather than the more difficult task of making the images fit the text. So the writing often reads both superfluous in unnecessary detail (required to keep up with visual changes), and yet still somehow lacking in substance.</p>
+
+<p>Probably a lot of this is just down to average visual novel prose already being terrible. But at least part of it is the constraints problem.</p>
+
+<p>Ideally: neither the text nor the visuals of any medium with both would need to sacrifice their quality to meet the other. But in practice, it does need to happen sometimes. And between the two, I'm happier to prioritize preserving the prose.<span class='edi'> Especially when the prose is, you know, the <i>classics</i>.</span></p>
+
+<p>Of course, the visuals need to not be so sacrificed as to negate any supplementary value they have in telling the story. Otherwise, there'd be no point to reading a visual novel as compared to just reading the book.</p>
+
+<p>And maybe after reading this, you agree with that statement, and go back to just the plain books. But as for me, I think the visual novels still have great potential for story enhancement, constrained as their visuals might be in cases. And after all, the better the constraints are understood, the better we can work around them!</p>
 
