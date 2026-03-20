@@ -261,7 +261,7 @@ t=henry
 <li><code>nospace</code>: Causes text from the current text line to not have an automatic space appended onto it when building the next slide.</li>
 <li><code>allowbreak</code>: Allows a line break to be placed where it otherwise wouldn't be permitted by the <a href="#line-break-rules">rules described further below</a>.</li>
 <li><code>dialogue</code>: Causes text within quotes to be formatted bold, like dialogue, even if there isn't an active speaker or thinker.</li>
-<li><code>nocounter</code>: Causes sprites to not swap between suffix variations. See also the <code>no-speaker-counter</code> header below.</li>
+<li><code>nospeaker</code>: Causes active speakers to not show sprites in the speaker box. (Used for example in representing a character speaking from another room or otherwise out-of-view.<span class='edi'> Will also probably be useful when doing the <book>Invisible Man</book> conversion.</span>)</li>
 </ul>
 
 <h2>(h)eader</h2>
@@ -278,7 +278,16 @@ t=henry
 
 <p>The only tags that <code>r</code> doesn't reset are the three permanent ones: <code>n</code>, <code>h</code>, and <code>z</code>; and then also the <code>a</code> tag, since while we don't expect a character's expression to persist between scenes, their current age generally should.</p>
 
-<h1>The Text Lines</h1>
+<h2>(i)ndex</h2>
+
+<p><code>i</code> for "index" refers to the speaker counter index, with this tag being used to override the default sprite variation sequence — the one described above in the (s)peaker section.</p>
+
+<p>Used without an argument, like <code>i=2</code>, it sets the sprite variation to use for the <i>current speaker</i> for the current line. Used with an argument, like <code>i:jake=2</code>, it sets the variation for a specific character, on-screen in either the active character list of the speaker box.</p>
+
+<p>So for example if the variation counter would normally result in Jake's current emotion of angry showing the 3rd variation, <code>c-jake-eangry-s3</code>, but we set <code>i:jake=2</code>, then the VN will use <code>c-jake-eangry-s2</code> instead. But importantly, this override only affects the current line. It does not carry over to subsequent lines like other metadata. (And therefore, doesn't apply to the (r)eset considerations of the prior section.</p>
+
+
+<h1 id="text-lines">The Text Lines</h1>
 
 <p>The text lines are the other half of the <code>pulp.txt</code> format in the overall "Text Line → Metadata Line → Blank Line" slide 3-cycle.</p>
 
