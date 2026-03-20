@@ -147,7 +147,7 @@
 
 <p>The problem is on the output side. Even if we consider only a novella-length book of 30k words (and assume a 4:3 ratio for tokens:words), that's 40k tokens just to spit the text back out — the bare minimum. Then there's all the new stuff around the original text — the line breaks and metadata annotations — that push the output token count even higher.</p>
 
-<p>And from observations in practice of seeing what the top-tier LLMs can handle, their ability to accurately spit back out the text with good line breaks and metadata annotations does drop as output text lengths increase. And eventually, the text either goes completey awry, or the LLM just errors out.</p>
+<p>And from observations in practice of seeing what the top-tier LLMs can handle, their ability to accurately spit back out the text with good line breaks and metadata annotations does drop as output text lengths increase. And eventually, the text either goes completely awry, or the LLM just errors out.</p>
 
 <p>We can re-roll bad text generation outputs, but ideally we want to do this as infrequently as possible, and as the requested output length increases, the probability of eventually ending up with bad results approaches… if not one, then something close enough to it.</p>
 
@@ -158,7 +158,7 @@
 
 <p>Overall, this approach works better, but the failure mode rates are still too high. Even though the LLM can ingest the whole book, and even the whole book repeated again with added metadata annotations, there's still quality drop-off with the increased input context.</p>
 
-<p>Third attempted approach then: feed in just the particular chapter text an LLM needs at any given time, plus all previously generated metadata-annoted text. This works better still, but still starts to collapse in later chapters of longer texts, as the full weight of the ever-growing <code>pulp.txt</code> text crowds the input context. While the LLMs can very well understand the <code>pulp.txt</code> in small doses, they do still tend to choke as the <code>pulp.txt</code> approaches full book length. Their capabilities aren't <i>as</i> impaired as in the previous approaches, but still impaired enough to cause problems.</p>
+<p>Third attempted approach then: feed in just the particular chapter text an LLM needs at any given time, plus all previously generated metadata-annotated text. This works better still, but still starts to collapse in later chapters of longer texts, as the full weight of the ever-growing <code>pulp.txt</code> text crowds the input context. While the LLMs can very well understand the <code>pulp.txt</code> in small doses, they do still tend to choke as the <code>pulp.txt</code> approaches full book length. Their capabilities aren't <i>as</i> impaired as in the previous approaches, but still impaired enough to cause problems.</p>
 
 
 <h2>The Chapter-by-Chapter Approach</h2>
@@ -276,7 +276,7 @@ Replace: \n\n\1 \3\n\2;\4
 
 <h2>Feeding Forward</h2>
 
-<p>After we've gotten our chapter all nice and converted, we move on to the next one. But before we try feeding it in, we need to update the rolling character list. We can use the same regex sa included above for the name tag cleanup to pull the names out, and then copy them into the end of the boilerplate prompt, along with updating the desired target chapter header, and selecting the next chapter file for our conversion.</p>
+<p>After we've gotten our chapter all nice and converted, we move on to the next one. But before we try feeding it in, we need to update the rolling character list. We can use the same regex included above for the name tag cleanup to pull the names out, and then copy them into the end of the boilerplate prompt, along with updating the desired target chapter header, and selecting the next chapter file for our conversion.</p>
 
 <p>Note that we don't necessarily want to carry every last character over between chapters, since some of them might be one-offs that have no bearing, and might have generic identifiers like <code>waiter</code> or <code>policeman</code> that we wouldn't want to get reused in subsequent chapters. (In fact, it's often beneficial to swap the IDs for these to ones like <code>waiter1</code> or <code>policeman1</code> to help make sure they don't get accidentally reused between chapters.)</p>
 
