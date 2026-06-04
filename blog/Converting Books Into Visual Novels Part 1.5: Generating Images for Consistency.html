@@ -5,15 +5,11 @@
 #b-right.ed { background-image: url(/vn/TheMysteriousAffairAtStyles/images/c-cynthia-xhat-enervous-s.webp),url(/vn/TheMysteriousAffairAtStyles/images/c-hastings-xnight1-econfused-s.webp); }
 </style>
 
-<p>This is the fourth in a series of posts explaining my processes for how I convert books into visual novels. See the full series links over on the <a href='https://github.com/JohnQPulp/PublicDomainPulp?tab=readme-ov-file#contributing'>website's README.md</a>.</p>
+<p>This is the fourth (or perhaps fifth) in a series of posts explaining my processes for how I convert books into visual novels. See the full series links over on the <a href='https://github.com/JohnQPulp/PublicDomainPulp?tab=readme-ov-file#contributing'>website's README.md</a>.</p>
 
-<p>Originally I had planned to document all the image generation technicalities <i>after</i> "Part 2 — The Second Edit". However, I realized that, since that edit is all about setting up the visual metadata in preparation for the image generating to follow, it probably makes sense to start with the high-level explanation of how exactly that character sprite and background generation works, which should help to explain the motivations behing how <code>pulp.txt</code> winds up being edited.</p>
+<p>This post will attempt to document, at a high-level, how the actual image generating and processing works — how to go from character and background text description to VN-ready <code>.avif</code> file.</p>
 
-<h1>Image Generation: The Prompts and the Commands</h1>
-
-<p>To start, this section will just run down the primary image prompts and image processing commands used as part of the conversion pipeline, designed for getting out results in a consistent style.</p>
-
-<p>These should act as a sufficient-enough reference guide for getting started generating Pulp-type character and background images. However, it won't explain <i>why</i> the processes are as they are. (Read on through to the subsequent sections for that.)</p>
+<p>This post won't fully explain the <i>why</i> behind these processes or fully describe the most efficient/effective prompting systems (those details will come later in subsequent posts in the series), but should act as a sufficient-enough reference guide for getting started generating images that conform to the desired style of Public Domain Pulp's VNs.</p>
 
 <h2>The Prompts</h2>
 
@@ -71,6 +67,10 @@ The update is to change the sprite to have the character be wearing outdoor clot
 # result saved off as c-lizzy-xbonnet.jpeg
 </pre>
 
+<p>And a visual example of the base sprites you might end up with:</p>
+
+<img src="/images/poirots-2.avif" />
+
 <p>And another example, for an expression variation:</p>
 
 <pre>
@@ -82,6 +82,10 @@ The update is to change the sprite to have the character's expression be thinkin
 
 # result saved off as c-lizzy-ethinking-s.jpeg
 </pre>
+
+<p>And a visual example of all the many expression variations off the base sprites you can end up with (noting how expressions produce many many more sprites!):</p>
+
+<img src="/images/poirots.avif" />
 
 <h3>Base Background Prompt</h3>
 
@@ -133,6 +137,10 @@ The update is to make the scene outside the window(s) nighttime by adding dense 
 # result saved off as b-manor-mary-night.jpeg
 </pre>
 
+<p>And here's a visual example of a background and a simple variation on it:</p>
+
+<img src="/images/backgrounds.avif" />
+
 <h2>Image Commands</h2>
 
 <p>The above prompts, done for all the character sprites and backgrounds throughout a book, will produce a set of initial unprocessed reference images. The next step is to run commands on these images to make them VN-ready:</p>
@@ -160,7 +168,7 @@ for f in c-*.jpeg; do
     outpng="pngsc/${f%.*}.png"
     rm "$outpng"
     convert "$f" pC.png -fx "v.p{u.r*v.w, u.intensity*v.h}" temp.png
-    rembg i -m isnet-anime -om temp.png mask.png
+    rembg i -m isnet-anime -om temp.png mask.png <span class='edi'># that model… how embarrassing</span>
     convert temp.png mask.png -alpha off -compose CopyOpacity -composite "$outpng"
     avifenc -q 50 --qalpha 50 -s 2 -y 444 "$outpng" "$out"
     rm temp.png
@@ -197,56 +205,24 @@ done
 
 <p>Again, we generate both the intermediate <code>.png</code> and a final <code>.avif</code>, with the compressed <code>.avif</code> being the only one that actually gets committed to source.</p>
 
-<h1>Process Explanation and Motivations</h1>
+<h2>Quick Explanations</h2>
 
-<p>Now that we have the prompts and the commands, let's walk through why they are as they are.</p>
+<p>The full details of how the semi-automated image generation pipeline processes work are best left for the eventual "Part 3: Character Sprite Generation" and "Part 4: Background Generation" posts. Those will go into much more detail about how to get the best results out, for their respective image types.</p>
 
-<p>First off: an image recap. The three image types that the site currently supports are backgrounds, cards, and character sprites. Here's an example with all three:</p>
+<p>However, there are a few areas where I think it makes to at least quickly touch on the "why" aspect of the processes laid out above, at a high-level:</p>
 
-<img src="/images/slide-2.avif" />
-
-<p>Backgrounds occupy the full background of the VN window. Cards sit on top of the background in the middle of the screen, and character sprites sit on top of the background either in the lower-left speaker corner or on the screen if meant to be set into the background.</p>
-
-<p>(Cards are basically just backgrounds of arbitrary resolutions that sit on top of other backgrounds without taking up the full view. Therefore, from a technical perspective of uniqueness, they can be mostly ignored. Also: they're pretty uncommon anyway.)</p>
-
-<p>With these images, the goal is to have them look good, clean, text-accurate, and importantly: consistent. Inconsistencies in art styles are very distracting, and so we want the style of the lines, the colors, the hatching shading, and everything else to sell the idea that these images all exist together.</p>
-
-<p>Let's walk through how best to make that happen, starting with:</p>
-
-<h2>Characters</h2>
-
-<p>Characters each have a set of base sprites, based on each of their (a)ge/e(x)tra metadata combinations (where an "extra" is usually just an outfit). For example, in <book>The Mysterious Affair at Styles</book>, Poirot had three different outfits:</p>
-
-<img src="/images/poirots-2.avif" />
-
-<p>Each of these, in turn, having many (e)xpression variations:</p>
-
-<img src="/images/poirots.avif" />
-
-<p>A character can require anywhere from one to dozens of different expression sprites, depending on how often they speak and with what diversity of emotion.</p>
-
-<p>In general, it's not too difficult to generate additional marginal expression sprites (with some caveats explored furhter below), and so we don't necessarily need to prioritize minimizing their number, like we do with other metadatas. However, it's still preferable to reuse sprites as often as possible, to save time.</p>
-
-<p>One way to do this is to minimize the number of outfits, since each unique outfit multiplies the number of expression variations needed. There's limits to how much minimizing can be done, since for example, almost all male characters will need at least indoor (hatless) and outdoor (hat-wearing) outfit variations if they're around for any significant amount of story time. But: it does mean that pursuing every last possible subtle costume change to absolute story precision may not always be worth it, especially if the change ends up being quite subtle. (And remember: characters are mostly only visible from the shoulders-up. So changes below the shoulders are often not even going to be visible!)</p>
-
-<h3>Character Prompting</h3>
+<h3>File Format</h3>
 
 
 
-<h2>Backgrounds</h2>
+<h3>Character Sizing</h3>
 
-<p>Most backgrounds are their own independent </p>
 
-<img src="/images/backgrounds.avif" />
 
-<p></p>
+<h3>Color Normalizing</h3>
 
-<h1>The High-Level Image Generation Process</h1>
 
-<h2>Color Normalizing</h2>
 
-<h2>Background Removal</h2>
+<h3>Background Removal</h3>
 
-<p></p>
 
-<h1></h1>
