@@ -286,6 +286,17 @@ t=henry
 
 <p>So for example if the variation counter would normally result in Jake's current emotion of angry showing the 3rd variation, <code>c-jake-eangry-s3</code>, but we set <code>i:jake=2</code>, then the VN will use <code>c-jake-eangry-s2</code> instead. But importantly, this override only affects the current line. It does not carry over to subsequent lines like other metadata. (And therefore, doesn't apply to the (r)eset considerations of the prior section.</p>
 
+<h2>(g)ödel</h2>
+
+<p>The <code>g</code> tag uses "g", because "f" for "frame narrative" was already taken. But the idea is the same: of putting a VN window within a VN window.</p>
+
+<p><code>g</code> accepts one background-name argument like <code>g=boarding-int</code>, which creates an inner VN framing using that new background. Once inside a frame narrative, all tags continue to work the same, except that they apply only to the new inner frame window, rather than the outer frame, which is fixed in-place with whatever background and speaker sprite it had, prior to entering the frame narrative.</p>
+
+<p>A frame narrative is exited by "popping" the frame off the stack with an empty argument like <code>g=</code>, but a second level of framing can also be "pushed" onto the frame stack to create an inner inner window. (But that's it: there's not yet support for inner inner inner windows, though it could be added!)</p>
+
+<p>The purpose of the frame narrative is that it pushes dialogue one layer deeper, such that instead of bolding "outer" dialogue like “I went to the store.”, it bolds inner dialogue like the single-quote portion of “He said, ‘I went to the store.’” And inner inner frame narratives handle the quotes one layer deeper than that, even.</p>
+
+<p>This all helps in situations where one character speaks at length, especially if their dialogue contains inner conversations between other characters, where you want the inner dialogue to be the one that's labeled, rather than the unchanging outer speaker.</p>
 
 <h1 id="text-lines">The Text Lines</h1>
 
@@ -384,7 +395,7 @@ It had been forwarded from Paris:
 
 <h2>Editor's Notes</h2>
 
-<p>Lastly, text lines can contain "Editor's Notes" formatted like:</p>
+<p>Text lines can contain "Editor's Notes" formatted like:</p>
 
 <pre>
 “I reverse the order. For Bryan’s sake. As a tribute to the Great Commoner. First the chicken; then the egg.”&lt;e&gt;Based William Jennings Bryan reference.&lt;/e&gt;
@@ -392,3 +403,14 @@ s=bill
 </pre>
 
 <p>The Pulpifier automatically converts the custom e tags into span-html, and also removes the e tag text from the original text comparison. This allows arbitrary Editor's Note text (or even html, including scripts!) to be added, though the notes aren't visible by default.</p>
+
+<h2>Footnotes</h2>
+
+<p>Footnotes/endnotes can be added similarly like:</p>
+
+<pre>
+“We Elders have many heifers,<f>Heber C. Kemball, in one of his sermons, alludes to his hundred wives under this endearing epithet.</f> but our children must also be provided.”
+e:brigham=serious
+</pre>
+
+<p>Generally, fiction novels don't have many footnotes, if there are any in the original text, this will automatically insert an asterisk (or equivalent) where the f-tag starts, and move the text out to its own line, below the main text.</p>
