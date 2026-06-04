@@ -9,6 +9,106 @@
 
 <p>While I was originally planning on jumping right into the Part 2 — The Second Edit as the next series post, I realized that, since that edit is all about laying the foundation and editing the metadata in preparation for the image generation, it probably makes sense to quickly discuss what the high-level process is for image generation for these visual novels.</p>
 
+<h1>Commands TL;DR</h1>
+
+<p>I'll start with just a quick reference for the prompts and commands used to generate the images in the consistent Public Domain Pulp cross-hatching style. This section won't explain <i>why</i> the prompts and commands are as they are — see the subsequent sections for that — but rather will act as just a guide for how to quickly get started in for getting images out in the correct style.</p>
+
+<h2>The Prompts</h2>
+
+<p>All image prompting should be done with Google's Nano Banana Pro model. This is what the prompts have been tweaked to get the best results for. (GPT Image 2 is the current strong contender for best image model; however, it won't work well with these Banano-optimized commands and reference images, and also has some other problems in general that make it not-quite well-suited for the Pulp task.)</p>
+
+<h3>Base Character Prompt</h3>
+
+<p>For generating a character base sprite, use this prompt (feeding in these two character style reference images: <a href="/images/reference/c-example-1.jpeg">c-example-1.jpeg</a> and <a href="/images/reference/c-example-2.jpeg">c-example-2.jpeg</a>):</p>
+
+<pre>
+
+</pre>
+
+<p>For example:</p>
+
+<pre>
+
+</pre>
+
+<h3>Character Variation Prompt</h3>
+
+<p>For generating a character sprite variation, use this prompt (feeding in a previously generated character sprite as the reference image):</p>
+
+<pre>
+
+</pre>
+
+<p>For example, for an outfit variation:</p>
+
+<pre>
+
+</pre>
+
+<p>And another example, for an expression variation:</p>
+
+<pre>
+
+</pre>
+
+<h3>Base Background Prompt</h3>
+
+<p>For generating a new background, use this prompt (feeding in this background style reference image: <a href="/images/reference/b-example.jpeg">b-example.jpeg</a>):</p>
+
+<pre>
+
+</pre>
+
+<p>For example:</p>
+
+<pre>
+
+</pre>
+
+<h3>Background Variation Prompt</h3>
+
+<p>For generating a background variation, use this prompt (feeding in a previously generated background as the reference image):</p>
+
+<pre>
+
+</pre>
+
+<p>For example:</p>
+
+<pre>
+
+</pre>
+
+<h2>Image Commands</h2>
+
+<p>The above prompts, done for all the character sprites and backgrounds throughout a book, will produce a set of initial unprocessed reference images. The next step is to run commands on these images to make them VN-ready:</p>
+
+<h3>Character Commands</h3>
+
+<p>For characters, we need to do three things:</p>
+
+<ul>
+<li>Normalize colors</li>
+<li>Remove backgrounds</li>
+<li>Apply compression</li>
+</ul>
+
+<p>The base commands for that are (feeding in this color palette reference image: <a href="/images/reference/pC.png">pC.png</a>):</p>
+
+<pre>
+
+</pre>
+
+<h3>Background Commands</h3>
+
+<p>For backgrounds, we need to normalize colors and apply compression as with the character sprites, but we can skip the background-removal step.</p>
+
+<p>The commands to run therefore become (still using <a href="/images/reference/pC.png">pC.png</a>):</p>
+
+<pre>
+
+</pre>
+
 <h1>Image Type Recap</h1>
 
 <p>The three image "types" that the site currently supports are backgrounds, "cards", and character sprites. Here's an example with all three:</p>
@@ -36,6 +136,10 @@
 <p></p>
 
 <h1>The High-Level Image Generation Process</h1>
+
+<h2>Color Normalizing</h2>
+
+<h2>Background Removal</h2>
 
 <p></p>
 
