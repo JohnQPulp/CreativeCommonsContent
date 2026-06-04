@@ -207,22 +207,61 @@ done
 
 <h2>Quick Explanations</h2>
 
-<p>The full details of how the semi-automated image generation pipeline processes work are best left for the eventual "Part 3: Character Sprite Generation" and "Part 4: Background Generation" posts. Those will go into much more detail about how to get the best results out, for their respective image types.</p>
+<p>While the full best-practice details of the image generation processes need to be left for the "Part 3: Character Sprite Generation" and "Part 4: Background Generation" posts, there are a few high-level considerations that ought to be fleshed out at least partially here:</p>
 
-<p>However, there are a few areas where I think it makes to at least quickly touch on the "why" aspect of the processes laid out above, at a high-level:</p>
+<h3>File Formats</h3>
 
-<h3>File Format</h3>
+<p>Even though the image pipeline moves through three different file types throughout the process — the initial <code>.jpeg</code>, the intermediate <code>.png</code>, and the final <code>.avif</code> — it's only that final one that gets committed to source. We don't want multiple versions of the same files committed, since that'd be a waste of space. We only want the final compressed copies.</p>
 
-
+<p>Also: although the more recent VNs use <code>.avif</code> at quality=50 for their image compressions, earlier VNs used <code>.webp</code> files instead, at q=25. The reason the latest ones switched away from <code>.webp</code> is that that file format was found to be producing ugly off-color artifacts in the tans of the cross-hatching style at a very high frequency, and there wasn't a good way to get rid of those without cranking up the quality to unreasonably bloated levels.</p>
 
 <h3>Character Sizing</h3>
 
+<p>Since all character use the same 1376x768 pixel resolution for their sizes (expect for a few unsuccessful experimental cases in <i>Pride and Prejudice</i>), there are some factors around character height that need considering.</p>
 
+<p>To start: height needs to take into account the <i>tallest</i> version of a sprite that needs to exist, which usually means taking into account any hatwear they might have on in their various outfits. If, for example, a character has a variation without a top hat, and another with a top hat, the one <i>with</i> the top hat should be generated first, and then removed via the character update prompt, and not the other way around. (Since otherwise, the character update would have to shrink the character in order to fit the top hat, which would result in their sizing being inconsistent.)</p>
+
+<p>Also: because characters are different heights, earlier VNs had a problem wherein the tallest characters would end up at lower, crummier effective resolutions, since in order to accomodate their full bodies, their heads would need to be a smaller size in terms of pixels, which when blown up, would looks bad and inconsistent compared to shorter characters, especially children sprites.</p>
+
+<p>The solution for this (after many failed alternate approaches) was to simply stop having the sprites be full-body, and instead just have the sprites generate from the legs up. This works well-enough because "legs-up" leaves wiggle room for how much of the legs to show, such that taller characters can cut off at a higher point and shorter characters at a lower point, leaving heads more consistently sized (if still not perfectly consistent):</p>
+
+<img src="/images/scaling.avif" />
+
+<p>Since the bottoms of the legs aren't ever really seen anyway in the VNs, this also has the bonus of just dedicating more overall image pixel size to the portions of the images that actually matter, bumping character resolutions all-around.</p>
 
 <h3>Color Normalizing</h3>
 
+<p>The ImageMagick <code>convert</code> color command collapses all colors down to a palette that looks like this:</p>
 
+<img src="/images/reference/pC.png" />
+
+<p>This has two effects. First off, it tends to deepen the paper-ness or perhaps sepia-ness of the colors, making the results a bit more orangey than they are in their initial generated state, which tends to look a bit richer, and also better match the website's color scheme.</p>
+
+<p>Second, and more important, it helps to make coloring more consistent across all the images, which is very important for helping wrangle the differing probabalistic outputs of the image generations, especially for backgrounds, which can sometimes be more wild.</p>
+
+<p>However, the <code>v.p{u.r*v.w, u.intensity*v.h}</code> color formula used for the normalization is a little weird in that, while it takes into account the source image's red and green channels, it completely ignores the blue channel! This works out fine for images that are close-enough to the paper-like tan-style coloring that we want, but if the image generator gets too wild and outputs too wild of colors, this normalization won't work well. Therefore, while it helps to contain the image generation's output, it can't automatically fix all coloring in a kind of perfect color plane projection fix.</p>
+
+<p>(Also: sometimes different colors are actually desired for special unique effects, in which case, manual editing to combine the pre- and post-normalized images is required.)</p>
 
 <h3>Background Removal</h3>
 
+<p>Would that we could just use character sprites as they're generated, they would be much lower cost to make more of on the margin. However: most character sprites wind up requiring some level of background removal cleanup, especially around the ears and hair. (And the more complex the boundary of the hair, the more complex the cleanup.)</p>
+
+<img src="/images/uncleaned.avif" />
+
+<p>Initially, I was having <code>rembg</code> do the background removal and have it output the adjusted image directly. However, this proved to be a burden for many sprites, since <code>rembg</code> also darkens the border pixels between background and foreground, which theoretically makes for smoother transitions between those areas. But: in the areas where it gets the foreground wrong, treating it incorrectly as background, this has the effect of removing colors, necessitating pulling out the original image, layering it on top of the background-removed one, and fiddling with the masks of both layers.</p>
+
+<p>By instead using the approach of having <code>rembg</code> just output a mask and then applying that mask directly to the original image — no color changes involved — the sprites wind up much easier to clean up as-needed, since it's only a matter of working with the one layer's mask, wiping out false-positive foregrounds and restoring false-positive backgrounds.</p>
+
+<p>Background removal is, therefore, a much time-reduced process from what it was previously, though still somewhat of an annoyance for large character batches. (And there's no good way yet to have image generators directly output background-removed sprites, nor does there appear to be any better automatable removal tool than <code>rembg</code>.) Therefore, consideration must be given to character sprite quantity and complexity beyond just the cost of the initial prompting.</p>
+
+<h3>Curation</h3>
+
+<p>As you can tell, the common denominator of all these considerations is: consitency, consistency, consistency.</p>
+
+<p>It's easy to quickly generate lots of images, but it's hard to make them look consistent, while also keeping them good-looking and accurate. Image generations require many iterations to get acceptable results out of.</p>
+
+<p>So, while the above prompts and references and commands and tips should help in getting images that fit the overall Public Domain Pulp theme, they are by no means a guarantee! Manual curation is an absolutely necessary step of the overall generation process.</p>
+
+<p>More details on that to come…</p>
 
