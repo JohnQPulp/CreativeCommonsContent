@@ -235,13 +235,18 @@ done
 
 <img src="/images/reference/pC.png" />
 
-<p>This has two effects. First off, it tends to deepen the paper-ness/sepia-ness of the images, making the results a bit more orangey/rich overall, which I find looks nicer and also just better matches the website's color scheme.</p>
+<pre class='ed'>
+# magick command:
+convert -size 256x256 xc:white -sparse-color Bilinear '0,%[h] #311c00  %[w],0 #dcb362  %[w],%[h] #fff2e0 20,20 black' pC.png
+</pre>
 
-<p>Second, and more important, it helps to make coloring more consistent across all the images, which can otherwise vary in their interpretations of "paper-coloring". (Especially the backgrounds.)</p>
+<p>This has two effects. First off, it tends to slightly increase the contrast of the images by making the base tans slightly lighter and the black hatching lines slightly darker, which helps make the visuals pop out a bit more.</p>
 
-<p>However, the <code>v.p{u.r*v.w, u.intensity*v.h}</code> color formula used for the normalization is a little weird in that, while it takes into account the source image's red and green channels, it completely ignores the blue channel! This works out fine for images that are close-enough to the paper-like tan-style coloring that we want, but if the image generator outputs colors too far off from the tan-to-black spectrum, this normalization won't work well. Therefore, while it helps in partially wrangling generated image colors, it doesn't act as a perfect color-fixing projection down.</p>
+<p>Second, and more important, the palette-collapsing helps make the images look like they belong together, as a consistent set. Without this normalization, individual images like backgrounds can get a little "creative" with their interpretation of "paper-coloring", and for example give too-deep of oranges to fires, or put greens on leaves, or blues in the sky; all of which would look fine in isolation, but it would be distracting to have some images colored thusly, while others aren't.</p>
 
-<p>(Also: sometimes different colors are actually desired for special unique effects, in which case, manual editing to combine the pre- and post-normalized images is required.)</p>
+<p>It should be noted though that the <code>v.p{u.r*v.w, u.intensity*v.h}</code> color formula used for the normalization is a little weird in that: while it takes into account the source image's red and green channels, it completely ignores blue. This only works for input images that are already close-enough to the desired paper-coloring, which is usually fine, because usually the image generator creates something within the ballpark of the palette, but for wildly off images, this normalization will produce weird/undesirable results.</p>
+
+<p>(Also: sometimes we <i>do</i> actually want off-palette colors in special situations that intentionally pop out, like the green light in <book>Great Gatsby</book> or bloods in murder backgrounds. But even for those cases, generally we still want to apply the normalization, and then just layer the normalized coloring on top of the original, and then fiddle with transparency masks to just unmask the parts of the image where we want the special coloring.)</p>
 
 <h2>Background Removal</h2>
 
