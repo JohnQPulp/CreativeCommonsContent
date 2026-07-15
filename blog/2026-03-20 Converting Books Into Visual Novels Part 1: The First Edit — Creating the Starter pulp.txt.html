@@ -290,3 +290,44 @@ Replace: \n\n\1 \3\n\2;\4
 
 <p>But those subsequent step explanations and their own unique discussion topics will have to wait for the next parts.</p>
 
+<h2>Bonus: Semi-automated Regex Corrections</h2>
+
+<p>This section is being edited in from later on, after more opportunities for regex fixups have been identified, and have also been somewhat consolidated into helper regex scripts. The failure mode considerations from the previous sections still apply, and their Gedit-style regexes can still be used, but these Perl-style regexes can now also be used for quicker (if still imperfect) fixer-upping.</p>
+
+<p>First off, this batch of regexes can fix up a variety of the line break anomalies, quote-handling anomalies, and output unicode-handling anomalies that the LLM tends to spit out:</p>
+
+<pre>
+perl -CSDA -Mutf8 -0777 -pi -e 's/ \[cite: [\d ,]+\]//mg' chapter.txt
+perl -CSDA -Mutf8 -0777 -pi -e 's/\n\n\n\n/\n\n\n/mg' chapter.txt
+perl -CSDA -Mutf8 -0777 -pi -e 's/^([^=\n]+)\n\n(?=[^\n])/$1\n\n\n/mg' chapter.txt
+perl -CSDA -Mutf8 -0777 -pi -e 's/([^\n]*=[^\n]*)\n\n\n/$1\n\n/mg' chapter.txt
+
+perl -CSDA -Mutf8 -0777 -pi -e 's/^"([^\n"”]*)$/“$1”/mg' chapter.txt
+perl -CSDA -Mutf8 -0777 -pi -e 's/"([^\n]*?)"/“$1”/mg' chapter.txt
+perl -CSDA -Mutf8 -0777 -pi -e 's/"([^\n]*?)”/“$1”/mg' chapter.txt
+perl -CSDA -Mutf8 -0777 -pi -e 's/“([^\n]*?)"/“$1”/mg' chapter.txt
+perl -CSDA -Mutf8 -0777 -pi -e 's/“([^\n”]+)$/“$1”/mg' chapter.txt
+
+perl -CSDA -Mutf8 -0777 -pi -e 's/“ ‘/“‘/mg' chapter.txt
+perl -CSDA -Mutf8 -0777 -pi -e 's/’ ”/’”/mg' chapter.txt
+perl -CSDA -Mutf8 -0777 -pi -e 's/﻿ ﻿…/…/mg' chapter.txt
+perl -CSDA -Mutf8 -0777 -pi -e 's/﻿\.\.\./…/mg' chapter.txt
+perl -CSDA -Mutf8 -0777 -pi -e 's/… \?/… ?/mg' chapter.txt
+</pre>
+
+<p>And the second, this block of Perl replacements helps combine lines split across semicolons (though with no regard for cases where semicolon-splitting might be desirable, which means that manual fixer-upping afterwards is still a necessity):</p>
+
+<pre>
+perl -CSDA -Mutf8 -0777 -pi -e 's/\n\n([^\n]*;”?)\n([^\n]*)\n\n(“?[^\n]*)\n([^\n]*)/\n\n$1 $3\n$2;$4/mg' chapter.txt
+perl -CSDA -Mutf8 -0777 -pi -e 's/\n\n([^\n]*;”?)\n([^\n]*)\n\n(“?[^\n]*)\n([^\n]*)/\n\n$1 $3\n$2;$4/mg' chapter.txt
+perl -CSDA -Mutf8 -0777 -pi -e 's/\n\n([^\n]*;”?)\n([^\n]*)\n\n(“?[^\n]*)\n([^\n]*)/\n\n$1 $3\n$2;$4/mg' chapter.txt
+perl -CSDA -Mutf8 -0777 -pi -e 's/\n\n([^\n]*;”?)\n([^\n]*)\n\n(“?[^\n]*)\n([^\n]*)/\n\n$1 $3\n$2;$4/mg' chapter.txt
+perl -CSDA -Mutf8 -0777 -pi -e 's/\n\n([^\n]*;”?)\n([^\n]*)\n\n(“?[^\n]*)\n([^\n]*)/\n\n$1 $3\n$2;$4/mg' chapter.txt
+
+perl -CSDA -Mutf8 -0777 -pi -e 's/” “/ /mg' chapter.txt
+perl -CSDA -Mutf8 -0777 -pi -e 's/\n;+/\n;/mg' chapter.txt
+perl -CSDA -Mutf8 -0777 -pi -e 's/;+\n\n/\n\n/mg' chapter.txt
+perl -CSDA -Mutf8 -0777 -pi -e 's/;;+/;/mg' chapter.txt
+</pre>
+
+<p>The combined effect of running these two blocks of replace commands against new chapters pasted into a <code>chapter.txt</code> should be to reduce even further the time needed to be spent on the first edit. (In most cases!)</p>
