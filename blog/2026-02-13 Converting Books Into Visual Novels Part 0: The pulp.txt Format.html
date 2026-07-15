@@ -272,10 +272,12 @@ t=henry
 <li><code>margin</code>: Causes the text display to have padding on either side, as a sort of quasi-blockquote effect.</li>
 <li><code>joined</code>: Causes text from the current text line to feed into the next slide.</li>
 <li><code>nospace</code>: Causes text from the current text line to not have an automatic space appended onto it when building the next slide.</li>
-<li><code>allowbreak</code>: Allows a line break to be placed where it otherwise wouldn't be permitted by the <a href="#line-break-rules">rules described further below</a>.</li>
+<li><code>allowbreak</code> (or <code>break</code>): Allows a line break to be placed where it otherwise wouldn't be permitted by the <a href="#line-break-rules">rules described further below</a>.</li>
 <li><code>dialogue</code>: Causes text within quotes to be formatted bold, like dialogue, even if there isn't an active speaker or thinker.</li>
 <li><code>nospeaker</code>: Causes active speakers to not show sprites in the speaker box. (Used for example in representing a character speaking from another room or otherwise out-of-view.<span class='edi'> Will also probably be useful when doing the <book>Invisible Man</book> conversion.</span>)</li>
 </ul>
+
+<p>The modifier tag can also accept a second integer argument <code>N</code> like <code>m=allowbreak,1</code>, which tells the modifier to only apply for N slides before deactiving itself.</p>
 
 <h2>(h)eader</h2>
 
