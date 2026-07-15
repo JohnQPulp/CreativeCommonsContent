@@ -249,7 +249,20 @@ t=henry
 
 <h2>(f)ilter</h2>
 
-<p><code>f</code> is a tag that can be applied to either a character (e.g., <code>f:c:jake=blur(5px)</code>) or a background (e.g., <code>f:b:flat-ext=brightness(85%)</code>) to set a css filter on that character's sprites or the background image.</p>
+<p>There are two different types of filters, reflected in two different ways to use the <code>f</code> tag:</p>
+
+<p>First, the <code>f</code> tag's key can specify a custom css filter to pair either with a specific character (e.g., <code>f:c:jake=blur(5px)</code>) or a specific background (e.g., <code>f:b:flat-ext=brightness(85%)</code>). This will cause that custom css filter (which can be any valid css filter) to apply to that specific character's on-screen sprite or the specific background, until either reset back to no filter (e.g., <code>f:b:flat-ext=</code>) or the sprite and/or background go off-screen.</p>
+
+<p>Second, the <code>f</code> tag can just specify a plain value like <code>f=fade</code>. In this case, the filter applies a pre-specified effect to the current slide, which can different forms. Running down the list of allowed effects:</p>
+
+<ul>
+<li><code>fade</code>: When moving to the next slide, the screen will fade to black and then fade back into the new slide, rather than switching immediately. (Note that this filter is automatically applied when entering or exiting a frame narrative level.)</li>
+<li><code>hit</code>: When the slide with the hit-filter comes on-screen, the background will temporarily blur and then unblur, representing a sort of hitting or crashing effect.</li>
+<li><code>blood</code>: When the slide with blood-filter comes on-screen, the background will temporarily flash transparent red before returning to a normal color, representing a sort of spilling of blood.</li>
+<li><code>lightning</code>: When the slide with the lightning filter comes on-screen, the background will temporarily have a large brightness (>100%) effect applied before returning to a normal level.</li>
+</ul>
+
+<p>Also note that, when one of these special filter effects is applied to a slide, other filter effects (including the default quick-fade effect for switching backgrounds) are disabled.</p>
 
 <h2>(m)odifier</h2>
 
