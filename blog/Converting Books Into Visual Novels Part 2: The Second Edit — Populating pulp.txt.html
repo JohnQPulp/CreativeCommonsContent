@@ -13,24 +13,34 @@
 
 <h1>The Second Edit's Goals</h1>
 
-<p>In the first edit, we had the LLM generate us up some <code>n</code> (name definition) tags, some <code>s</code> (speaker attribution) tags, some <code>e</code> (emotion labeling) tags, and some line breaks.</p>
+<p>In the first edit, we had the LLM generate us up some initial <code>n</code> (name definition) tags, <code>s</code> (speaker attribution) tags, <code>e</code> (emotion labeling) tags, and line breaks. The LLM tends to do a decent job at labeling those bits of metadata, but it certainly isn't perfect, so one of the goals of this second edit will be to review and edit those tags as-needed.</p>
 
-<p>All that gives us a solid starting point for what we need, but still not enough to start generating the actual visuals. There are several tags that still <i>need</i> before starting to generate any images, because these tags are involved in determining what all images even need generating. These are:</p>
-
-<ul>
-<li><code>b</code> (background) tags</li>
-<li><code>b</code> (background) tags</li>
-</ul>
-
-<p>At the same time, we also need to go through the generated output of the first edit and make sure the existing metadata is correct. ...</p>
-
-<p>And then there are several other tags that don't strictly need setting now — they don't affect the set of images that we need and therefore <i>could</i> be left for the third edit. However, because we're going through the full text anyway in this pass, it makes sense to add these in as well as we go:</p>
+<p>At the same time, we also need to populate most of rest of the missing metadata tags, as all these will also be involved in determining the set of images we'll actually need. These being:</p>
 
 <ul>
-
+<li>The background-determining tag — the <code>b</code> tag — where we'll have to figure what background we want active for each slide of the VN.</li>
+<li>The tags that determine which all <i>base</i> sprites we'll need — the <code>a</code> age-determining tags (e.g., <code>a:char=old</code> if a character ages over the course of the text) and the <code>x</code> eXtra-attribute tags (e.g., <code>x:char=hat</code> if a character needs to wear a hat in a scene).</li>
+<li>The tags that determine when we'll need to have sprites to show, which on top of the already mentioned <code>s</code> speaker tags also includes: the <code>t</code> thinker tags (for close-mouthed sprites instead of open-mouthed ones), the <code>g</code> frame narrative tags, which determine what depth layer within dialogue the active speaker is determined from, and the <code>c</code> on-screen character positioning tags.</li>
+<li>The sprite expression-determining tags, which on top of the already mentioned <code>e</code> emotion tag also includes the <code>i</code> expression index tag, for controlling which of the potentially multiple variations on the same expression is shown at a given time.</li>
+<li>The object-determining tag — the <code>o</code> tag — though only when on-screen objects are used, which is becoming less common.</li>
+<li>And then lastly, the <code>f</code> filter and <code>m</code> modifier tags, which are both a little different and special in both their usages and effects: neither actually determines the set of required images themselves (usually), but both heavily influence how the other tags need be set, especially the background tag, and therefore it makes since to include setting these as part of the second edit. (This will be elaborated on in much more detail further below.)</li>
 </ul>
 
-<p>The only tags that can't really be added at this point are the <code>z</code> (character zoom) and <code>v</code> (view sizing) tags, wihch both require actually being able to see the sizes of the sprites we're working with to set correctly. So those two will need to be left for the third edit, and for that reason, the second edit doesn't technically set <i>all</i> metadata, but close enough.</p>
+<p>Both of these subgoals — editing the existing metadata tags and adding in the set of new metadata tags — essentially force us to do a full re-read of the book. And we can't really skim-read either, since a book's visual-determining descriptors can hide anywhere in a text.</p>
+
+<p>Of course, having already read the book once helps a lot with knowing where special editing attention will be needed to get the visuals right. But even so, the second edit is still necessarily a much closer and more involved and longer one than the first. We have to develop a mental model of how all these visuals will fit and flow together, <i>prior to actually being able to see any of them</i>.</p>
+
+<p>The results of the second edit won't be perfect then. But the goal isn't perfection, but rather to set ourselves up for a smooth process in the subsequent sprite-generation step, background-generation step, and final visual-editing step.</p>
+
+<p>Some reworking and rethinking will be required in those steps, since actually being able to see the visuals will change how we want to structure some of the metadata to flow better and be more accurate, but the goal of the second edit is to develop a close-enough approximation of what the final metadata should need to look like, that we can avoid major re-editing in those later steps.</p>
+
+<h1>Overview</h1>
+
+<p>Since the second edit if a full re-read, it involves going sequentially back through the entire text, editing or editing-in <i>any</i> of the previously mentioned aspects of the metadata at any point in the text. From an editing-process perspective, all of the metadata needs to be considered all at once.</p>
+
+<p>But from an explanatory perspective, that would be impossible to follow. So instead, we'll break up the different metadata-editing aspects into subcategories, explaining the specific considerations involved in each conceptual grouping.</p>
+
+<p>Just keep in mind, though, that the order of these sections for the rest of the post isn't the order the edits should be done in, but rather just a way to mentally compartmentalize all the different potential edits that need to be happening throughout the course of the full sequential re-read.</p>
 
 <h1>Fixups</h1>
 
@@ -79,15 +89,7 @@
 
 
 
-<h1>Additional Tasks</h1>
-
-
-
-<h2>Sprite-determining Tag Review</h2>
-
-
-
-<h2>Editorializing!</h2>
+<h1>Editorializing!</h1>
 
 <p>Fun task</p>
 
