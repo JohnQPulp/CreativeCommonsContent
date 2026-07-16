@@ -42,19 +42,192 @@
 
 <p>Just keep in mind, though, that the order of these sections for the rest of the post isn't the order the edits should be done in, but rather just a way to mentally compartmentalize all the different potential edits that need to be happening throughout the course of the full sequential re-read.</p>
 
-<h1>Fixups</h1>
+<h1>Line Breaks</h1>
+
+<p>The positioning of line breaks are an all-encompassing aspect of the <code>pulp.txt</code> metadata, and one that interacts with all the other metadata tags. Therefore, it makes sense to talk about line breaks first.</p>
+
+<p>In our instructions to the LLM as part of the first edit, we told it to insert line breaks as-needed between sentences, grouping together short sentences that act as logical units but also splitting apart long paragraphs that would be too much for one slide. We also instructed it to split apart dialogue lines from non-dialogue lines as much as possible, though still without splitting up individual sentences.</p>
+
+<p>Take for instance this snippet from the beginning of <book>The Maltese Falcon</book>:</p>
+
+<pre>
+Samuel Spade’s jaw was long and bony, his chin a jutting v under the more flexible v of his mouth. His nostrils curved back to make another, smaller, v. His yellow-grey eyes were horizontal. The v motif was picked up again by thickish brows rising outward from twin creases above a hooked nose, and his pale brown hair grew down﻿—from high flat temples﻿—in a point on his forehead. He looked rather pleasantly like a blond satan.
+
+He said to Effie Perine: “Yes, sweetheart?”
+
+She was a lanky sunburned girl whose tan dress of thin woolen stuff clung to her with an effect of dampness. Her eyes were brown and playful in a shiny boyish face. She finished shutting the door behind her, leaned against it, and said: “There’s a girl wants to see you. Her name’s Wonderly.”
+
+</pre>
+
+<p>A good way to insert the line breaks here could look like:</p>
+
+<pre>
+Samuel Spade’s jaw was long and bony, his chin a jutting v under the more flexible v of his mouth.
 
 
-<h2>Line Breaks</h2>
+His nostrils curved back to make another, smaller, v. His yellow-grey eyes were horizontal.
 
 
-
-<h2>Incorrect Attributions</h2>
-
+The v motif was picked up again by thickish brows rising outward from twin creases above a hooked nose, and his pale brown hair grew down﻿—from high flat temples﻿—in a point on his forehead.
 
 
-<h2>Missing Thinker Tags</h2>
+He looked rather pleasantly like a blond satan.
 
+
+He said to Effie Perine:
+
+
+“Yes, sweetheart?”
+
+
+She was a lanky sunburned girl whose tan dress of thin woolen stuff clung to her with an effect of dampness. Her eyes were brown and playful in a shiny boyish face.
+
+
+She finished shutting the door behind her, leaned against it, and said:
+
+
+“There’s a girl wants to see you. Her name’s Wonderly.”
+
+</pre>
+
+<p>The LLM's initial pass might or might not do a good job of setting these line breaks. Sometimes it chops up sentences too finely, putting each on its own line, which for short choppy sentences in-a-row is overly disruptive to flow. We want to combine such cases together, since that keeps the reading <i>and</i> the editing simpler, particularly in dialogue cases <code>“There’s a girl wants to see you. Her name’s Wonderly.”</code> where keeping the sentences grouped together avoids having to set a different sprite for each sentence, which wouldn't be necessary or add anything in this case.</p>
+
+<p>Conversely, the LLM sometimes combines too many too long of sentences together. For example, it might keep that entire first paragraph from the book grouped together still as one slide. In general, lines above 200 characters long should start coming under strong consideration for splitting up, if possible; and lines above 400 characters should almost always be split up. While it's usually better to keep sentences together as one unit, some sentences are simply too long, for example:</p>
+
+<pre>
+Besides the wallet and its contents there were three gaily colored silk handkerchiefs fragrant of chypre; a platinum Longines watch on a platinum and red gold chain, attached at the other end to a small pear-shaped pendant of some white metal; a handful of United States, British, French, and Chinese coins; a ring holding half a dozen keys; a silver and onyx fountain pen; a metal comb in a leatherette case; a nail file in a leatherette case; a small street guide to San Francisco; a Southern Pacific baggage check; a half-filled package of violet pastilles; a Shanghai insurance broker’s business card; and four sheets of Hotel Belvedere writing paper, on one of which was written in small precise letters Samuel Spade’s name and the addresses of his office and his apartment.
+
+</pre>
+
+<p>In this case, we'd want to split on the semicolons, which the Pulpifier allows, into slides like this:</p>
+
+<pre>
+Besides the wallet and its contents there were three gaily colored silk handkerchiefs fragrant of chypre; a platinum Longines watch on a platinum and red gold chain, attached at the other end to a small pear-shaped pendant of some white metal;
+
+
+a handful of United States, British, French, and Chinese coins; a ring holding half a dozen keys; a silver and onyx fountain pen; a metal comb in a leatherette case; a nail file in a leatherette case; a small street guide to San Francisco; a Southern Pacific baggage check;
+
+
+a half-filled package of violet pastilles; a Shanghai insurance broker’s business card; and four sheets of Hotel Belvedere writing paper, on one of which was written in small precise letters Samuel Spade’s name and the addresses of his office and his apartment.
+
+
+</pre>
+
+<p>In other situations, we might even need to split up sentences via commas or other separators, such as to split up dialogue from long non-dialogue sections, though this should be done sparingly. Because dialogue gets bolded in the visual novels, its visually identifiable what is and is not spoken, so it's okay if there are short non-dialogue sentence parts grouped together with dialogue, like:</p>
+
+<pre>
+“Now, sir,” he said, “I hope you’ll let me apologize for﻿—”
+
+
+“Never mind that,” Spade said. “Let’s talk about the black bird.”
+
+
+The fat man cocked his head to the left and regarded Spade with fond eyes.
+
+
+“All right, sir,” he agreed. “Let’s.”
+
+
+</pre>
+
+<p>It's okay in these cases the non-dialogue units like <code>he said</code> and <code>Spade said</code> and <code>he agreed</code> are grouped together in lines that will become dialogue lines, because those units are short. When it becomes worht splitting is when long sections of non-dialogue are grouped in the same sentences with dialogue; or, when the non-dialogue portion warrants some visual change or logical breaking point, where keeping the whole thing together would flow strangely. For example, consider this book snippet:</p>
+
+<pre>
+The District Attorney put his finger on one of the pearl buttons in a battery of four on his desk, said to the lathy youth who opened the door again, “Ask Mr. Thomas and Healy to come in,” and then, rocking back in his chair, addressed Spade pleasantly: “You and the police haven’t been hitting it off so well, have you?”
+</pre>
+
+<p>In this case, we'd want to split the dialogue apart like:</p>
+
+<pre>
+The District Attorney put his finger on one of the pearl buttons in a battery of four on his desk, said to the lathy youth who opened the door again,
+
+
+“Ask Mr. Thomas and Healy to come in,”
+m=allowbreak,1
+
+and then, rocking back in his chair, addressed Spade pleasantly:
+
+
+“You and the police haven’t been hitting it off so well, have you?”
+
+
+</pre>
+
+<p>Line breaks are allowed to be inserted at commas before dialogue lines, but not before non-dialogue lines. Therefore, we need to add an <code>allowbreak</code> modifier to the gap between <code>in,”</code> and <code>and then,</code> to get the Pulpifier to compile it.</p>
+
+<p>In general, some heuristics around this to follow for when to split up lines are:</p>
+
+<ul>
+<li>Add splits wherever a visual change is required. When this happens from one sentence to the next, this just involves keeping those sentences split apart. But sometimes this will require splitting up an individual sentence like e.g., splitting <code>Spade sighed, rose from the bed, and went to the telephone-box beside his bathroom door.</code> after <code>bed,</code> via an <code>allowbreak</code> marker to transition to the <code>b=spade-passageway</code> background.</li>
+<li>Make sure dialogue lines always start with dialogue. It doesn't look visually correct to start a dialogue line like non-bolded non-dialogue — we want the bold of the dialogue to visually line up with the bolded speaker label. So sentences like <code></code> should be split after <code></code>.</li>
+<li>It's okay for dialogue lines to contains or end with non-dialogue as long as the non-dialogue portion is non too long and doesn't indicate a separate action. For example: <code>“Stop it,” Spade commanded.</code> and <code>“If I remember,” Spade said, “they were pretty well fixed.”</code> are both fine to keep grouped together, whereas <code>“The ornament is a statuette,” Cairo went on, selecting and mouthing his words carefully, “the black figure of a bird.”</code> should be split after <code>carefully,</code> and <code>“That’s good. There goes the curtain. Good night,” Spade said, and crossed the street to board a westbound streetcar.</code> should be split after <code>said,</code>.</li>
+</ul>
+
+<h1>Speaker and Thinker Attributions</h1>
+
+<p>The first edit's LLM pass will have populated an initial set of <code>s</code> speaker tags, which for the most part, can be used as-is. But there are a few adjustments that second edit will need to make.</p>
+
+<h2>Line Break Adjustments</h2>
+
+<p>To start, as we adjust the line breaks in our manual editing, we also need to make corresponding adjustments to the speaker tags. For example, maybe the LLM initially grouped together dialogue and non-dialogue as one unit like:</p>
+
+<pre>
+“How do you feel now, angel? Any better?”
+s=spade
+
+“Yes, much better, only”﻿—she reduced her voice until the last words would have been unintelligible two feet away﻿—“I’m frightened.”
+s=brigid
+
+</pre>
+
+<p>The second line her needs to be split up between dialogue and non-dialogue portions, so we'll need to go from an active speaker to no speaker and back to the active speaker, like:</p>
+
+<pre>
+“How do you feel now, angel? Any better?”
+s=spade
+
+“Yes, much better, only”﻿—
+s=brigid;m=allowbreak,2;m=nospace,2
+
+she reduced her voice until the last words would have been unintelligible two feet away﻿—
+s=
+
+“I’m frightened.”
+s=brigid
+
+</pre>
+
+<h2>Thinker Adjustments</h2>
+
+<p>Another problem that will arise is the need to insert <code>t</code> thinker tags. The LLM instructions we give as part of the first pass does not tell the LLM about the existence of thinker tags, because it tends to just confuse the output, and in general thought-based "dialogue" is much rarer than spoken dialogue. But it does come up, and when it does, the LLM will get it wrong either by just not labeling the thought "dialogue" with any tag, or just treating it as spoken dialogue, such as in a case like this:</p>
+
+<pre>
+“What is it? What is it? For God’s sake, tell me.”
+s=nadyezhda
+
+“Can Kirilin have written him something?” she thought.
+
+
+“It’s nothing,” said Laevsky, laughing and crying; “go away, darling.”
+s=laevsky
+</pre>
+
+<p>Here, we need to turn the speaker off in the second line by adding in <code>s=</code> and then set the active thinker to the character. Then, we do the reverse on the third line by setting the active thinker back to none:</p>
+
+<pre>
+“What is it? What is it? For God’s sake, tell me.”
+s=nadyezhda
+
+“Can Kirilin have written him something?” she thought.
+s=;t=nadyezhda
+
+“It’s nothing,” said Laevsky, laughing and crying; “go away, darling.”
+t=;s=laevsky
+</pre>
+
+<h2>Attribution Adjustments</h2>
+
+<p>And then a final problem that can arise that the second edit should address is just in fixing up incorrectly labeled speakers. The LLM is mostly very good at getting the active speaker correct, but can sometimes get tripped up, especially in complex back-and-forths without many labels, and in those cases the second edit's close re-read should fix up the <code>s</code> tags as-needed, referencing back to the original text with its original paragraph structure as-needed to determine the correct speaker.</p>
 
 
 <h1>Backgrounds</h1>
