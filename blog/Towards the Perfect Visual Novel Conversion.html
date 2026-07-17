@@ -31,18 +31,20 @@
 
 <p>Despite the horrific disaster that most of the site's VNs are (at time of writing), the trend <i>is</i> one of improvement.</p>
 
-<p>Compare the site's first VN in its initial UI appearance: (TODO: insert img)</p>
+<p>Compare the site's first VN in its initial UI appearance:</p>
 
+<img src="/images/slide-old.avif" />
 
+<p>…To the the most recent (at time of writing) published VN (the twelfth of the site):</p>
 
-<p>…To the the most recent published VN: (TODO: insert img)</p>
-
+<img src="/images/slide-new.avif" />
 
 
 <ul>
 <li>The backgrounds, previously universally awful to look at, are becoming no longer universally so.</li>
 <li>The sprites, previously wildly inconsistent in both their visual quality and in their adherance to the text, are becoming less wildly so.</li>
 <li>The character expressions, previously displaying little bearing to any actual emotion implied by the text, are capturing larger bearings.</li>
+<li>The text flow, previously horrendouly muddling-up dialogue and non-dialogue, is now less muddled.</li>
 </ul>
 
 <p>…And with other trends of encouraging directions. The overall point being: the site is very bad in many ways so far.</p>
@@ -50,106 +52,181 @@
 <p>But: it's becoming <i>less</i> bad over time.</p>
 
 
-<h1>Towards the Ideal: What's Working Now</h1>
 
-<p>The goal is for the site and its VNs to get better over time. The following sections will list out ideas — both the practical and the aspirational — about how to move the site towards its ideal form.</p>
+<h1>Towards the Ideal: Practical Progress</h1>
 
-<p>But before getting to those, perhaps the site needs to justify itself — why it is as it is — and why it can claim to be a starting point from which any ideal can be progressed towards.</p>
+<p>It's one thing to have gone from terrible to somewhat less terrible. It's another to continue that trend towards eventually being good.</p>
 
-
-<h2>The Visuals</h2>
-
-<p>Every visual novel on the site does indeed have visuals.</p>
-
-<p>So the "Visual Novel" label is technically correct, but beyond just that, it bears repeating that having visuals is <i>good</i> for a goal of maximizing the entertainment and engagement value of books.</p>
-
-<p> Explain how (visuals/editorializing) and why (good prose mentally good)</p>
+<p>But there is reason for optimism, in the form of there being small improvements still available to make:</p>
 
 
-<h2>The Texts</h2>
+<h2>Animations</h2>
 
-<p></p>
+<p>The latest in-progress VN (<book>The Picture of Dorian Gray</book>) is working on introducing some new filter effects around custom fade transitions, and also shaking-type hitting animations and blood-like reddening animations, on top of introducing some other ones like lightning animations for a previous VN.</p>
 
-<p>one key constraint</p>
-
-
-<h2>The Licensing</h2>
+<p>The plan is to continue adding more custom effects like these to provide a wider toolset for better bringing forth action from images, making the experience more visually dynamic; but: to do this <i>without</i> making the text less readable (or slower to read).</p>
 
 
+<h2>UI</h2>
 
-<h2>The Editorializing</h2>
+<p>There's still a variety of enhancements that ought be made to the UI. These include:</p>
 
+<ul>
+<li>Adding more slider input options to make the textbox sizing and other aspects of especially the reading experience more configurable.</li>
+<li>Fixing up the performance issues that can occur when too many filters are on-screen at the same time.</li>
+<li>Improving the textbox, frame narrative, and other rectangle-shaped UI elements to all be more visually diverse, perhaps adding more decorative effects. (These could also be used to further distinguish active speakers, if applying different decorations for different characters.)</li>
+<li>Improving the handling of speakers and their appearances over darker backgrounds, where they currently tend to blend in somewhat, perhaps leveraging more filter options for speaker sprites.</li>
+<li>Improving the UI that exists <i>around</i> the visual novel window itself, including sprucing up the buttons, sliders, table of contents, and other elements.</li>
+</ul>
 
-
-
-<h1>Towards the Ideal: The Likely Future</h1>
-
-<p>Continued small improvements</p>
-
-<h2>Slide custom filters/animations</h2>
-
-
-<h2>Better consistency in images still</h2>
-
-
-<h2>Denser Editorializing</h2>
-
-<p>MST3K/Rifftrax</p>
+<p>…With many other related tasks in the site's TODO list.</p>
 
 
-<h2>UI improving</h2>
+<h2>Images</h2>
 
-<p>More options</p>
+<p>The quality and consistency of the site's background and sprite images has improved significantly since the first visual novel, but the image generation process still sometimes spits out subpar results, which sometimes still make it into the visual novels.</p>
+
+<p>At this point, the problem has become less of figuring out the right image generation pipeline, since the process there has been mostly ironed out, and more about continuing to hone better editing and curation skills about what makes it into the final visuals, a trend which seems to still be continuing in a good direction.</p>
 
 
 <h2>Visual Novel Remakes</h2>
 
-<p>Certainly the first six are poorly editing enough to deserve re-editing. Feel bad about disrespecting Twain and Fitzgerald and Stevenson. (Feel less bad about Hemingway and Steinbeck and Buchan.)</p>
+<p>The earlier in the site you go, the worse the visual novels get. But it's the first six that are especially poorly edited, being produced prior to many process and generation improvement changes. It'd be no good to leave those as-is in their poor states for all time, disrespecting Twain and Fitzgerald and Stevenson. <span class='edi'>Though disrecpting Hemingway and Steinbeck and Buchan is justified.</span></p>
 
-<p>Will likely involve creating new branches, allowing the old versions to still be kept around, for fun.</p>
+<p>For those, the future probably holds total re-edits, where the metadata is enhanced to the (then-)current standards, and the full set of images regenerated. This <i>could</i> involve fully replacing the old versions of the VNs, but it may be more fun to just make new branches in the repos, and host both the older and the newer versions, since there's <i>some</i> minimal value in having those older ones still around, for reference.</p>
 
 
-<h2>Performance improving</h2>
+<h2>Visual Novel Continued Editing</h2>
 
-<p>Filters cause issues</p>
+<p>At the same time, the <s>good</s> less bad visual novels can be continually edited with minor improvements and fixes. (After all, that's one of the whole points of having them hosted in open source repos. Some of them even have small active TODOs ready for addressing, and it's simply a matter of allocating the time to get to them.</p>
+
+
+<h2>Denser Editorializing</h2>
+
+<p>The "Editor's Notes" are a main secondary goal of the site, in pursuit of the larger goal of maximizing entertainment value out of public domain books.</p>
+
+<p>In general, it seems surprising that nothing like MST3K/Rifftrax-style riffing exists for books, with jokes made about the book for the reader as they read through it. (<i>372 Pages</i> exists, and is excellent, but it's a different format: a post-reading discussion-type comedy podcast.)</p>
+
+<p>It doesn't seem like the visual novel format is a requirement for making editorialized footnotes, riffing on a text, but visual novels might perhaps be better suited to the task, visually, since the riffs can jump out at you better in real time, rather than be a footnote or highlight you'd see in a book in advance, that you'd then have to jump away from the main text to read.</p>
+
+<p>That's all to say: more riffing on the books in the form of more "helpful" notes has the potential to make the visual novels all the more engaging (to the extent that text-based jokes can be packed into a single book without becoming tiresome.)</p>
+
 
 
 <h1>Towards the Ideal: The Perfect Future</h1>
 
-<p>Standard visual novel features:</p>
+<p>That prior section listed out a bunch of miscallenous mostly-small improvements that could (and will) be made on the margin — process tweaks, minor bug fixes, visual tweaks, codebase enhancements — all TODOs that have the potential to add some value.</p>
+
+<p>But what would the <i>perfect</i> idealized visual novel conversion look like? What would the experience be if we could pull in <i>all</i> of the features of all existing VNs into all existing books?</p>
+
+
+<h2>Animations (again)</h2>
+
+<p>Small-scale animation enhancmenets were touched on before in the practical section, but there's theoretical potential for so much more:</p>
+
+<p>Images themselves and the transitions between them could feature custom animations, along with custom effects, as is done in many VNs.</p>
+
+<p>The text itself could be animated as it crawls out onto the screen, paired with text appearance sound effects. (Though perhaps only optionally — any such effect would necessarily slow down the reading experience.)</p>
+
+<p>The UI itself could be animated, moving about dynamically as part of keeping up with the text, character, background, and context changes.</p>
+
 
 <h2>Music</h2>
 
+<p>Visual novels generally have some form of soundtrack that plays in the background.</p>
 
-<h2>Animation</h2>
-
-
-<p>Including text animation, with sound of its own</p>
-
+<p>So far, the site <i>doesn't</i> have this, because retrofitting music and music transitions to fit existing text is challenging. But challenging doesn't mean impossible, and with the right attention to detail, there's lots of potential for pulling out music from the public domain. (Or: just generating the soundtracks. Whichever works better in practice.)</p>
 
 
 <h2>Speakers</h2>
 
+<p>Visual novels generally also have spoken audio for their bits of dialogue.</p>
 
-<h2>Choices</h2>
+<p>Again, this is a harder problem in the context of a book-converted visual novel, where dialogue and non-dialogue tend to be less cleanly separated. There'd be the issue to solve of determining what all portions of the text need to be spoken, and how to put the appropriate breaks in.</p>
 
+<p>An alternative would be to treat the audio more like an audiobook style experience, where the entire thing is voiced, and indeed some public domain audiobooks even exist for use. But even then, there'd still be the problems to figure out around timing the audio breaks and also making sure the slide breaks don't cut off the audio unnaturally.</p>
 
-<h2>Gameplay</h2>
-
-<p>372 pages discussion</p>
+<p>Again, it's not an impossible task — just a difficult one — and again one that may end up being appropriate for AI-generated custom audio.</p>
 
 
 <h2>Themes</h2>
 
-<p>More colors</p>
+<p>The site currently only has the one theme — the literary-/paper-style cross-hatching-type theme. This works well across the wide variety of books that the public domain has to offer (and also its simplification of colors makes consistency much easier), but there's no reason the site needs be limited to just the one type of visuals.</p>
 
-<p>Potential non-AI</p>
+<p>More engaging visual themes could be created: some perhaps more stylized, some perhaps more colorful, and some perhaps more editorialized. <span class='edi'>And some perhaps more <i>alluring</i>.</span></p>
 
-<p>Likely require its own branch</p>
-
-<p>Potential for even more engagment (e.g., editorialized visuals), though at the expense of disrespecting the text</p>
+<p>There's be many potential issues adding multiple themes: for one, just the much greater amount of work it would involve; but also, that it would perhaps require splitting out the metadata into multiple branches, since different visuals may require different tag attributions and flows. Still, it's again not an impossible problem, but one of time and effort. (And of perhaps being willing to disrespect the text in some cases.)</p>
 
 
-<h1>The Fundamental Tradeoff</h1>
 
-<p>The perfect VN vs the complete website</p>
+<h2>Interactivity?</h2>
+
+<p>Going way out there: Wouldn't the ideal book VN conversion have choices? Wouldn't the idealy VN conversion have <i>gameplay</i>?</p>
+
+<p>It's hard to imagine how such features could ever be implemented in a non-gimmicky way.</p>
+
+<p>For one, following the site's strict requirement of <i>not modifying the original text ever</i>, it's hard to see how choices/consequences could ever exist. But perhaps you could have choices that veer off into fanfiction based on the main text.</p>
+
+<p>And as for gameplay, how would you ever do it? Bringing up <i>372 Pages</i> again, that podcast did manage to invent some challenges out of pure book experiences, such as the iconic real-or-fanfic guessing game, the over/under word-usage count game, the sonic challenge, and so on. Would any of these ever work as compelling visual novel minigame features? Would any of them really <i>add</i> to the engagement or entertainment value?</p>
+
+<p>It all seems very unclear, but again, this is the idealized perfect visual novel form we're thinking of, so such features, if the right implementation could be thought of for them, shouldn't be fully ruled out!</p>
+
+
+
+
+
+
+<h1>What's the Point of it All?</h1>
+
+<p>This blog began with a claim: "The perfect visual novel conversion would be one that maximizes the entertainment, engagement, and informational value of a book <i>without</i> degrading, distracting, encumbering, spoiling, misrepresenting, contradicting, or disrespecting its original intended reading experience."</p>
+
+<p>But why have visual novel conversions of books at all? If it's so hard to retrofit visual novel features to fit books, then why not just keep books as books and VNs as VNs, letting each play to their own strengths, separately?</p>
+
+
+<h2>Books</h2>
+
+<p>Books are great, and it's great that an essentially endless supply of great books already exists in the public domain. Books are even sometimes quite entertaining as well. But only <i>sometimes</i>.</p>
+
+<p>Books, even the great ones, are not as engaging as other forms of media. They <i>can't</i> be as engaging as other forms of media. (The postmodernists have tried and failed.)</p>
+
+<p>And as the volume and addictiveness of alternate media options has risen, books have declined — a decline of an inevitable nature, borne out of opportunity cost.</p>
+
+<p>The great prose of the world is contained within books, but it's their destiny to be read by fewer and fewer, and even among those who still do read them, to do so for fewer and fewer titles.</p>
+
+
+
+<h2>Visual Novels</h2>
+
+<p>Conversely, visual novels are trashfire garbage.</p>
+
+<p>The prose involved in VNs is invariably awful, and the characters are invariably immature and awful, and the plots invariably stupid and awful, and everything about their whole existence is invariably awful.</p>
+
+<p>And yet: visual novels are entertaining and engaging, and continue to be bought and read due to being entertaining and engaging. Whether or not it's fair, there's something hard-wired in humans where <i>seeing a face</i> has the power to make us more invested.</p>
+
+
+
+
+<h2>Public Domain Pulp</h2>
+
+<p>The point of the Public Domain Pulp is to try to synthesize these two types of media together — to steal the engagement value back away from stupider media and inject it into back into the slower but <i>gooder</i> medium.</p>
+
+<p>The implementation of Public Domain Pulp is to try to do this in the best way possible: keeping the original prose <i>as-is</i>, with no changes or simplifications; <i>and</i>: keeping the licensing of the visual novels (and source code) public domain: always free to read and always available to improve upon.</p>
+
+<p>At the same time, there's the editorializing: an attempt to inject another layer of entertainment value — a less-than-high-brow way to treat and analyze the literature, but with the goal of being engaging nonetheless. (Much in the same way that a reaction video is the junk food form of media, yet still somehow manages to scratch a consumption itch.)</p>
+
+<p>And with this all being done under the fundamental tradeoff of trying to balance reaching an ideal form for each visual novel, with the desire to convert as many public domain books as possible, such that the widest variety can be read in visual novel form.</p>
+
+<p>All this, to hopefully make books competitively entertaining again, to pull focus back onto them, and encourage more reading.</p>
+
+<p>…</p>
+
+<p>…</p>
+
+<p>…</p>
+
+<p>Or: perhaps that's all post-hoc rationalized self-justifying bullshit, and the real goal is to push a new hyper-engaging product of dubious value in a world already full of such horrors.</p>
+
+<p>But, if it gets more people reading the classics, that's really not so bad now, is it?</p>
+
+
+
