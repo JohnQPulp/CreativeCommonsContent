@@ -78,9 +78,7 @@ Output the full text of the chapter back out to make it easy for me to diff the 
 
 <p>With the the prompt, the books, and the predictions all set up, I went ahead with running the loop and committing the results, and then eagerly began my examination of the diffs. And I immediately ran into most of the issues I'd thought I had preempted, plus several <i>additional</i> ones.</p>
 
-<p>The diffs were, in many places, a nightmare to read. The LLMs were fond of splitting and merging paragraphs: fine changes to make in theory, except that they wreck the diffs' readability.</p>
-
-<p>Here's kdiff:</p>
+<p>The diffs were, in many places, a nightmare to read. The LLMs were fond of splitting and merging paragraphs: fine changes to have made in theory, except that they wrecked the readability of the diffs in all three viewers I tried. See kdiff:</p>
 
 <img src="/images/experiment/diff1.webp" />
 
@@ -92,40 +90,60 @@ Output the full text of the chapter back out to make it easy for me to diff the 
 
 <img src="/images/experiment/diff3.webp" />
 
-<p>Now, not all the diffs were borked like this, and interestingly, there were even differences between the different diff applications about which particular paragraphs were borked. So in theory with enough time, switching between different diff viewers and manually fixing the diff viewer line-ups, these paragraphs could have been properly examined.</p>
-
-<p>But unfortunately, this problem combined with another problem of the diffs being way over-edited, almost universally throughout all the chapters of all the books. Not <i>good</i> edits either, but tons of meaningless word choice changes and comma adjustments and British-to-American (or the reversed) spelling adjustments and unicode character deletions that held no real impact on readability or prose quality.</p>
-
-<p>And to make things worse, huge chunks of various points were inexplicably deleted at times, for no reason:</p>
+<p>Additionally, the LLMs would often quit halfway through their edits, inexplicably, leaving huge chunks of chapters missing (a problem which reprompting did <i>not</i> consistently solve, for some reason):</p>
 
 <img src="/images/experiment/diff4.webp" />
 
-<p>Bizarrely, reprompted with the same prompt for the same chapter, the output text would quit at about the same point each time, though not <i>exactly</i> the same point, so the results clearly weren't determinstic, yet they still managed to give up at about the same points consistently. (This in combination with the density of the diffs also being wildly off at times between adjacent chapters.)</p>
+<p>The diff density was also highly inconsistent between chapters, varying from over-edited to insanely over-edited.</p>
 
-<p>So, with all these diffing issues, my original plan of carefully walking through all the diffs for each book through each chapter became wildly impractical.</p>
+<p>Despite my "clever" prompting's best efforts, the diffs were full of pointless changes: lateral word choice replacements, unnecessary comma adjustments, unnecessary spelling adjustments (both British-to-American and American-to-British), and actively detrimental non-ASCII unicode character deletions against hair spaces and so forth.</p>
 
-<p>Instead what I did was just skim the diffs, catalog <i>some</i> of the more interesting results, and then sit on them while I spent time trying to rethink how to better carry out the experiment to avoid the awful diff clutter.</p>
+<p>So my initial plan of carefully combing through all the diffs rapidly deteriorated into <i>skimming</i> the diffs.</p>
 
-<p>But now a month-and-a-half has passed since actually doing and reading the diffs, and I now realize that, regardless of whether I have time to redo the experiment more correctly, I need to just go forward with presenting what this first pass found, even if the results are incompletely understood and somewhat unsatisfying to me:</p>
+<p>And my secondary plan of redoing the whole process with better prompting got delayed and delayed and derailed by other priorities, such that now — five weeks later — I decided enough is enough, and that I need to just go ahead and write up the results I did find, with these acknowledgements that the process ended up being badly flawed.</p>
+
+<p>But as unsatisfying and incomplete as the results and their examinations are to me, there were still at least <i>some</i> interesting patterns of changes I managed to spot:</p>
 
 
 <h1>The Results</h1>
 
-<p>In displaying the results, I'll show the before-and-after always in pairs, with the original book text first and the LLM-edited changed text below it, like this:</p>
+<p>In displaying the edits, I'll show the before-and-after in pairs: original book text on top and LLM-edited text on bottom.</p>
 
 <blockquote>This is the source text.<br>This is the edited text.</blockquote>
 
-<p>(Note that my poor organization has led me to not include the specific book+LLM pair that each edit corresponds to, but a combinations of <code>grep</code> and <code>git log -S</code> against the <code>PublicDomainDiffs</code> repo source should reveal them in each case.)</p>
+<p>I failed to catalog the results well enough to include the book and LLM editor that each change corresponds to — a limitation that ended up being not too terribly meaningful anyway, since the differences in behavior across the different books and between the two LLMs all ended up being far less interesting than expected.</p>
+
+<p>A followup experiment would need to do this better, though even for this initial one, the information is <i>technically</i> accessible via cloning <code>PublicDomainDiffs</code> and using a combination of <code>grep</code> and <code>git log -S</code>.</p>
+
+<p>In any case, working with what information is readily accessible now:</p>
 
 <h2>Lateral Edits</h2>
 
-<p>As mentioned, the over-editing was extreme, with the vast majority of the results being <i>nothing</i> changes not even worth discussing. A more successful version of this experiment would have needed to find a better prompting approach that avoids all of the various meaningless edits to make the actually interesting ones easier to pull out.</p>
+<p>The vast majority of the LLMs' edits were <i>nothing</i> changes that have no real impact on the reading experience:</p>
 
-<p>That said, while <i>most</i> of the lateral edits were pointless, some more interesting categories did emerge:<p>
+<blockquote>fixed a pillow under her head<br>fluffed a pillow under her head</blockquote>
 
-<h3>Helping the Reader</h3>
+<blockquote>“Foolish child! foolish child!”<br>“Foolish child! Foolish child!”</blockquote>
 
-<p>One of the more curious behaviors of the LLMs was their tendency to try to throw a bone to the modern reader, seemingly to help them in places where older word usages might cause confusion, such as "flags" or "theatre" or "arcade" or "leaders" or "transit":</p>
+<blockquote>Dundy asked: “Well, what happened then?”<br>“Well, what happened then?” Dundy asked.</blockquote>
+
+
+<p>A better version of this experiment would need to somehow better impress upon the LLMs the importance of <i>not</i> flooding the diffs with meaningless changes like these.</p>
+
+
+
+<p>In a few cases, the lateral changes were <i>somewhat</i> more interesting in that they represented the LLMs insisting on being technically correct:</p>
+
+<blockquote>The old Guiacum test was very clumsy and uncertain.<br>The old guaiacum test was very clumsy and uncertain.</blockquote>
+
+<blockquote>the unemotional Indians, journeying in with their pelties<br>the unemotional Indians, journeying in with their peltries</blockquote>
+
+<blockquote>Spaniards strangled Edward Mansveldt on the garotte<br>Spaniards strangled Edward Mansveldt on the garrote</blockquote>
+
+<p>Though I don't give the LLMs much credit for these micro fact-checks, since they're the type of fixes that no one would ever notice.</p>
+
+
+<p>The only really interesting type of change that fell under the "lateral" umbrella involved the LLMs' tendency to try to clarify words potentially confusing to the modern reader, such as "flags" or "theatre" or "arcade" or "leaders" or "transit":</p>
 
 <blockquote>a quadrangle paved with flags and lined by sordid dwellings<br>a quadrangle paved with flagstones and lined by sordid dwellings</blockquote>
 
@@ -137,49 +155,15 @@ Output the full text of the chapter back out to make it easy for me to diff the 
 
 <blockquote>revolved it slowly, tracing, like the leg of transit, a thin red circle<br>revolved it slowly, tracing, like the leg of a compass, a thin red circle</blockquote>
 
-<p>Sometimes this also took the form of clarifying the speaker in dialogue:</p>
 
-<blockquote>“I have been wanting to speak to you, Jekyll,” began the latter.<br>“I have been wanting to speak to you, Jekyll,” began the lawyer.</blockquote>
-
-
-
-<h3>Bleh Edits</h3>
-
-<blockquote>fixed a pillow under her head<br>fluffed a pillow under her head</blockquote>
-
-<blockquote>“Foolish child! foolish child!”<br>“Foolish child! Foolish child!”</blockquote>
-
-<blockquote>Dundy asked: “Well, what happened then?”<br>“Well, what happened then?” Dundy asked.</blockquote>
-
-
-<h3>Technical Correctness</h3>
-
-<blockquote>The old Guiacum test was very clumsy and uncertain.<br>The old guaiacum test was very clumsy and uncertain.</blockquote>
-
-<blockquote>the unemotional Indians, journeying in with their pelties<br>the unemotional Indians, journeying in with their peltries</blockquote>
-
-<blockquote>Spaniards strangled Edward Mansveldt on the garotte<br>Spaniards strangled Edward Mansveldt on the garrote</blockquote>
-
+<p>None of these represent an actual information change for the reader who already correctly understands the words, but for the reader that doesn't, I suppose this kind of editing is… okay? It's at least not something I would have ever thought to do, which makes it somewhat interesting.</p>
 
 
 <h2>Bad Edits</h2>
 
+<p>There were many bad edits — more than there were good edits — a big disappointment. Though there were at least a <i>variety</i> of patterns in the bad edits, making them somewhat interesting.</p>
 
-
-<h3>Voice Removing</h3>
-
-<p>Watson's ejaculations are an iconic part of his character, not to be removed:</p>
-
-<blockquote>“Wonderful!” I ejaculated.<br>“Wonderful!” I exclaimed.</blockquote>
-
-<blockquote>The youth loitered with other loiterers<br>The youth mingled with the other loiterers</blockquote>
-
-<blockquote>Lady Narborough hit him with her fan.<br>Lady Narborough tapped him with her fan.</blockquote>
-
-<blockquote>It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.<br>It is a truth universally acknowledged that a single man in possession of a good fortune must be in want of a wife.</blockquote>
-
-
-<p>Overcorrecting grammar</p>
+<p>First, there were the cases where the LLMs couldn't help themselves but to overcorrect grammar:</p>
 
 <blockquote>“A good, swift sailor,” Henry observed<br>“She looks a good, swift sailor,” Henry observed</blockquote>
 
@@ -191,34 +175,31 @@ Output the full text of the chapter back out to make it easy for me to diff the 
 
 <blockquote>“Your frients haff gone upstairs,”<br>“Your friends have gone upstairs,”</blockquote>
 
+<p>These represent a subclass of the problem of the voice of the LLM trying to insert itself over the author, either via weakening the word choice or just inserting a distracting internet-y style where it doesn't belong:</p>
 
+<blockquote>Spade was stupid. “How what?”<br>Spade played dumb. “How what?”</blockquote>
 
-<p>Removing entertaining word choices.</p>
+<blockquote>His reading had been tremendous.<br>He read voraciously.</blockquote>
+
+<blockquote>The youth loitered with other loiterers<br>The youth mingled with the other loiterers</blockquote>
+
+<blockquote>Lady Narborough hit him with her fan.<br>Lady Narborough tapped him with her fan.</blockquote>
+
+<blockquote>he had studied and considered what navigation there was in books<br>he had devoured what books on navigation he could find</blockquote>
 
 <blockquote>Henry Morgan was aroused.<br>Henry Morgan flushed with anger.</blockquote>
 
 <blockquote>His face was stupid in its calmness.<br>His face was stolid in its calmness.</blockquote>
 
-<blockquote>Spade was stupid. “How what?”<br>Spade played dumb. “How what?”</blockquote>
-
-<p>Inserting modern voice</p>
-
-<blockquote>His reading had been tremendous.<br>He read voraciously.</blockquote>
-
-<blockquote>he had studied and considered what navigation there was in books<br>he had devoured what books on navigation he could find</blockquote>
-
 <blockquote>He was not prepared for this change of idea. He was staggered at such a revolt against his preconceptions.<br>He was staggered by this subversion of his expectations.</blockquote>
 
-<h3>Bowdlerizing</h3>
+<p>Also included were cases of useless bowdlerizing:</p>
 
 <blockquote>they had to travel in Indian file<br>they had to travel in single file</blockquote>
 
 <blockquote>Strong, glistening blacks pulled at the oars of the canoe<br>Strong, glistening men pulled at the oars of the canoe</blockquote>
 
-
-<h3>?? Changes</h3>
-
-<blockquote>“Don’t talk so much, old sport,” commanded Gatsby. “Play!”<br>“Don’t talk so much, old sport,” commanded Gatsby gently. “Just play.”</blockquote>
+<p>And actively rewriting sentences to be stupider:</p>
 
 <blockquote>He felt that that was to play his enemy’s game<br>He knew that dying would be playing right into his enemies' hands</blockquote>
 
@@ -226,20 +207,31 @@ Output the full text of the chapter back out to make it easy for me to diff the 
 
 <blockquote>The day-coach﻿—he was penniless now﻿—was hot.<br>The day-coach was stiflingly hot, and he was penniless now.</blockquote>
 
+<blockquote>“Don’t talk so much, old sport,” commanded Gatsby. “Play!”<br>“Don’t talk so much, old sport,” commanded Gatsby gently. “Just play.”</blockquote>
 
-<h3>Strict Mistakes</h3>
+<p>But most egrocious of all were the cases where the LLM thought it had any authority to override literature's identity, whether that be Austen's iconic jank commas or Watson's famous ejaculations:</p>
+
+<blockquote>It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.<br>It is a truth universally acknowledged that a single man in possession of a good fortune must be in want of a wife.</blockquote>
+
+<blockquote>“Wonderful!” I ejaculated.<br>“Wonderful!” I exclaimed.</blockquote>
+
+<p>And then lastly there were some scattered cases of the LLMs just making strict mistakes in their transcriptions, their probabilistic nature showing through:</p>
 
 <blockquote>their pride held them inexorably apart<br>their pride held them inexroxably apart</blockquote>
 
 <blockquote>“Tell him I cannot see anyone,” it said complainingly.<br>“Tell him I cannot see anyone,” it said complain ingly.</blockquote>
 
+<p>Overall, lots of lots of bad.</p>
+
+<p><i>However.</i> More bad than good <i>can</i> be acceptable — even if not desirable — when the results can be human-curated afterwards. If the LLMs had spit out loads of garbage but wedged in a sufficient number of banger edits, the bad could be acceptable.</p>
+
+<p>Instead:</p>
 
 <h2>Good Edits</h2>
 
+<p>They were few and far between. And even where they were present, the improvements themselves were rarely more than marginal.</p>
 
-<h3>Basic Improvements</h3>
-
-<p>Simplifications</p>
+<p>First off, there were the basic prose simplifications:</p>
 
 <blockquote>“You appear to be astonished,” he said, smiling at my expression of surprise.<br>“You appear to be astonished,” he said, smiling at my expression.</blockquote>
 
@@ -259,8 +251,7 @@ Output the full text of the chapter back out to make it easy for me to diff the 
 
 <blockquote>“No,” answered his mother with a placid expression in her face.<br>“No,” answered his mother with a placid expression.</blockquote>
 
-
-<p>Word choice</p>
+<p>And there were some word choice improvements:</p>
 
 <blockquote>It was a foggy, cloudy morning, and a dun-coloured veil hung over the housetops, looking like the reflection of the mud-coloured streets beneath.<br>It was a foggy, overcast morning, and a dun-coloured veil hung over the housetops, mirroring the mud-coloured streets beneath.</blockquote>
 
@@ -270,17 +261,15 @@ Output the full text of the chapter back out to make it easy for me to diff the 
 
 <blockquote>Mary hesitated about two minutes and then boldly spoke the truth.<br>Mary hesitated for a long moment, and then boldly spoke the truth.</blockquote>
 
+<blockquote>“How is it now?” he answered anxiously<br>“How is it now?” he asked anxiously</blockquote>
 
-
-<p>Correcting grammar</p>
+<p>And there was even the occasional <i>useful</i> grammatical fix:</p>
 
 <blockquote>“And who do you expect will answer this advertisement.”<br>“And who do you expect will answer this advertisement?”</blockquote>
 
-<blockquote>“How is it now?” he answered anxiously<br>“How is it now?” he asked anxiously</blockquote>
+<p>But none of these changes represent any kind of great value that would have made this whole process worth it.</p>
 
-
-
-<h3>Improving Voice</h3>
+<p>There were perhaps only <i>three</i> cases where the LLMs managed to really impress me with their ability to <i>improve</i> the voice of the author, either through better word choice or better mode of description:</p>
 
 <blockquote>his eyes had assumed the vacant, lacklustre expression which showed mental abstraction.<br>his eyes had assumed the vacant, lacklustre expression that betokened mental abstraction.</blockquote>
 
@@ -288,10 +277,19 @@ Output the full text of the chapter back out to make it easy for me to diff the 
 
 <blockquote>She had sprung away from him.<br>She sprang away from him.</blockquote>
 
+<p>With the first of the three coming from <i>A Study in Scarlet</i> and the next two coming from <i>Cup of Gold</i>. So ultimately the predicted editing value ordering <i>was</i> correct — technically — accepting the eight-way tie at zero in last place.</p>
+
 
 
 <h1>Lessons Learned?</h1>
 
+<p>This process updated me against the practicality of using current-generation LLMs to improve published, well-authored books.</p>
 
+<p>It also updated me against the value potential of these kind of small-scale edits in general for those same books — the changes were ultimately far smaller than the changes you'd see between e.g., different translations of the same book into another language, which usually go unnoticed anyway.</p>
 
+<p>But neither result changes the fact that <i>A Study in Scarlet</i> and <i>Cup of Gold</i> (and perhaps a few of the others, to a lesser extent) are still flawed books that <i>could</i> be improved — even if those improvements would need to occur on either a larger scale, or via a better prompted (or just smarter) LLM.</p>
+
+<p>Therefore, I would like to see the experiment repeated, but it perhaps should not be anyone's highest priority to do so.</p>
+
+<p>Womp womp.</p>
 
