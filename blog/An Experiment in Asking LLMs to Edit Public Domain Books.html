@@ -9,7 +9,7 @@
 
 <p>First, that LLMs are good at editing. Not <i>perfect</i> at editing, but neither are books perfect. So in theory, a sufficiently smart LLM could improve upon the published works of respected authors.<span class='edi'> (Where <i>I</i> get to decide what is and isn't an improvement, on account of my having good taste.)</span></p>
 
-<p>Second, that the type of edits that current LLMs are best-suited for — local, targeted changes — are also exactly the type of changes that diff viewers are built for.</p>
+<p>Second, that the type of edits that current LLMs are best suited for — local, targeted changes — are also exactly the type of changes that diff viewers are built for.</p>
 
 <p>Together, the plan became to combine the smartness of LLMs with the tooling of version control: I'd create a repository that had full-text versions of famous books as its root master branch with LLM-edited child branches off of it:</p>
 
@@ -21,7 +21,7 @@
 
 <p>Provided with ten famous(-ish) public domain texts: Could the LLMs find areas for prose improvements? Could they make those good edits while avoiding making bad or superfluous edits?</p>
 
-<p class='ed'>(For crappy source texts, we already know the answers to these questions are "yes" and "mostly yes". Hence why we want the more interesting challenge of running against more highly regarded works. The improvement potential should still be there, even if only more marginally so.)</p>
+<p class='ed'>(For crappy source texts, we already know the answers to these questions are "yes" and "mostly yes". Hence why we want the more interesting challenge of running against more highly regarded works. The improvement potential should still be there, even if only marginally so.)</p>
 
 <p>This diff-based version controlled approach seemed the most efficient way to find out, with the added bonus of being able to compare the relative editing intelligence of competing LLMs.</p>
 
@@ -58,13 +58,13 @@ Output the full text of the chapter back out to make it easy for me to diff the 
 <p>That is, I had a specific least-editable-to-most-editable ordering in mind that I wanted to see borne out in the relative diff densities between the ten books:</p>
 
 <ul>
-<li><i><b>The Sun Also Rises</b></i>: Hemingway's characteristic style represents the closest thing literature has to a local maxima. Can you improve upon perfected annoyingness?</li>
+<li><i><b>The Sun Also Rises</b></i>: Hemingway's characteristic style represents the closest thing literature has to a local maximum. Can you improve upon perfected annoyingness?</li>
 <li><i><b>The Great Gatsby</b></i>: Almost as tight a read as Iceberg Man's, but Scott did use "wan" too many times.</li>
 <li><i><b>Dr. Jekyll and Mr. Hyde</b></i>: Stevenson's prose is weaker, but his book is also shorter. Some limited room for improvement.</li>
-<li><i><b>The Picture of Dorian Gray</b></i>: Wilde's prose is excellent, but his more obnoxious habits need to be reigned in. <span class='edi'>(And as for his writing…)</span></li>
+<li><i><b>The Picture of Dorian Gray</b></i>: Wilde's prose is excellent, but his more obnoxious habits need to be reined in. <span class='edi'>(And as for his writing…)</span></li>
 <li><i><b>The Secret Garden</b></i>: Some repetitive prose to smooth out in this one, but the children's-novel tone needs to be maintained while doing so. <span class='edi'>(And the pro-Theosophy message.)</span></li>
 <li><i><b>Pride and Prejudice</b></i>: Austen wrote the most readable books in history up until that point. She overstays her welcome and her books have moderate room for improvement.</li>
-<li><i><b>The Maltese Falcon</b></i>: The first of the three mystery pulp schlock novels: Hammett accomplishes what he aims for — it's just that what he aims for isn't all the great.</li>
+<li><i><b>The Maltese Falcon</b></i>: The first of the three mystery pulp schlock novels: Hammett accomplishes what he aims for — it's just that what he aims for isn't all that great.</li>
 <li><i><b>The Mysterious Affair at Styles</b></i>: It's definitely a first-time author's novel.</li>
 <li><i><b>A Study in Scarlet</b></i>: An absolute structural trashfire, and one whose prose nosedives in the second half. Competent LLM editors will need to be more aggressive while in Utah.</li>
 <li><i><b>Cup of Gold</b></i>: Steinbeck's book is bad and he should feel bad. Short of deleting the entire text, the LLMs should absolutely recognize that this book is the one in need of the most editing.</li>
@@ -76,7 +76,7 @@ Output the full text of the chapter back out to make it easy for me to diff the 
 
 <h1>The Problems</h1>
 
-<p>With the the prompt, the books, and the predictions all set up, I went ahead with running the loop and committing the results, and then eagerly began my examination of the diffs. And I immediately ran into most of the issues I'd thought I had preempted, plus several <i>additional</i> ones.</p>
+<p>With the prompt, the books, and the predictions all set up, I went ahead with running the loop and committing the results, and then eagerly began my examination of the diffs. And I immediately ran into most of the issues I'd thought I had preempted, plus several <i>additional</i> ones.</p>
 
 <p>The diffs were, in many places, a nightmare to read. The LLMs were fond of splitting and merging paragraphs: fine changes to have made in theory, except that they wrecked the readability of the diffs in all three viewers I tried. See kdiff:</p>
 
@@ -113,7 +113,7 @@ Output the full text of the chapter back out to make it easy for me to diff the 
 
 <p>I failed to catalog the results well enough to include the book and LLM editor that each change corresponds to — a limitation that ended up being not too terribly meaningful anyway, since the differences in behavior across the different books and between the two LLMs all ended up being far less interesting than expected.</p>
 
-<p>A followup experiment would need to do this better, though even for this initial one, the information is <i>technically</i> accessible via cloning <code>PublicDomainDiffs</code> and using a combination of <code>grep</code> and <code>git log -S</code>.</p>
+<p>A follow-up experiment would need to do this better, though even for this initial one, the information is <i>technically</i> accessible via cloning <code>PublicDomainDiffs</code> and using a combination of <code>grep</code> and <code>git log -S</code>.</p>
 
 <p>In any case, working with what information is readily accessible now:</p>
 
@@ -235,13 +235,13 @@ Output the full text of the chapter back out to make it easy for me to diff the 
 
 <blockquote>“You appear to be astonished,” he said, smiling at my expression of surprise.<br>“You appear to be astonished,” he said, smiling at my expression.</blockquote>
 
-<blockquote>a singularly simious and apelike appearance<br>a singularly simian appearance</blockquote>
-
 <blockquote>The Boots volunteered to show me the room: it was on the second floor, and there was a small corridor leading up to it.<br>The Boots volunteered to show me the room. It was on the second floor, down a small corridor.</blockquote>
 
 <blockquote>He took no particular notice of him, beyond thinking in his own mind that it was early for him to be at work.<br>He took no particular notice of him, beyond thinking it was early for him to be at work.</blockquote>
 
 <blockquote>The young fellow seemed pleased at the suggestion, and his dark eyes sparkled with pleasure.<br>His dark eyes sparkled at the suggestion.</blockquote>
+
+<blockquote>a singularly simious and apelike appearance<br>a singularly simian appearance</blockquote>
 
 <blockquote>lest something which fell from their lips might be misconstrued, and bring down a swift retribution upon them<br>lest a misconstrued word bring down a swift retribution upon them</blockquote>
 
