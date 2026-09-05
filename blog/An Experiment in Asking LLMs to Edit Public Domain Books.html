@@ -58,33 +58,37 @@ Output the full text of the chapter back out to make it easy for me to diff the 
 <p>That is, I had a specific least-editable-to-most-editable ordering in mind that I wanted to see borne out in the relative diff densities between the ten books:</p>
 
 <ul>
-<li><i><b>The Sun Also Rises</b></i>: Hemingway is a deeply annoying writer, but he's the best at being deeply annoying. Improving his prose without screwing up its characteristic style may prove impossible.</li>
-<li><i><b>The Great Gatsby</b></i>: Scott is just about as tight as Hemingway, so it's again difficult to think of what could even be improved upon. If the LLM can make any positive edits to either of these authors, it will be impressive.</li>
-<li><i><b>Dr. Jekyll and Mr. Hyde</b></i>: Stevenson's prose is a little weaker prose-wise than the above two, but Jekyll and Hyde is still the most compact book of this set. (Partially, of course, because it's the shortest.) Perhaps a select few good edits can be mined from the text.</li>
-<li><i><b>The Picture of Dorian Gray</b></i>: Wilde's prose is excellent, but like Hemingway, his prose is also often annoying, and unlike Hemingway, the annoyance here is less justifiable. The LLM should have room here to cut back on some of Wilde's more obnoxious habits, though it will need to tread carefully about not screwing up the good stuff.</li>
-<li><i><b>The Secret Garden</b></i>: Burnett's prose is definitely less refined here than in any of the above books, but that's partially down to Secret Garden being a children's novel. Improving the text is definitely doable, but the improvements need to avoid screwing up the tone.</li>
-<li><i><b>Pride and Prejudice</b></i>: Austen's prose was great and groundbreaking for its time, but two centuries of writing technique refinements make the early weaknesses here more noticeable. That said, the book is still mostly good, even if it overstays its welcome. There's moderate room for improvement.</li>
-<li><i><b>The Maltese Falcon</b></i>: Of the three mystery pulp schlock novels here, Hammett's does the best at accomplishing via prose what it aims for. However, what it aims for still isn't all that great, so there should be plenty room for improvements, even while preserving the noir tone.</li>
-<li><i><b>The Mysterious Affair at Styles</b></i>: For a first novel, Christie does pretty good here, but the book still has at least one major problem and many more minor ones. Prose-wise, there should be plenty to tighten up.</li>
-<li><i><b>A Study in Scarlet</b></i>: This book is a real structural trashfire, and is the best example out of this set where the quality of the prose actively worsens over the course of the text. Conan Doyle's prose isn't particularly strong at any point in the text, but the LLM should still recognize that the second half needs more fixing than the first.</li>
-<li><i><b>Cup of Gold</b></i>: Both in concept and in execution, Cup of Gold is a bad book, and Steinbeck should feel bad for having written it. There should be no shortage of improvements the LLM can make to this text, even if the biggest improvement would probably be to just delete the entire thing.</li>
+<li><i><b>The Sun Also Rises</b></i>: Hemingway's characteristic style represents the closest thing literature has to a local maxima. Can you improve upon perfected annoyingness?</li>
+<li><i><b>The Great Gatsby</b></i>: Almost as tight a read as Iceberg Man's, but Scott did use "wan" too many times.</li>
+<li><i><b>Dr. Jekyll and Mr. Hyde</b></i>: Stevenson's prose is weaker, but his book is also shorter. Some limited room for improvement.</li>
+<li><i><b>The Picture of Dorian Gray</b></i>: Wilde's prose is excellent, but his more obnoxious habits need to be reigned in. <span class='edi'>(And as for his writing…)</span></li>
+<li><i><b>The Secret Garden</b></i>: Some repetitive prose to smooth out in this one, but the children's-novel tone needs to be maintained while doing so. <span class='edi'>(And the pro-Theosophy message.)</span></li>
+<li><i><b>Pride and Prejudice</b></i>: Austen wrote the most readable books in history up until that point. She overstays her welcome and her books have moderate room for improvement.</li>
+<li><i><b>The Maltese Falcon</b></i>: The first of the three mystery pulp schlock novels: Hammett accomplishes what he aims for — it's just that what he aims for isn't all the great.</li>
+<li><i><b>The Mysterious Affair at Styles</b></i>: It's definitely a first-time author's novel.</li>
+<li><i><b>A Study in Scarlet</b></i>: An absolute structural trashfire, and one whose prose nosedives in the second half. Competent LLM editors will need to be more aggressive while in Utah.</li>
+<li><i><b>Cup of Gold</b></i>: Steinbeck's book is bad and he should feel bad. Short of deleting the entire text, the LLMs should absolutely recognize that this book is the one in need of the most editing.</li>
 </ul>
+
+<p>This set of books represents a good range in input quality<span class='edi'> (noting that books can get <a href="https://372pages.com/about">significantly worse</a> yet)</span>, so I had high hopes for the experiment.</p>
+
+<p>Unfortunately:</p>
 
 <h1>The Problems</h1>
 
-<p>So with the loop, the prompt, and the predictions all set up, I went forward with running the experiment. And in examining the diffs… I ran into almost every problem I had tried to prevent, plus some additional ones.</p>
+<p>With the the prompt, the books, and the predictions all set up, I went ahead with running the loop and committing the results, and then eagerly began my examination of the diffs. And I immediately ran into most of the issues I'd thought I had preempted, plus several <i>additional</i> ones.</p>
 
-<p>The diffs were, in many places, a nighmare to read. The LLMs were fond of splitting and merging paragraphs — a fine type of edit to make in the abstract, except that it wrecked the ability to easily see what was actually being changed. I tried three different viewers, none of which was particularly readable:</p>
+<p>The diffs were, in many places, a nightmare to read. The LLMs were fond of splitting and merging paragraphs: fine changes to make in theory, except that they wreck the diffs' readability.</p>
 
-<p>kdiff:</p>
+<p>Here's kdiff:</p>
 
 <img src="/images/experiment/diff1.webp" />
 
-<p>Rider:</p>
+<p>And Rider:</p>
 
 <img src="/images/experiment/diff2.webp" />
 
-<p>GitHub:</p>
+<p>And GitHub:</p>
 
 <img src="/images/experiment/diff3.webp" />
 
