@@ -5,33 +5,31 @@
 #b-right.ed { background-image: url(/vn/TheSunAlsoRises/images/c-author-abased.webp),url(/vn/TheMysteriousAffairAtStyles/images/c-author-abased.webp); }
 </style>
 
-<p>In creating the <a href="https://github.com/JohnQPulp/PublicDomainDiffs">Public Domain Diffs</a> repo, I started with two premises:</p>
+<p>I created the <a href="https://github.com/JohnQPulp/PublicDomainDiffs">Public Domain Diffs</a> repository with two ideas in mind:</p>
 
-<ul>
-<li>First, LLMs are good at editing. Not <i>perfect</i> at it, but books aren't perfect either, not even the public domain classics.</li>
-<li>Second, the type of edits that LLMs are best at — local, targetted changes — are exactly the type of changes that diff viewers are meant to be good at showing.</li>
-</ul>
+<p>First, that LLMs are good at editing. Not <i>perfect</i> at editing, but neither are books perfect. So in theory, a sufficiently smart LLM could improve upon the published works of respected authors.<span class='edi'> (Where <i>I</i> get to decide what is and isn't an improvement, on account of my having good taste.)</span></p>
 
-<p>So, what if there was a repository that had full-text versions of famous books as its root master branch, and then had individual child branches off it, each representing a specific LLM, each tasked with making the best edits it could to the various source texts:</p>
+<p>Second, that the type of edits that current LLMs are best-suited for — local, targetted changes — are also exactly the type of changes that diff viewers are built for.</p>
+
+<p>Together, the plan became to combine the smartness of LLMs with the tooling of version control: I'd create a repository that had full-text versions of famous books as its root master branch with LLM-edited child branches off of it:</p>
 
 <img src="/images/experiment/repo.webp" />
 
-<p>Those edits would would all be captured in individual diffs per LLM branch per book, to make the examination of the edits as easy as possible:</p>
+<p>Each LLM's edit of each book would be captured in an individual commit to its LLM branch, making the LLMs' edits easy (in theory) to examine:</p>
 
 <img src="/images/experiment/branches.webp" />
 
-<p>The goals would be twofold:</p>
+<p>Provided with ten famous(-ish) public domain texts: Could the LLMs find areas for prose improvements? Could they make those good edits while avoiding making bad or superfluous edits?</p>
 
-<ul>
-<li>First, to see to what extent LLMs are able to improve upon famous texts — to see whether or not they can find <i>any</i> places for improvement in some of the western canon's most highly regarded works.</li>
-<li>Second, based on the above, to see which LLMs are better at editing than others.</li>
-</ul>
+<p class='ed'>(For crappy source texts, we already know the answers to these questions are "yes" and "mostly yes". Hence why we want the more interesting challenge of running against more highly regarded works. The improvement potential should still be there, even if only more marginally so.)</p>
+
+<p>This diff-based version controlled approach seemed the most efficient way to find out, with the added bonus of being able to compare the relative editing intelligence of competing LLMs.</p>
 
 <h1>The Setup</h1>
 
-<p>Current-generation LLMs' intelligence degrades at longer context sizes. At novel-length sizes, the degradation makes their outputs largely worthless — a problem I'd already ran into in previous LLM-based book-processing tasks.</p>
+<p>I knew from previous book-processing experiences that the LLMs were not yet good enough to process novel-length texts intelligently all in one go — the context size degradation would be too severe.</p>
 
-<p>The solution was simple though: just break the book into chapter-length chunks, where performance remains acceptable. So I wrote up a short loop script that fed books chapter-by-chapter into the LLM APIs, using this prompt:</p>
+<p>Instead, the plan would be to just break the books apart into chapter-length chunks, using a short looping script that fed the individual chapters into the LLM APIs with this prompt:</p>
 
 <pre>
 You are going to be given the task of editing a chapter from a famous public domain book, with the goal of improving its prose. Your edits can take any semantic form — adding, removing, restructuring, etc — using your own best judgment on what what prose changes have the potential to improve the existing text's quality. No author is perfect over the course of an entire book-length text, so I expect you to be able to identify some areas for enhancement.
@@ -45,19 +43,19 @@ The book you'll be editing is &lt;book&gt; by &lt;author&gt;.
 Output the full text of the chapter back out to make it easy for me to diff the results against the original chapter to see what edits you've made. (And output juts the chapter text, starting with the chapter header.)
 </pre>
 
-<p>With this prompt, I tried to preempt several ways I thought of that the editing could go wrong:</p>
+<p>In the prompt, I tried to preempt several problems I foresaw that might hurt the editing:</p>
 
 <ul>
-<li>First, I was worried the LLMs might under-edit, being intimidated by the big-name authors. So I tried to reassure it that room for improvement could always be found.</li>
-<li>Second, I was worried the LLMs would over-edit. I didn't want to sift through a bunch of purposeless edits, made only because the LLMs thought they needed to change <i>something</i>. So I tried to appeal the LLMs' intelligence that it should know when is correct to edit vs leave be.</li>
-<li>Third, because the chapter edits were all happening independently, I was worried the density of the editing might vary wildly from chapter-to-chapter, swinging between under- and over-editing. I tried to appeal to a sort of Schelling point approach here, and again, the LLMs' best judgement.</li>
-<li>Fourth, I was worried the LLMs might make attempt to make some larger scale structural-type changes in some of the edits. For many of the books, such structural improvements were badly needed, and were it possible to feed in and out the whole book at once, I would have loved to experiment with seeing what the LLMs could do. However, the necessity of the chapter-by-chapter approach necessarily precluded such overarching changes, since they'd definitely wind up inconsistent between the individually edited chapters, and therefore I had to request that the changes be kept essentially local.</li>
-<li>And lastly, I was worred the LLMs might try to override the specific styles of the various individual authors with a more homogenized LLM-infused voice. So I tried to make sure the LLMs understood that they needed to make improvements within the bounds of keeping to the authors' voices.</li>
+<li>I wanted to avoid under-editing.</li>
+<li>I wanted to avoid over-editing.</li>
+<li>I wanted to avoid editing scope/density inconsistencies between the independently processed chapters.</li>
+<li>I wanted to avoid larger scale structural-type edits. (By necessity. Since even for those books that <i>needed</i> structural overhauls, it would be impossible with the independent chapter setup to keep such changes consistent.)</li>
+<li>I wanted to avoid voice homogenization.</li>
 </ul>
 
-<h2>Predictions</h2>
+<p>If the LLMs were at all competent, they would be able to avoid all of these pitfalls <i>and</i> also know to scale their editing inversely with the "tightness" of the various source texts.</p>
 
-<p>What I wanted out of this experiment — what I would have considered a success — is if the LLMs' book-by-book editing density ended up inversely proportional to the inputted books' "tightness". I fed in ten books, and this was the rough order from least editable to most editable that I expected the LLMs to follow:</p>
+<p>That is, I had a specific least-editable-to-most-editable ordering in mind that I wanted to see borne out in the relative diff densities between the ten books:</p>
 
 <ul>
 <li><i><b>The Sun Also Rises</b></i>: Hemingway is a deeply annoying writer, but he's the best at being deeply annoying. Improving his prose without screwing up its characteristic style may prove impossible.</li>
