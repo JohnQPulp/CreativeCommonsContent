@@ -9,7 +9,7 @@
 
 <p>First, that LLMs are good at editing. Not <i>perfect</i> at editing, but neither are books perfect. So in theory, a sufficiently smart LLM could improve upon the published works of respected authors.<span class='edi'> (Where <i>I</i> get to decide what is and isn't an improvement, on account of my having good taste.)</span></p>
 
-<p>Second, that the type of edits that current LLMs are best-suited for — local, targetted changes — are also exactly the type of changes that diff viewers are built for.</p>
+<p>Second, that the type of edits that current LLMs are best-suited for — local, targeted changes — are also exactly the type of changes that diff viewers are built for.</p>
 
 <p>Together, the plan became to combine the smartness of LLMs with the tooling of version control: I'd create a repository that had full-text versions of famous books as its root master branch with LLM-edited child branches off of it:</p>
 
@@ -96,11 +96,11 @@ Output the full text of the chapter back out to make it easy for me to diff the 
 
 <p>The diff density was also highly inconsistent between chapters, varying from over-edited to insanely over-edited.</p>
 
-<p>Despite my "clever" prompting's best efforts, the diffs were full of pointless changes: lateral word choice replacements, unnecessary comma adjustments, unnecessary spelling adjustments (both British-to-American and American-to-British), and actively detrimental non-ASCII unicode character deletions against hair spaces and so forth.</p>
+<p>Despite my "clever" prompting's best efforts, the diffs were full of pointless changes: lateral word choice replacements, unnecessary comma adjustments, unnecessary spelling adjustments (both British-to-American and American-to-British), and actively detrimental non-ASCII character deletions against hair spaces and so forth.</p>
 
 <p>So my initial plan of carefully combing through all the diffs rapidly deteriorated into <i>skimming</i> the diffs.</p>
 
-<p>And my secondary plan of redoing the whole process with better prompting got delayed and delayed and derailed by other priorities, such that now — five weeks later — I decided enough is enough, and that I need to just go ahead and write up the results I did find, with these acknowledgements that the process ended up being badly flawed.</p>
+<p>And my secondary plan of redoing the whole process with better prompting got delayed and delayed and derailed by other priorities, such that now — five weeks later — I decided enough is enough, and that I need to just go ahead and write up the results I did find, with these acknowledgments that the process ended up being badly flawed.</p>
 
 <p>But as unsatisfying and incomplete as the results and their examinations are to me, there were still at least <i>some</i> interesting patterns of changes I managed to spot:</p>
 
@@ -209,7 +209,7 @@ Output the full text of the chapter back out to make it easy for me to diff the 
 
 <blockquote>“Don’t talk so much, old sport,” commanded Gatsby. “Play!”<br>“Don’t talk so much, old sport,” commanded Gatsby gently. “Just play.”</blockquote>
 
-<p>But most egrocious of all were the cases where the LLM thought it had any authority to override literature's identity, whether that be Austen's iconic jank commas or Watson's famous ejaculations:</p>
+<p>But most egregious of all were the cases where the LLM thought it had any authority to override literature's identity, whether that be Austen's iconic jank commas or Watson's famous ejaculations:</p>
 
 <blockquote>It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.<br>It is a truth universally acknowledged that a single man in possession of a good fortune must be in want of a wife.</blockquote>
 
@@ -291,5 +291,5 @@ Output the full text of the chapter back out to make it easy for me to diff the 
 
 <p>Therefore, I would like to see the experiment repeated, but it perhaps should not be anyone's highest priority to do so.</p>
 
-<p>Womp womp.</p>
+<p>(Womp womp?)</p>
 
