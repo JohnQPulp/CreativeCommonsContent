@@ -5,13 +5,33 @@
 #b-right.ed { background-image: url(/vn/TheSunAlsoRises/images/c-author-abased.webp),url(/vn/TheMysteriousAffairAtStyles/images/c-author-abased.webp); }
 </style>
 
-<p>In creating the <a href="https://github.com/JohnQPulp/PublicDomainDiffs">Public Domain Diffs</a> repo, I had two great ideas:</p>
+<p>In creating the <a href="https://github.com/JohnQPulp/PublicDomainDiffs">Public Domain Diffs</a> repo, I started with two premises:</p>
 
-<p>First, good editing</p>
+<ul>
+<li>First, LLMs are good at editing. Not <i>perfect</i> at it, but books aren't perfect either, not even the public domain classics.</li>
+<li>Second, the type of edits that LLMs are best at — local, targetted changes — are exactly the type of changes that diff viewers are meant to be good at showing.</li>
+</ul>
 
-<p>Second, diffs good</p>
+<p>So, what if there was a repository that had full-text versions of famous books as its root master branch, and then had individual child branches off it, each representing a specific LLM, each tasked with making the best edits it could to the various source texts:</p>
+
+<img src="/images/experiment/repo.webp" />
+
+<p>Those edits would would all be captured in individual diffs per LLM branch per book, to make the examination of the edits as easy as possible:</p>
+
+<img src="/images/experiment/branches.webp" />
+
+<p>The goals would be twofold:</p>
+
+<ul>
+<li>First, to see to what extent LLMs are able to improve upon famous texts — to see whether or not they can find <i>any</i> places for improvement in some of the western canon's most highly regarded works.</li>
+<li>Second, based on the above, to see which LLMs are better at editing than others.</li>
+</ul>
 
 <h1>The Setup</h1>
+
+<p>Current-generation LLMs' intelligence degrades at longer context sizes. At novel-length sizes, the degradation makes their outputs largely worthless — a problem I'd already ran into in previous LLM-based book-processing tasks.</p>
+
+<p>The solution was simple though: just break the book into chapter-length chunks, where performance remains acceptable. So I wrote up a short loop script that fed books chapter-by-chapter into the LLM APIs, using this prompt:</p>
 
 <pre>
 You are going to be given the task of editing a chapter from a famous public domain book, with the goal of improving its prose. Your edits can take any semantic form — adding, removing, restructuring, etc — using your own best judgment on what what prose changes have the potential to improve the existing text's quality. No author is perfect over the course of an entire book-length text, so I expect you to be able to identify some areas for enhancement.
@@ -25,33 +45,118 @@ The book you'll be editing is &lt;book&gt; by &lt;author&gt;.
 Output the full text of the chapter back out to make it easy for me to diff the results against the original chapter to see what edits you've made. (And output juts the chapter text, starting with the chapter header.)
 </pre>
 
-<p>preempting</p>
+<p>With this prompt, I tried to preempt several ways I thought of that the editing could go wrong:</p>
 
-<p>predictions (w/ books)</p>
+<ul>
+<li>First, I was worried the LLMs might under-edit, being intimidated by the big-name authors. So I tried to reassure it that room for improvement could always be found.</li>
+<li>Second, I was worried the LLMs would over-edit. I didn't want to sift through a bunch of purposeless edits, made only because the LLMs thought they needed to change <i>something</i>. So I tried to appeal the LLMs' intelligence that it should know when is correct to edit vs leave be.</li>
+<li>Third, because the chapter edits were all happening independently, I was worried the density of the editing might vary wildly from chapter-to-chapter, swinging between under- and over-editing. I tried to appeal to a sort of Schelling point approach here, and again, the LLMs' best judgement.</li>
+<li>Fourth, I was worried the LLMs might make attempt to make some larger scale structural-type changes in some of the edits. For many of the books, such structural improvements were badly needed, and were it possible to feed in and out the whole book at once, I would have loved to experiment with seeing what the LLMs could do. However, the necessity of the chapter-by-chapter approach necessarily precluded such overarching changes, since they'd definitely wind up inconsistent between the individually edited chapters, and therefore I had to request that the changes be kept essentially local.</li>
+<li>And lastly, I was worred the LLMs might try to override the specific styles of the various individual authors with a more homogenized LLM-infused voice. So I tried to make sure the LLMs understood that they needed to make improvements within the bounds of keeping to the authors' voices.</li>
+</ul>
+
+<h2>Predictions</h2>
+
+<p>What I wanted out of this experiment — what I would have considered a success — is if the LLMs' book-by-book editing density ended up inversely proportional to the inputted books' "tightness". I fed in ten books, and this was the rough order from least editable to most editable that I expected the LLMs to follow:</p>
+
+<ul>
+<li><i><b>The Sun Also Rises</b></i>: Hemingway is a deeply annoying writer, but he's the best at being deeply annoying. Improving his prose without screwing up its characteristic style may prove impossible.</li>
+<li><i><b>The Great Gatsby</b></i>: Scott is just about as tight as Hemingway, so it's again difficult to think of what could even be improved upon. If the LLM can make any positive edits to either of these authors, it will be impressive.</li>
+<li><i><b>Dr. Jekyll and Mr. Hyde</b></i>: Stevenson's prose is a little weaker prose-wise than the above two, but Jekyll and Hyde is still the most compact book of this set. (Partially, of course, because it's the shortest.) Perhaps a select few good edits can be mined from the text.</li>
+<li><i><b>The Picture of Dorian Gray</b></i>: Wilde's prose is excellent, but like Hemingway, his prose is also often annoying, and unlike Hemingway, the annoyance here is less justifiable. The LLM should have room here to cut back on some of Wilde's more obnoxious habits, though it will need to tread carefully about not screwing up the good stuff.</li>
+<li><i><b>The Secret Garden</b></i>: Burnett's prose is definitely less refined here than in any of the above books, but that's partially down to Secret Garden being a children's novel. Improving the text is definitely doable, but the improvements need to avoid screwing up the tone.</li>
+<li><i><b>Pride and Prejudice</b></i>: Austen's prose was great and groundbreaking for its time, but two centuries of writing technique refinements make the early weaknesses here more noticeable. That said, the book is still mostly good, even if it overstays its welcome. There's moderate room for improvement.</li>
+<li><i><b>The Maltese Falcon</b></i>: Of the three mystery pulp schlock novels here, Hammett's does the best at accomplishing via prose what it aims for. However, what it aims for still isn't all that great, so there should be plenty room for improvements, even while preserving the noir tone.</li>
+<li><i><b>The Mysterious Affair at Styles</b></i>: For a first novel, Christie does pretty good here, but the book still has at least one major problem and many more minor ones. Prose-wise, there should be plenty to tighten up.</li>
+<li><i><b>A Study in Scarlet</b></i>: This book is a real structural trashfire, and is the best example out of this set where the quality of the prose actively worsens over the course of the text. Conan Doyle's prose isn't particularly strong at any point in the text, but the LLM should still recognize that the second half needs more fixing than the first.</li>
+<li><i><b>Cup of Gold</b></i>: Both in concept and in execution, Cup of Gold is a bad book, and Steinbeck should feel bad for having written it. There should be no shortage of improvements the LLM can make to this text, even if the biggest improvement would probably be to just delete the entire thing.</li>
+</ul>
 
 <h1>The Problems</h1>
 
-<p>Diff issues</p>
+<p>So with the loop, the prompt, and the predictions all set up, I went forward with running the experiment. And in examining the diffs… I ran into almost every problem I had tried to prevent, plus some additional ones.</p>
+
+<p>The diffs were, in many places, a nighmare to read. The LLMs were fond of splitting and merging paragraphs — a fine type of edit to make in the abstract, except that it wrecked the ability to easily see what was actually being changed. I tried three different viewers, none of which was particularly readable:</p>
+
+<p>kdiff:</p>
 
 <img src="/images/experiment/diff1.webp" />
 
+<p>Rider:</p>
+
 <img src="/images/experiment/diff2.webp" />
+
+<p>GitHub:</p>
 
 <img src="/images/experiment/diff3.webp" />
 
+<p>Now, not all the diffs were borked like this, and interestingly, there were even differences between the different diff applications about which particular paragraphs were borked. So in theory with enough time, switching between different diff viewers and manually fixing the diff viewer line-ups, these paragraphs could have been properly examined.</p>
+
+<p>But unfortunately, this problem combined with another problem of the diffs being way over-edited, almost universally throughout all the chapters of all the books. Not <i>good</i> edits either, but tons of meaningless word choice changes and comma adjustments and British-to-American (or the reversed) spelling adjustments and unicode character deletions that held no real impact on readability or prose quality.</p>
+
+<p>And to make things worse, huge chunks of various points were inexplicably deleted at times, for no reason:</p>
+
 <img src="/images/experiment/diff4.webp" />
 
-<p>Reading difficulty</p>
+<p>Bizarrely, reprompted with the same prompt for the same chapter, the output text would quit at about the same point each time, though not <i>exactly</i> the same point, so the results clearly weren't determinstic, yet they still managed to give up at about the same points consistently. (This in combination with the density of the diffs also being wildly off at times between adjacent chapters.)</p>
 
-<p>Eventually decided I need to stop sitting</p>
+<p>So, with all these diffing issues, my original plan of carefully walking through all the diffs for each book through each chapter became wildly impractical.</p>
+
+<p>Instead what I did was just skim the diffs, catalog <i>some</i> of the more interesting results, and then sit on them while I spent time trying to rethink how to better carry out the experiment to avoid the awful diff clutter.</p>
+
+<p>But now a month-and-a-half has passed since actually doing and reading the diffs, and I now realize that, regardless of whether I have time to redo the experiment more correctly, I need to just go forward with presenting what this first pass found, even if the results are incompletely understood and somewhat unsatisfying to me:</p>
+
 
 <h1>The Results</h1>
 
+<p>In displaying the results, I'll show the before-and-after always in pairs, with the original book text first and the LLM-edited changed text below it, like this:</p>
+
+<blockquote>This is the source text.<br>This is the edited text.</blockquote>
+
+<p>(Note that my poor organization has led me to not include the specific book+LLM pair that each edit corresponds to, but a combinations of <code>grep</code> and <code>git log -S</code> against the <code>PublicDomainDiffs</code> repo source should reveal them in each case.)</p>
 
 <h2>Lateral Edits</h2>
 
+<p>As mentioned, the over-editing was extreme, with the vast majority of the results being <i>nothing</i> changes not even worth discussing. A more successful version of this experiment would have needed to find a better prompting approach that avoids all of the various meaningless edits to make the actually interesting ones easier to pull out.</p>
+
+<p>That said, while <i>most</i> of the lateral edits were pointless, some more interesting categories did emerge:<p>
+
+<h3>Helping the Reader</h3>
+
+<p>One of the more curious behaviors of the LLMs was their tendency to try to throw a bone to the modern reader, seemingly to help them in places where older word usages might cause confusion, such as "flags" or "theatre" or "arcade" or "leaders" or "transit":</p>
+
+<blockquote>a quadrangle paved with flags and lined by sordid dwellings<br>a quadrangle paved with flagstones and lined by sordid dwellings</blockquote>
+
+<blockquote>as he crossed the theatre<br>as he crossed the anatomical theatre</blockquote>
+
+<blockquote>They were carrying tables out and setting them up under the arcade.<br>They were carrying tables out and setting them up under the arches.</blockquote>
+
+<blockquote>some had leaders upon it<br>some had leading articles upon it</blockquote>
+
+<blockquote>revolved it slowly, tracing, like the leg of transit, a thin red circle<br>revolved it slowly, tracing, like the leg of a compass, a thin red circle</blockquote>
+
+<p>Sometimes this also took the form of clarifying the speaker in dialogue:</p>
+
+<blockquote>“I have been wanting to speak to you, Jekyll,” began the latter.<br>“I have been wanting to speak to you, Jekyll,” began the lawyer.</blockquote>
 
 
+
+<h3>Bleh Edits</h3>
+
+<blockquote>fixed a pillow under her head<br>fluffed a pillow under her head</blockquote>
+
+<blockquote>“Foolish child! foolish child!”<br>“Foolish child! Foolish child!”</blockquote>
+
+<blockquote>Dundy asked: “Well, what happened then?”<br>“Well, what happened then?” Dundy asked.</blockquote>
+
+
+<h3>Technical Correctness</h3>
+
+<blockquote>The old Guiacum test was very clumsy and uncertain.<br>The old guaiacum test was very clumsy and uncertain.</blockquote>
+
+<blockquote>the unemotional Indians, journeying in with their pelties<br>the unemotional Indians, journeying in with their peltries</blockquote>
+
+<blockquote>Spaniards strangled Edward Mansveldt on the garotte<br>Spaniards strangled Edward Mansveldt on the garrote</blockquote>
 
 
 
@@ -59,8 +164,127 @@ Output the full text of the chapter back out to make it easy for me to diff the 
 
 
 
+<h3>Voice Removing</h3>
+
+<p>Watson's ejaculations are an iconic part of his character, not to be removed:</p>
+
+<blockquote>“Wonderful!” I ejaculated.<br>“Wonderful!” I exclaimed.</blockquote>
+
+<blockquote>The youth loitered with other loiterers<br>The youth mingled with the other loiterers</blockquote>
+
+<blockquote>Lady Narborough hit him with her fan.<br>Lady Narborough tapped him with her fan.</blockquote>
+
+<blockquote>It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.<br>It is a truth universally acknowledged that a single man in possession of a good fortune must be in want of a wife.</blockquote>
+
+
+<p>Overcorrecting grammar</p>
+
+<blockquote>“A good, swift sailor,” Henry observed<br>“She looks a good, swift sailor,” Henry observed</blockquote>
+
+<blockquote>Marvelous plan! Genius of an officer!<br>A marvelous plan! The genius of an officer!</blockquote>
+
+<blockquote>he’d of got me sure.<br>he’d have got me sure.</blockquote>
+
+<blockquote>“Taken who to prison?”<br>“Taken whom to prison?”</blockquote>
+
+<blockquote>“Your frients haff gone upstairs,”<br>“Your friends have gone upstairs,”</blockquote>
+
+
+
+<p>Removing entertaining word choices.</p>
+
+<blockquote>Henry Morgan was aroused.<br>Henry Morgan flushed with anger.</blockquote>
+
+<blockquote>His face was stupid in its calmness.<br>His face was stolid in its calmness.</blockquote>
+
+<blockquote>Spade was stupid. “How what?”<br>Spade played dumb. “How what?”</blockquote>
+
+<p>Inserting modern voice</p>
+
+<blockquote>His reading had been tremendous.<br>He read voraciously.</blockquote>
+
+<blockquote>he had studied and considered what navigation there was in books<br>he had devoured what books on navigation he could find</blockquote>
+
+<blockquote>He was not prepared for this change of idea. He was staggered at such a revolt against his preconceptions.<br>He was staggered by this subversion of his expectations.</blockquote>
+
+<h3>Bowdlerizing</h3>
+
+<blockquote>they had to travel in Indian file<br>they had to travel in single file</blockquote>
+
+<blockquote>Strong, glistening blacks pulled at the oars of the canoe<br>Strong, glistening men pulled at the oars of the canoe</blockquote>
+
+
+<h3>?? Changes</h3>
+
+<blockquote>“Don’t talk so much, old sport,” commanded Gatsby. “Play!”<br>“Don’t talk so much, old sport,” commanded Gatsby gently. “Just play.”</blockquote>
+
+<blockquote>He felt that that was to play his enemy’s game<br>He knew that dying would be playing right into his enemies' hands</blockquote>
+
+<blockquote>He spoke jocosely.<br>He spoke with a grim, forced lightness.</blockquote>
+
+<blockquote>The day-coach﻿—he was penniless now﻿—was hot.<br>The day-coach was stiflingly hot, and he was penniless now.</blockquote>
+
+
+<h3>Strict Mistakes</h3>
+
+<blockquote>their pride held them inexorably apart<br>their pride held them inexroxably apart</blockquote>
+
+<blockquote>“Tell him I cannot see anyone,” it said complainingly.<br>“Tell him I cannot see anyone,” it said complain ingly.</blockquote>
+
+
 <h2>Good Edits</h2>
 
+
+<h3>Basic Improvements</h3>
+
+<p>Simplifications</p>
+
+<blockquote>“You appear to be astonished,” he said, smiling at my expression of surprise.<br>“You appear to be astonished,” he said, smiling at my expression.</blockquote>
+
+<blockquote>a singularly simious and apelike appearance<br>a singularly simian appearance</blockquote>
+
+<blockquote>The Boots volunteered to show me the room: it was on the second floor, and there was a small corridor leading up to it.<br>The Boots volunteered to show me the room. It was on the second floor, down a small corridor.</blockquote>
+
+<blockquote>He took no particular notice of him, beyond thinking in his own mind that it was early for him to be at work.<br>He took no particular notice of him, beyond thinking it was early for him to be at work.</blockquote>
+
+<blockquote>The young fellow seemed pleased at the suggestion, and his dark eyes sparkled with pleasure.<br>His dark eyes sparkled at the suggestion.</blockquote>
+
+<blockquote>lest something which fell from their lips might be misconstrued, and bring down a swift retribution upon them<br>lest a misconstrued word bring down a swift retribution upon them</blockquote>
+
+<blockquote>The afternoon passed slowly, procession-like with an end of evening, and on the heels of the evening an excited wind rushed out<br>The afternoon passed slowly, a solemn procession toward evening. On its heels, an excited wind rushed out,</blockquote>
+
+<blockquote>a degree in science or any other recognized portal which would give him an entrance into the learned world<br>a degree in science or any other recognized avenue into the learned world</blockquote>
+
+<blockquote>“No,” answered his mother with a placid expression in her face.<br>“No,” answered his mother with a placid expression.</blockquote>
+
+
+<p>Word choice</p>
+
+<blockquote>It was a foggy, cloudy morning, and a dun-coloured veil hung over the housetops, looking like the reflection of the mud-coloured streets beneath.<br>It was a foggy, overcast morning, and a dun-coloured veil hung over the housetops, mirroring the mud-coloured streets beneath.</blockquote>
+
+<blockquote>with sad brown eyes like a dog’s eyes<br>with sad brown eyes like a hound's</blockquote>
+
+<blockquote>Mary even thought she saw him wink his eyes as if to wink tears away.<br>Mary even thought she saw him blink as if to keep tears away.</blockquote>
+
+<blockquote>Mary hesitated about two minutes and then boldly spoke the truth.<br>Mary hesitated for a long moment, and then boldly spoke the truth.</blockquote>
+
+
+
+<p>Correcting grammar</p>
+
+<blockquote>“And who do you expect will answer this advertisement.”<br>“And who do you expect will answer this advertisement?”</blockquote>
+
+<blockquote>“How is it now?” he answered anxiously<br>“How is it now?” he asked anxiously</blockquote>
+
+
+
+<h3>Improving Voice</h3>
+
+<blockquote>his eyes had assumed the vacant, lacklustre expression which showed mental abstraction.<br>his eyes had assumed the vacant, lacklustre expression that betokened mental abstraction.</blockquote>
+
+<blockquote>This play of claque to a simpleton was a harsh tax on the convictions of Mother Morgan.<br>This pantomime of awe was a harsh tax on the convictions of Mother Morgan.</blockquote>
+
+<blockquote>She had sprung away from him.<br>She sprang away from him.</blockquote>
 
 
 
