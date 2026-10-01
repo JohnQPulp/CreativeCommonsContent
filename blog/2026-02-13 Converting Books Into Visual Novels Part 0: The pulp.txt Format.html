@@ -182,7 +182,9 @@ s=concierge1;e:concierge1=happy
 
 <h2>(o)bject</h2>
 
-<p><code>o</code> accepts zero or one arguments, placing an object sprite on screen like <code>o=trout</code> for <code>o-trout.webp</code>. Unlike backgrounds, objects don't cover the whole screen, but sit, horizontally centered, on top of both the background and characters. Like with backgrounds, they stay on-screen until another <code>o</code> tag is set, either switching to a different object, or removing any object via <code>o=</code>.</p>
+<p><code>o</code> accepts zero-to-two arguments, controlling the on-screen image card objects like <code>o=trout</code> to add in an <code>o-trout.webp</code> overlay. Like with backgrounds, they stay on-screen until another <code>o</code> tag is set, either switching to a different object, or removing any object via <code>o=</code>.</p>
+
+<p>Unlike backgrounds, objects don't cover the whole screen, but sit, horizontally centered, on top of both the background and characters. When given no size argument, they assume a default height of 60% of the VN window height, but this can be changed by providing a second arg like <code>o=glyph-2,20</code> to set the height to e.g., 20%. (The card width is always based on the specific image's aspect ratio, which can be anything, relative to the height.)</p>
 
 <h2>(e)xpression</h2>
 
