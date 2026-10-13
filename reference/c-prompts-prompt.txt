@@ -1,0 +1,189 @@
+I'm working on a project about converting public domain book texts into visual novels. It involves a three-step process of adding metadata to the original text, generating the set of sprite and background images required by that metadata, and then visually reviewing/editing the final product.
+
+This task will be about the the character sprite half of the first half of the image-generating step: the setting up of the sprite image prompts to be ready for generation. This involves creating an `images` array, to be used as part of an automated image generation python script (the actual running of which is out-of-scope for this current subtask — don't actually do any image generating yet).
+
+An example of what the final product of the current subtask should look like is this one for *The Picture of Dorian Gray*:
+
+
+images = [
+    ["c-adrian", crefs, cprompt, "Adrian Singleton, a mid-20s man met at the opium den, whose addiction should reflect subtly in his appearance: slightly sunked temples and weary eyes. He's described as having short light-colored hair with a slight widow's peak curling on either side of his head slightly, with noticeable facial stubble. He should be wearing a coat but with his collar/tie not properly done. (Make the opium/messiness effects subtle overall, and his overall hair/clothing/etc appearance is still distinctly Victorian.)"],
+    ["c-agatha", crefs, cprompt, "Lady Agatha, an older aristocratic woman. Give her light-hatched hair, tied back in buns (hatless), with fancy Victorian clothing, including lace and ornamentation."],
+    ["c-alan", crefs, cprompt, "Alan Campbell, a late-20s scentific gentleman described as having a pale face. He should have neatly parted darkly-hatched hair and eyebrows, a trim mustache with a chin strip, and be wearing an Astrakhan coat with a thin tie."],
+    ["c-basil", crefs, cprompt, "30-year-old Basil Hallward, described as having coal-black hair (represented by dense/dark hatching), which should be short and parted in the middle. Give him a bushy mustache too. His countenance is described as a 'rugged strong face', both masculine and intellectual. He should be wearing a medium-hatched suit, with light-hatched tie."],
+    ["c-basil-aold", ["c-basil"], cupdate, "have the character in his eighteen-years-older appearance (so late-40s), where he should be slightly more wrinkled, and his hair slightly thinner/lighter-hatched, though the same general style with center part, and still with a bushy mustache, though with added mutton chops. He should be wearing a darker-hatched suit with bowtie/cravat. (Make his aged-up changed subtle, not so much that he looks an old man, but still only a late-40s one.)"],
+    ["c-basil-aold-xhat-xulster", ["c-basil-aold"], cupdate, "have the character wearing outdoor winter clothing over his existing clothes: a turned-up medium-hatched ulster along with a bowler hat and Victorian scarf."],
+    ["c-burdon", crefs, cprompt, "Sir Thomas Burdon, an MP with tight lips and a stern demeanor. Give him short medium-light hatched center-parted hair and a trim mustache."],
+    ["c-dorian", ["c-dorian-xhat"], cupdate, "have the character be gloveless and also hatless, such that his full beautiful light-hatched curly hair can be seen, though keeping the parts of his hair already visible the same style (except making it lighter where no longer in the shadow of the hat) and same size (don't give him more hair than he already has)."],
+    ["c-dorian-xcig", ["c-dorian"], cupdate, "have him smoking a small short cigarette in his mouth (keeping his hands where they are, and not adding any smoke effects to the cigarette, just updating his mouth. Also make sure the cigarette is period-accurate, with no filter - no darker part at its base.)"],
+    ["c-dorian-xfancy", ["c-dorian"], cupdate, "have the character in fancy expensive Victorian formal attire, described 'exquisitely dressed and wearing a large buttonhole of Parma violets', including a bowtie. Have his suit be a lighter-hatched one."],
+    ["c-dorian-xcommon-xhat", ["c-dorian"], cupdate, "have the character wearing an inexpensive bowler hat and muffler wrapped tightly his throat, plus an overcoat over his clothes, and a less stiff collar with lighter tie, and dark-hatched gloves."],
+    ["c-dorian-xfur-xhat", ["c-dorian-xhat"], cupdate, "have the character be wrapped up in a heavy expensive winter fur coat around his clothing."],
+    ["c-dorian-xhat", crefs, cprompt, "Dorian Gray, described as a beautiful and 'pure' 20-year-old, youthful and innocent in appearance. He should have fashionable and wealthy gentleman's attire, wearing a suit and bowler hat, with a trim collar. Out under the top hat his light-hatched short curling should be visible."],
+    ["c-dorian-xnight", ["c-dorian"], cupdate, "have the character in Victorian nighttime/sleeping clothing, with his har slightly uncombed. (Make the hair effect subtle - it should only be slightly messier, almost not noticeable)"],
+    ["c-dorian-xshooting", ["c-dorian"], cupdate, "have the character wearing a different outfit: a thick winter hunting overcoat with with thick cravat, along with wearing a flat trapezoidal hunting hat."],
+    ["c-erskine", crefs, cprompt, "Mr. Erskine, described only as an old gentleman of considerable charm and culture. Give him light-hatched hair, very short on top with a widow's peak, and large sideburns, and have him be slightly stout."],
+    ["c-fermor-xcigar", crefs, cprompt, "Lord Fermor, an older gentleman with bushy white eyebrows. He is described as a genial but somewhat rough-mannered old bachelor. He should be bald on top but with sideburns, wearing a shooting coat, and have a short cheroot cigar in his mouth."],
+    ["c-francis", crefs, cprompt, "Francis, one of the servants of Selby Royal. Have him be middle-aged, somewhat wrinkled, with short dark hair in a widow's peak, trim sideburns, and a short beard and thin mustache. Have him in formal indoor attire."],
+    ["c-francis-xundressed", ["c-francis"], cupdate, "have him 'half-dressed' in his appearance at 2am, with a coat on top of night clothes (no bowtie), with slightly less neat hair (slightly) and slightly drowsier expression (slightly)."],
+    ["c-gardener-xhat", crefs, cprompt, "the gardener of the estate, a somewhat elderly gentleman with a bald head under his bowler hat, in winter outdoor Victorian gardening attire."],
+    ["c-gentleman-xhat", crefs, cprompt, "is the unnamed middle-aged gentleman on the street at night. Have him dressed in winter attire with a thick overcoat and neat hat, giving him medium-light hatched sideburns that connect with a mustache (but no beard)."],
+    ["c-geoffrey-xshooting", crefs, cprompt, "Sir Geoffrey Clouston, the Duchess's brother, a roughly 30-year-old man. He should be wearing a sportsman's winter shooting attire, with coat and tie and plaid cap, and have a bushy mustache."],
+    ["c-gladys-xhat", crefs, cprompt, "Gladys, Duchess of Monmouth, described 'a pretty and clever aristocratic woman'. She should have fashionable Victorian/Edwardian attire, including a modestly large hat, with patterened decorations all around. (The hat should have ribbons/bow/flowers, but no feathers)"],
+    ["c-hansomdriver-xhat", crefs, cprompt, "should be of the unnamed hansom driver, described as middle-aged with short medium-hatched hair, including prominent/bushy sideburns and beard. He should have outdoor attire including hat and overcoat."],
+    ["c-harley-xbonnet", crefs, cprompt, "Duchess of Harley, a wealthy older woman described as being slightly stout. She should have medium-hatched curled hair, tied up in a delicate Victorian-style bonnet (small lace on top with elaborate ribbons below the chin). She should be wearing attire to match."],
+    ["c-henry", crefs, cprompt, "30-year-old Lord Henry Wotton, described as a tall and graceful gentleman with a romantic/tan yet slightly worn (if bemused) face. He has 'dark, crescent-shaped eyebrows', heavy eyelids, and a pointed medium-dark hatched beard. He should have a dandy's clothing, including an expensive/stylish coat, trim collar, and large patterned cravat. His hair should be short, combed backwards (rather than parted)."],
+    ["c-henry-xcig", ["c-henry"], cupdate, "have him smoking a small short cigarette in his mouth (keeping his hands where they are, and not adding any smoke effects to the cigarette, just updating his mouth. Also make sure the cigarette is period-accurate, with no filter - no darker part at its base.)"],
+    ["c-henry-xhat", ["c-henry"], cupdate, "have him wearing a fashionable/expensive bowler hat."],
+    ["c-henry-aold", ["c-henry"], cupdate, "have the character be eighteen years older, slightly more worn still and with hair (including eyebrows) slightly lighter-hatched, keeping his facial hair broadly the same style, but removing the parts of his beard at the sides, just leaving the pointed part around his chin. Make his age up changes somewhat subtle, as he should still only be a late-40s man at that age. His countenance should still be broadly the same. Also: keep the clean lines of the art style stylistically consistent - don't make the image messier."],
+    ["c-henry-aold-xcig-xshooting", ["c-henry-aold-xshooting"], cupdate, "have him smoking a small short cigarette in his mouth (keeping his hands where they are, and not adding any smoke effects to the cigarette, just updating his mouth. Also make sure the cigarette is period-accurate, with no filter - no darker part at its base.)"],
+    ["c-henry-aold-xshooting", ["c-henry-aold"], cupdate, "have the character wearing a thick darker hunting overcoat with high upturned collar over his existing clothes, along with wearing a flat trapezoidal hunting hat."],
+    ["c-hubbard", crefs, cprompt, "Mr. Hubbard, described 'a florid, red-whiskered little man with a shiny forehead and fat, freckled hands'. Have him bald but with bushy sideburns and mustache."],
+    ["c-james", ["c-james-xhat"], cupdate, "have the character be hatless, keeping his hair the same color and general style, though still Victorian."],
+    ["c-james-xhat", crefs, cprompt, "16-year-old James Vane, described as slightly clumsy. He should have short medium-dark hair peeking out from under his bowler hat. His clothing should be plain, and slightly ill-fitting."],
+    ["c-james-aold", ["c-james"], cupdate, "the update is to have the character in his appearance eighteen years older (so about 34-years-old), with a slighly worn/bitter face, though slightly stockier build, in a British sailor's uniform (though still hatless), with shorter thinner hair (though still the same hatching color/density), and a stubbled face with slight mustache."],
+    ["c-ladyhenry-xhat", crefs, cprompt, "Lady Henry, a mid-20s woman with light-hatched Victorian style curled-up hair and a large hat (with ribbons/bows/petals but no feathers) and overly elaborate high-collared and puffed-shouldered dress in its trim and decorations to the point of seeming disorganized."],
+    ["c-ladynarborough", crefs, cprompt, "Lady Narborough, described an somewhat elderly hostess with a ugly/mannish countenance, though clever. Have her hatless with a pompadour dip Victorian hairstyle, and fashionable high-collared dress, with decorative trim."],
+    ["c-ladyruxton", crefs, cprompt, "47-year-old Lady Ruxton, described as having a plain appearance and a hooked nose. She's described being overdressed, having elaborate shoulder puffs and trim in her high-collared dress. Have her have medium-hatched hair, with a flattish Victorian pompadour style."],
+    ["c-leaf", crefs, cprompt, "Mrs. Leaf, the tremulous elderly housekeeper, descibed as wearing a black silk dress paired with old-fashioned thread mittens and headware."],
+    ["c-manager-xcigar-xhat", crefs, cprompt, "the theatre manager, described as ugly and slightly stout, a short cigar in his mouth. Give him short curling dark-hatched hair with a matching beard. Give him standard outdoor Victorian attire of a bowler and suit/vest, with 'a small diamond blazed in the centre of a soiled shirt.'"],
+    ["c-mrsvane", crefs, cprompt, "Mrs. Vane, a slightly tired-looking middle-aged woman with thin lips and fingers adorned with false jewels. She should be wearing indoor medium-dark Victorian clothing with a high collar and laced trim; and have medium-dark neat voluminous hair."],
+    ["c-parker", crefs, cprompt, "Parker, the butler of Basil's estate. Make him middle aged with short medium-hatched hair with long sideburns."],
+    ["c-passerby-xhat", crefs, cprompt, "an unnamed passerby, described only as a young man in outdoor winter evening dress. Have him wearing a bowler hat and have a trim dark-hatched mustache and beard."],
+    ["c-policeman-xhat", crefs, cprompt, "is the unnamed slightly stout policeman, who should be in full winter uniform including hat, with short dark hair coming down in sideburns."],
+    ["c-sibyl", ["c-sibyl-xhat"], cupdate, "have the character be hatless. Have her hair fully visible, though keeping the style of the already visible hair the same, and just continuing it with the same style and hatching density/shading."],
+    ["c-sibyl-xhat", crefs, cprompt, "17-year-old Sibyl Vane, described as beautiful with 'a little, flowerlike face, a small Greek head with plaited coils of dark-brown hair' (the hair represented by medium-dark hatching). She should be wearing simple outdoor Victorian attire (darker coat over lighter dress), including gloves and a small hat - the hat adorned with a few rose flowers. Her overall countenance should be sweet/curious."],
+    ["c-sibyl-xjuliet", ["c-sibyl"], cupdate, "have the character dressed in her Juliet costume for her Shakespeare play production, making that look good and accurate, but keeping her hair anachronistically the same to Victorian styles."],
+    ["c-thornton", ["c-thornton-xhat"], cupdate, "have the character be hatless. Have his hair (the same hatching density/shading as his beard) visible, very short and with a slight widow's peak."],
+    ["c-thornton-xhat", crefs, cprompt, "Thornton, the head gamekeeper of the estate, who should be dressed in outdoor winter attire, including overcoat and cap. He should have medium-dark hatched sideburns."],
+    ["c-vandeleur-xhat", crefs, cprompt, "Mrs. Vandeleur, an older woman of friendly countenance but 'dreadfully dowdy' in attire, wearing a small simple Victorian hat (with a single feather) and high collar. Have her hair be medium-dark hatched."],
+    ["c-victor", crefs, cprompt, "Victor, the middle-aged Frenchman valet/butler of Selby Royal, who's face is described as placid/servile except for his thoughtful/sly eyes. Give him short center-parted light-hatched hair."],
+    ["c-woman", crefs, cprompt, "one of the unnamed haggard women at the opium den, only mid-30s and yet somewhat sunken in countenance, her clothes and hair not completely messy, but still noticeably so. (Keeping the effects relatively subtle.)"],
+]
+
+
+
+To explain the above:
+
+The `images` array is made up of sub-arrays, each of length 4.
+
+The first item in the subarrays are the names of the various character sprite bases, arranged in alphabetical order based on character identifier name and then grouped by (a)ge modifier. (The modifier will be explained further down.)
+
+The second item in the subarrays is the array of reference images to be used for the image generation. By default, this is set to just be `crefs`, an array with a set of reference sprites for the desired "literary cross-hatching" style, defined like so: `crefs = ["helpers/c-example-1", "helpers/c-example-2", "helpers/c-example-3"]`. However, `crefs` can be replaced with a specific character reference sprite (or, in rare cases, multiple character reference sprites) in the case of doing a sprite update. This ties into:
+
+The third subarray item is the first half of the image generation prompt — the boilerplate half. This has two options: `cprompt` for generating the first variation of a particular character, and `cupdate` for generating a variation of a character based on one previously generated. `crefs` should be used with `cprompt`, whereas a specific character reference like `["c-henry"]` should be used with `cupdate`. The prompt boilerplate starters are defined like:
+
+
+
+cprompt = f"""I need you to generate a character sprite for a book character. The style of the character sprite I want generated is a sort of literary illustration style, which I've included a couple examples of for helping guide the output image. The output should follow the style of those examples, but use period-accurate and character-accurate imagery/clothing/etc based on the provided setting and character description and so forth. The image shouldn't have any background art — the background should be of plain paper-like coloring as in the example — and the character shouldn't be holding anything unless specified. The character (which should also have the same plain coloring) should be looking at the viewer, have body posture towards the viewer, and have a neutral expression unless otherwise specified. The illustration should make strong use of hatching/cross-hatching in its style and shading. The illustration should be sized like the example sprites, with similar sized head, cutting off at the legs at the bottom of the image.
+
+This particular book is {bookstring}
+
+The particular character is """
+
+cupdate = f"""I need you to take this character sprite and make and update to it, while keeping the character the same person, and also the art style (literary hatching drawing w/ paper-colored empty background) the same, and also maintaining period-/setting-accuracy for the character. The update should not add anything to the background. The update should also not change or add anything that the character is holding unless specified.
+
+This particular book is {bookstring}
+
+The update is to """
+
+
+
+That leaves the fourth argument left — the most important one — the second half of the image generation prompt, which informs the specific details about the character for either initial generation or variation updating. This is the primary task you'll be working towards, being provided the full text of the book and needing to put together accurate character prompts that as correctly as possible cover the details of a character, across their various outfits and ages and other modifiers throughout a book text. Here are the rules and heuristics you should follow as part of this process:
+
+- Each character will have one or more sprites that need generating. One of these needs to serve as the root sprite — the one to be generated using `cprompt` — from which all the others will be generated via `cupdate` prompts off of it, either directly or indirectly.
+- Sprites are generated from head-to-knee, roughly, with the heads of the characters at the tops of the image and their legs cut off at the bottom of the images, varying somewhat based on how tall the character is. But in general, it can be assumed that at least part of the sprites' legs will be visible, while their feet generally never will be. Additionally, most updates to the sprites (that aren't large age changes) shouldn't change the sprites' positions — for example their heads should stay in the same places. As a consequence of these two facts, some consideration needs to be given to the *ordering* of how sprites are generated, to ensure that all their variations will fit. Consider for example if a sprite has both hatless and hat-wearing variations. If their hat is short and clings tightly to their head — like for a bowler or cloche — it doesn't necessarily matter what order the sprites are generated in, since the hat should always fit. (In those cases, it's generally better to do the hatless variation first, since it means the root sprite can focus on getting the full hair right.) However, for other hat situations like top hats or tall Edwardian headware, the hat definitely won't fit within the image bounds if generated as part of an update. In those cases, the hatted variations of a sprite need to come first; and if there are multiple different hatted variations (different hat types), the tallest should come first.
+- Prompts need to be detailed, incorporating both the explicit and implied details about what a character should look like. Including sort direct quotes from the book as part of prompting is good, and in general care should be spent in analyzing all the information that can be mined about a character's appearance from throughout the full text: clothing, age, height, build, visage, etc. In some cases, this will be enough detail on its own to get a complete distinct character. Other times though, character details will be light — sometimes *too* light. For example, a character's hair style will often not be specified, but leaving a hair style out of the prompt tends to result in characters generated with anachronistic modern-looking hair. Therefore, especially for hair in particular, it's good to specify specific styles, ensuring they make sense in the context of the period.
+- Conversely, prompts need to not be *too* detailed. Again, some characters may have enormous descriptions heaped upon them, not all of which should necessarily be included in the prompt, because the more details specified, the less likely the image generator is to get all of them correctly — current image generator technology being good but not perfect. Prompts should focus primarily on the most important bit, especially around the details from the shoulders up, since sprites are usually seen in the corner as just their heads and shoulders. The further down the body, the less important details become to all get exactly correct, until reaching the feet, where shoe specificity is never required (and in fact, is bad, since it confuses the image generator into thinking it needs to do a full-body sprite, thus screwing up the image scaling). It's not often that details should be left out, so don't overindex on this advice, but do take it into account. And later on, it'll be explained how to include skipped details in python comments so that the human reviewer can check to see what was intentionally skipped.
+- Prompts need to take into account the final hatching style, which will always be a tan-and-black line-drawing type illustration, reminiscent of the types of drawings found in physical books. One thing this means is that the book's descriptions of specific colors should often be dropped from the prompt. Later color palette normalization will collapse off-style colors anyway, though the normalization works less well the further off from the intended paper-coloring the base generated image starts as. In many cases, there's no need to specify colors at all, as the image generator will be able to safely assume them based on what's being described. In other cases, coloring does need to be specified, but it should generally be done so in terms of hatching density or shading: like for example light vs medium-light vs medium vs medium-dark vs dark/dense hatching. These terms should generally be what's used for describing, for example, hair. Whereas eye color can almost always just be left out of the prompts, since the difference isn't noticeable in the hatching style.
+- Prompts should try to make characters visually distinct, within the constraints of still being accurate to both the explicit and implied details about their characters. It's bad to have all characters share the exact same hair style or hair color or exact same clothing style — especially a problem with men's suit clothing. The solution here isn't to anachronistically have the men not wear suits, for example, but to at least try to diversify the suit descriptions within the bounds of what etiquette and historical variations would permit. (Though again, whenever injecting *new* details into the prompts not gotten from the text itself, you'll want to python comment them — again explained further on.) Make liberal use of fancy/obscure hair and clothing terminology and different hat types to help impress variety upon the image generator, who in the absence of specifics, will tend to make characters of the same era all look quite similar. (This is less of an issue across character of different social classes, occupations, etc; so you'll need to be the judge of when extra details are warranted.)
+- Prompts should generally not specify emotions onto the character beyond the boilerplate prompt's default neutral emotional state. After the root character sprites is generated and the base variation sprites generated off of it — all a part of this overall subtask you're doing now — expression variation sprites off of those bases will happen in a later task. So in general, a neutral surface is exactly what the base sprites should all start as. Some exceptions are permissible for characters with especially non-neutral dispositions: the overly cheerful or overly snarky or overly downtrodden. Similarly, details about character pose should generally be left out, unless there's an unusual aspect of their posing that should be reflected in the base sprites: such as being hunched or tending to do something particular with their hands or whatever.
+- Prompts need to strike a balance between absolute accuracy with the need to not have too many separate tiny variations. For example, there are many implicit details around clothing implied from era etiquette, such as when to wear, for example, hats and gloves. Hats are very important to get right, because the characters' heads are the prominent things, and so special care is put into making sure the characters that need `-xhat` variations sprite variations have them. (So strong is this convention that even characters with only one sprite variation will still carry the `-xhat` marker to emphasize their need for that one sprite to have a hat on.) Conversely, gloves, while having similar detailed social rules around them, aren't as strictly important to get always correct, and so sometimes, even when a character should strictly speaking have both gloves and ungloved variations, only one will be requested, and it becomes the job of the visual editor later on to just make sure hands are only visible when correct (which is usually relatively easy to make happen). Another case of this etiquette compromising is in, say, morning vs evening dresses, which strictly speaking should be separate, but since they only affect the character from the shoulders down, and since the difference is quite subtle in the hatching format, a compromise halfway dress is sometimes just used. (Which simplifies things, especially when the text doesn't make obvious what time of day particular scenes even are.) Keep all this in mind when applying implicit etiquette details: be as accurate as possible given the constrained set of sprites variations chosen from the previous task, even with the knowledge that there might be some technical inaccuracies. If there are, they can be noted in a python comment.
+- Prompts doing updates should take care that the order they make the updates in doesn't create too long of update chains. Each update made to a sprite tends to cause a slight degradation to the generated image's hatching style consistency and quality. It's usually unnoticeable after single update, or even after an update of an update, but by the time you get to three or more chained updates, the drop in quality can become distracting. Therefore, after the root sprite is chosen, it's ideal if every variation sprite is made directly off of it. Now, sometimes this isn't possible, like for example if a character needs first a sprite variation that ages them up (e.g., an `-aold` modified), and then another that gives them a hat and overcoat in their older form; then a chain of at least two is necessarily required.
+- For the sprite modifiers, note that the (a)ge and e(x)tra naming conventions are rather loose. "Age" doesn't necessarily mean age, but rather any long-lasting change that persists between chapters, and so for example in say, *The Secret Garden*, when Mary goes from sick to well, the transition is captured in `-asick` to `-awell` modifiers, despite her not really aging. At the same time, the "extras" often mean more than just their implied names, like for example `-xhat` might mean adding not just a hat, but also perhaps gloves and an overcoat, or other additional items, just depending upon all of the considerations from above. And then there's the fact that sprites can have multiple different modifier variations like for example `-xhat` vs `-xfur-xhat`, where the shared `hat` name doesn't necessarily mean that both sprites should have the same hat type. The "vibe" hinting further below should help clarify some of the modifier meanings, which you can combine with your own best judgment.
+
+
+
+Taking into account all of the above, you can see why some character sprite prompts can end up taking many re-generations and even sometimes prompt retweakings to get right. And that's all fine, but since it'll be the human doing all that iterating and judging, they should be given as much help as possible in terms of making sure they're assessing the correctness of all the details correctly. As described above, there are many situations where you should inform the human about decisions about details, especially any character details intentionally left out and any details added in that weren't explicit from the text. Do so with a python comment after the subarray like so:
+
+    ["c-parker", crefs, cprompt, "Parker, the butler of Basil's estate. Make him middle aged with short medium-hatched hair with long sideburns."], # The sideburns are an added detail not from the text. Left out blue eye color.
+
+
+
+
+
+With all that established, I'll now go ahead with giving you a specific book text and the set of base sprites needed for the text. Remember that your only output should be the python `images` array with its set of subarrays — one for each input sprite — in the same ordering. (Though note that it's okay for a sprite to reference another further down the list, since the input ordering within per-character groups is semi-arbitrary, just ensuring there are no sprite dependency loops/cycles.)
+
+
+
+
+The book text is:
+
+bookstring = "*Fathers and Sons* by Ivan Turgenev, set across Russia around 1859."
+
+
+
+The base sprites required (with parenthetical comments afterwards as necessary to explain the intended "vibes") are:
+
+c-alexey (Father Alexey)
+c-anfisushka
+c-anna (Anna Sergyevna Odintsov, whatever her "default" indoor outfit is when they visit her in her house, indoors)
+c-anna-xball (formal ballroom variation)
+c-anna-xhat (some sort of outdoor hat)
+c-anna-xhat-xmantle (different hat, referring specifically to her appearance near the end in "black veil and a black mantle")
+c-anna-xnight (nighttime outfit, referred in the text to as "ample white gown" and "arms, bare to the elbow")
+c-arina (Arina Vlasyevna Bazarov - "little old woman in a white cap and a short striped jacket")
+c-arina-xnight (bedtime/sleeping clothing variation)
+c-arkady (indoor coat outfit, something that can double for both his casual and his ballroom appearances)
+c-arkady-xhat (some sort of outdoor hat)
+c-arkady-xcloak-xhat (outdoor hat + cloak, for his initial appearance in chapter 2)
+c-arkady-xcoat (variation for "his coat buttoned up to the throat" at the end of chapter 17)
+c-arkady-xnight (dressing-gown / nighttime variation)
+c-aunt (Princess H——)
+c-bazarov (default indoor clothing)
+c-bazarov-xhat (outdoor hat variation)
+c-bazarov-xovercoat (overcoat over clothing variation, as in his initial appearance)
+c-bazarov-xhat-xovercoat (hat and overcoat together)
+c-bazarov-xbesmeared-xhat (variation for "His linen coat and trousers were besmeared with mud; clinging marsh weed was twined round the crown of his old round hat")
+c-bazarov-xcloak-xhat (variation for "With a dusty cloak over his shoulders" - unclear if this "cloak" is distinct from his overcoat)
+c-bazarov-xevening (nicer ballroom attire)
+c-bazarov-xnight (dressing-gown / nighttime variation)
+c-bazarov-xnight-xpipe (nighttime + holding a pipe near his mouth - "as he sat in his dressing-gown by his bedside, smoking a short pipe.")
+c-bazarov-xsick (dying variation for the end of the book)
+c-boy (“What do you want frogs for, sir?” kid)
+c-coachman1-xhat (“Who’s to know﻿—miles hereabout aren’t measured,” man)
+c-driver1-xhat (“Do you hear, Mityuha,” man)
+c-dunyasha
+c-fenitchka-xkerchief (default variation with the kercheif up)
+c-fenitchka ("kerchief slipped from her head on to her shoulders" variation)
+c-germandoctor (doctor from the end of the book)
+c-germandoctor-xhat (variation w/ outdoor hat)
+c-girl (“Fedosya Nikolaevna is not quite well, she cannot come…” girl)
+c-katya (indoor)
+c-katya-xhat (some sort of outdoor hat)
+c-kukshina
+c-matvy-xnight (only speaking appearance sees him in a "magnificent velvet dressing-gown")
+c-neighbour-xhat (“What was he talking about?” middle age man)
+c-nikolai (indoor)
+c-nikolai-xhat (w/ outdoor hat)
+c-pavel ("dark English suit" outfit)
+c-pavel-xfez (w/ fez)
+c-pavel-xhat-xlightcoat (dueling appearance, "light check jacket and snow-white trousers")
+c-pavel-xfez-xnight (recovery appearance, wearing "fine cambric nightshirt, an elegant morning wrapper, and a fez")
+c-pavel-ayoung (young Pavel from the flashback, indoor)
+c-pavel-ayoung-xhat (young Pavel w/ hat)
+c-peasant1-xhat (“You’re a great sow,”)
+c-peasant2-xhat (“And your wife’s a witch,”)
+c-piotr-xhat (only ever speaks outdoors, so only a hatted variation is needed)
+c-princess (Princess R——)
+c-prokofitch
+c-sitnikov-xhat-xovercoat (outdoor, "Slavophil")
+c-sitnikov (indoor, not sure if also "Slavophil"? but needs to double for ballroom appearance)
+c-steward (“Anna Sergyevna asks you to come to her in half-an-hour,”)
+c-timofeitch
+c-vaska (“I’m afraid of frogs,”)
+c-vassily (indoor, default, military?)
+c-vassily-xhat (w/ outdoor hat)
+c-vassily-xhat-xpipe (hat + holding pipe near mouth)
+c-vassily-xnight-xskullcap ("Oriental dressing-gown" + "greasy skullcap")
+c-villager-xhat (“Well, we’ll try﻿ ﻿… because, you see, to be sure.﻿ ﻿…” man)
+

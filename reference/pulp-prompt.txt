@@ -1,0 +1,512 @@
+I'm working on a project about converting public domain book texts into visual novels, unabridged. It involves a three-step process of first adding metadata to the text, then generating the set of background and sprite images required by that metadata, and then visually reviewing/editing the final product.
+
+This task will be about completing the first step in that process: taking in an unedited text version of a novel — a book.txt file — and converting it into a parseable metadata-infused version of the text — a pulp.txt file.
+
+The book.txt file will start out looking like this, with each line a paragraph:
+
+`
+The Maltese Falcon<br>Dashiell Hammett
+
+## I<br>Spade & Archer
+
+Samuel Spade’s jaw was long and bony, his chin a jutting v under the more flexible v of his mouth. His nostrils curved back to make another, smaller, v. His yellow-grey eyes were horizontal. The v motif was picked up again by thickish brows rising outward from twin creases above a hooked nose, and his pale brown hair grew down﻿—from high flat temples﻿—in a point on his forehead. He looked rather pleasantly like a blond satan.
+
+He said to Effie Perine: “Yes, sweetheart?”
+
+She was a lanky sunburned girl whose tan dress of thin woolen stuff clung to her with an effect of dampness. Her eyes were brown and playful in a shiny boyish face. She finished shutting the door behind her, leaned against it, and said: “There’s a girl wants to see you. Her name’s Wonderly.”
+`
+
+And the end result pulp.txt file will look like this, with alternating lines of text and metadata:
+
+`
+The Maltese Falcon<br>Dashiell Hammett
+b=title
+
+## I<br>Spade & Archer
+r=office-inner
+
+Samuel Spade’s jaw was long and bony, his chin a jutting v under the more flexible v of his mouth.
+n:spade=Sam Spade
+
+His nostrils curved back to make another, smaller, v. His yellow-grey eyes were horizontal.
+
+
+The v motif was picked up again by thickish brows rising outward from twin creases above a hooked nose, and his pale brown hair grew down﻿—from high flat temples﻿—in a point on his forehead.
+
+
+He looked rather pleasantly like a blond satan.
+
+
+He said to Effie Perine:
+n:effie=Effie Perine
+
+“Yes, sweetheart?”
+s=spade;e:spade=curious
+
+She was a lanky sunburned girl whose tan dress of thin woolen stuff clung to her with an effect of dampness. Her eyes were brown and playful in a shiny boyish face.
+s=none
+
+She finished shutting the door behind her, leaned against it, and said:
+
+
+“There’s a girl wants to see you. Her name’s Wonderly.”
+s=effie;e:effie=contemplative
+`
+
+This pulp.txt format will be explained in much more detail below, though you may just from this short snippet example already be able to infer much of how it works. Also included in this directory are two much longer pulp.txt examples: dorian-pulp.txt for the first five chapters of the *Dorian Gray* visual novel, and journey-pulp.txt for the first ten chapters of the *Journey to the Center of the Earth* visual novel. These examples will be referred to throughout these instructions, representing more longer-form versions of what kind of output will be required, though ultimately the only true input for this task will be a full book.txt file for some new book to be converted, and the only output will be the new completed pulp.txt file, parsing in full for all chapters for that book. All else is simply reference and tooling helper material.
+
+At a high level, there are two types of metadata that need to be inserted into the text to get a completed pulp.txt output file: line breaks and tags. Line breaks are the conceptually simpler of the two, so we'll start with explaining them first, although the full heuristics of thinking through where to place them will require more context, and be discussed further down.
+
+In a book, paragraphs can be very long. In a book, paragraphs can also heavily mix dialogue and non-dialogue text together. Neither of these work well in the visual novel format, where the text presented on individual slides needs to be relatively concise, and where we want as strong a distinction as possible between dialogue-type text, associated with a speaking sprite, and non-dialogue text. Therefore, a major part of the pulp.txt format is deciding where to place line breaks to break up larger paragraphs into more VN-friendly chunks.
+
+There are some high-level ideas for how this should work:
+
+First, wherever a paragraph break exists in the original book.txt text, there should still be a break in the pulp.txt text. That is, there should never be a merging of paragraphs.
+
+Second, the insertion of line breaks should in general not change anything else about the original text — not even its special markdown-type formatting, if it had any. So for example, if the original text had some *italics* or **uppercase** formattings, or perhaps a <br> or <span>, though should remain exactly as-is in the pulp.txt version, just with extra line breaks as-needed. The only exception to this is in the rules surrounding quotations in dialogue, which will be explained in more detail later on.
+
+Third, breaks should generally not be inserted in the middle of sentences, but rather between sentences. Unlike the previous rule, this isn't an absolute however. Line breaks are best inserted after sentence-enders like periods, question marks, exclamations, and ellipses; however, they're also allowed to be inserted after some other characters like colons and semicolons that aren't strictly sentence breaks. Breaks aren't allowed to be inserted after commas by default, unless the comma precedes the start of a quotation. Breaks are also not allowed to be inserted between words separated by no punctuation (just spaces) by default. However, there's a special override that can be set to allow breaks in these cases, which in some circumstances is desirable. (More on that later on.) But for now, just keep the heuristic in mind that breaks should generally go between sentences.
+
+Fourth, while we don't want slides' texts to be too long, neither do we want them to be super choppy and short. Not every sentence needs its own full slide, and there shouldn't be a line break inserted between every single sentence gap. The way the visual novel UI works is that the text box is configured to grow as-needed for larger texts, which means the texts never overflow off-screen. Now, it's still somewhat visually distracting when this does need to happen, and so ideally it should be avoided. The textbox expansion starts needing to happen by default at around ~350 characters, though this isn't a monospace font, so it can vary. The font size itself is also configurable. Therefore, ~350 chars is the rough visual maximum for how long any individual slide should ideally be, but around ~200 characters is a more desirable general maximum. Still, 200 characters is enough for multiple sentences at times. So lines that look like this are acceptable:
+
+`
+The fact is, that during the course of his lectures at the Johannæum, the Professor often came to a complete standstill; he fought with wilful words that refused to pass his struggling lips, such words as resist and distend the cheeks, and at last break out into the unasked-for shape of a round and most unscientific oath: then his fury would gradually abate.
+`
+
+But lines that are closer in max length to something like this are better:
+
+`
+How well I knew all these bits of science! Many a time, instead of enjoying the company of lads of my own age, I had preferred dusting these graphites, anthracites, coals, lignites, and peats!
+`
+
+Fifth, dialogue should be generally be split from non-dialogue, although there's a lot of nuance to this, and so a full discussion will come later.
+
+Sixth, breaks should be inserted in a way that keeps related adjacent sentences together, where possible, when it doesn't conflict with the lines ending up too long, or with the need to split dialogue from non-dialogue, or with the desire to have line breaks be visually compatible with the other metadata assigned. Again, this needs more explanation, which will have to come later, but it leads into discussing the other type of metadata: tags. So we'll put the rest of the line break talk away for now, and start talking about the full pulp.txt formatting, with its various tags.
+
+
+
+So while the raw book.txt file goes `paragraph -> empty line -> paragraph -> empty line -> <repeat 2-cycle>`, the pulp.txt file goes `text chunk -> metadata tags -> empty line -> text chunk -> metadata tags -> empty line -> <repeat 3-cycle>.
+
+While the text chunk lines in the pulp.txt file are basically just chopped-up paragraphs, the metadata tag lines are a special semicolon-delimited format that represents the parseable metadata attributions that a tool called the Pulpifier will ingest. There are 11 different tag types that need assigning in this first step of the overall VN-conversion, with each tag having a unique one-letter key, used like: `k=value` or `k:name=value` or `k=val1,val2,…,valN` or `k:name=val1,val2,…,valN`. And each metadata line can have zero-to-many of these tag assignments delimited by the semicolons.
+
+At a high level, the tags are:
+
+* (n)ame: Defines a character identifier and the display name associated with that identifier (e.g., `n:prof=Professor Otto Liedenbrock`)
+* (s)peaker: Defines the active speaker using an identifier (e.g., `s=dorian`)
+* (t)hinker: Defines the active thinker using an identifier (e.g., `t=axel`)
+* (b)ackground: Defines the active background (e.g., `b=studio-window`)
+* (f)ilter: Defines the active background filter and slide transitions (e.g., `f:b:hamburg-wide=blur(3px)` or `f=fade`)
+* (a)ge: Sets an age modifier on a character used as part of determining the specific sprites to show (e.g., `a:james=young`)
+* e(x)tra: Sets the additional modifiers (zero-to-many) on a character used as part of determining their sprites (e.g., `x:prof=hat` or `x:spade=hat,overcoat` or `x:dorian=`)
+* (e)xpression: Sets the current expression/emotion of a character used to determine their active sprite (e.g., `e:henry=smirking`)
+* (m)odifier: Used to set a variety of flags to temporarily change the parsing or display behavior of the VN (e.g., `m=nospeaker` or `m=break,1`)
+* (g)ödel: Used to enter and exit frame narratives (e.g., `g=theatre-wide-night` or `g=`)
+* (r)eset: Defines the active background, just like the `b` tag (e.g., `r=title`), but also resets most of the other tags back to their default state
+
+Some of these tags are conceptually simple, while others require much more explanation, but we'll start from the top and describe how these get assigned and used and why.
+
+
+
+First off, the name tag. This serves the duel purpose of both declaring a character identifier, such that it can be used in other tags, and also providing the display name that the user will actually see, since they won't every see the identifier itself. So for example, in the dorian-pulp.txt file we have this snippet:
+
+`
+“I beg your pardon. I thought—”
+s=dorian;e:dorian=nervous
+
+“You thought it was my husband. It is only his wife. You must let me introduce myself. I know you quite well by your photographs. I think my husband has got seventeen of them.”
+n:ladyhenry=?;x:ladyhenry=hat;s=ladyhenry;e:ladyhenry=suspicious
+
+“Not seventeen, Lady Henry?”
+s=dorian;e:dorian=confused
+
+“Well, eighteen, then. And I saw you with him the other night at the opera.”
+n:ladyhenry=Lady Henry Wotton;s=ladyhenry;e:ladyhenry=happynervous
+
+She laughed nervously as she spoke, and watched him with her vague forget-me-not eyes.
+s=none
+`
+
+Focusing on just the name tags, we can see the `ladyhenry` identifier set twice. The first acts as the initial declaration, after which the other tags can use that identifier for the rest of the book. Note that metadata tags are processed in their written order, so a metadata snippet like `n:ladyhenry=?;x:ladyhenry=hat` works fine, because by the time the extra tag is processed, the name tag has defined `ladyhenry`. Whereas `x:ladyhenry=hat;n:ladyhenry=?` would throw `System.Exception: Missing name "ladyhenry" for expression.` (noting that this, like all the Pulpifier exceptions and other behaviors, can be analyzed in more detail if needed by looking at the Compiler.cs source code).
+
+Also note how there's a second name tag for `ladyhenry` that changes her display name. For her first line, we haven't been introduced to her character, and therefore we want her display to show just a question mark — the standard in these visual novels for a non-introduced character. But once we know who she is, her full name can be substituted in, using that second name tag not as a re-declaration of the identifier, but rather just as a display name swap.
+
+There are multiple others reasons too why a display name might change over time. For one, we might get a character's name revealed in pieces — perhaps just their last name at first, and then their first. Or perhaps we might get a nickname revealed, so we could update `n:henry=Lord Henry Wotton` later on to `n:henry=Lord Henry “Harry” Wotton`, or `ladyhenry` later on to `n:ladyhenry=Victoria, Lady Henry Wotton`. Or perhaps the character's actual name might change through marriage, which would also require an update. In general, we want the display name to show the full name of all characters as the reader knows their name to be at that current point in the book, giving the reader the full set of information for what a character might be referred to as, but doing so without spoiling information in advance.
+
+The identifiers to use for each character aren't strictly as important, since the reader never sees them, but in general we want the identifiers to be short and unambiguous. Usually this just means using whatever name — first or last or nickname — a character is most commonly referred to as, like `dorian` or `axel` or `basil`. Professor Liedenbrock is fine to short to `prof`, Mrs. Vane can be the compound `mrsvane`, and the unnamed throwaway traveling companion character with one line can be given the generic identifier `passenger1`. The only rules here are that the identifier can only be lowercase letters and numbers, and that there can be no non-ASCII letters, so Gräuben becomes `grauben`.
+
+
+
+Next tag: the speaker tag. The speaker tag defines who currently has dialogue, if anyone, which determines which character's sprite and display name need showing. There can only be one active speaker at a time, a speaker can only be active on text lines with quotations (though not all lines-with-quotations necessarily have active speakers), and a speaker remains active until another s tag either switches to another speaker, or sets the speaker to no one like `s=none` or `s=`. See for example:
+
+`
+“Well?”
+s=axel;e:axel=wary
+
+“Well, if we waited for the 22nd June we should be too late to see the shadow of Scartaris touch the crater of Snæfells. Therefore we must get to Copenhagen as fast as we can to secure our passage.”
+s=prof;e:prof=serious
+
+“Go and pack up.”
+e:prof=annoyed
+
+There was no reply to this.
+s=none;f:b:prof-study-grauben=blur(3px)
+`
+
+Axel is speaking on the first slide, so its metadata line gets `s=axel`. The professor is speaking on the next two slides, so he gets `s=prof` on the second, and since the active speaker remains active until another speaker tag is set, there's no need to change the speaker on the the third slide. Whereas on the fourth, where no one is speaking, we need `s=none`.
+
+The thinker tags work very similarly, but just apply to the less common case of when characters are described as thinking something, but their thoughts are still presented in dialogue-/quotation-type formatting, for example:
+
+`
+“Axel,” said he very mildly;
+s=prof;e:prof=neutral
+
+“you are a very ingenious young man, you have done me a splendid service, at a moment when, wearied out with the struggle, I was going to abandon the contest. Where should I have lost myself? None can tell.”
+e:prof=contemplative
+
+“Never, my lad, shall I forget it; and you shall have your share in the glory to which your discovery will lead.”
+e:prof=happy
+
+“Oh, come!” thought I, “he is in a good way. Now is the time for discussing that same glory.”
+s=none;t=axel;e:axel=nervous
+
+“Before all things,” my uncle resumed, “I enjoin you to preserve the most inviolable secrecy: you understand?”
+t=none;s=prof;e:prof=serious
+
+“There are not a few in the scientific world who envy my success, and many would be ready to undertake this enterprise, to whom our return should be the first news of it.”
+e:prof=suspicious
+`
+
+Here, since Axel thinks rather than speaks his line, we need to set the active speaker to none (can't have both an active speaker and active thinker simultaneously), then `t=axel`; then on the next line the reverse, setting the thinker to none and the speaker back to the professor.
+
+Note again in both these cases the necessity of the quotation marks to labeling an active speaker or thinker. Lines like "He thought of his friend’s young fiery-coloured life and wondered how it was all going to end." or "She made her brother talk of himself, his hopes, his prospects. He spoke slowly and with effort." would *not* have an active speaker or thinker, even though they describe the act of speaking and thinking, since those are done in an indirect way. Quotation marks are central to the active speaker/thinker formatting, since the way the VN ends up displaying and helping to distinguish between dialogue and non-dialogue is by semi-bolding the portions of text within quotations, when there's an active speaker or thinker. (Noting that this does *not* apply to non-dialogue quotations like those found in a line like "To be sure the fourteenth, fifteenth and sixteenth letters made the English word “ice”; the eighty-third and two following made “sir”; and in the midst of the document, in the second and third lines, I observed the words, “rots,” “mutabile,” “ira,” “net,” “atra.”", which again would *not* get an active speaker or thinker attribution.)
+
+Overall then, while a lot of labeling is required for assigning the active speakers (and to a lesser extent, thinkers) in a dialogue-heavy text, the rules for doing so are relatively unambiguous.
+
+
+
+Contrast with the new tag: the background tag. Backgrounds are where we need to start thinking heavily heuristically about how visually the converted VN will present its book text, since there are no fixed rules in the abstract about how many different backgrounds there should be or how they flow into each other. We need to be smart about thinking through the background metadata tags we plan to add, doing so in a way that maximizes reusability and minimizes the number of distinct backgrounds, to the greatest extent feasibly possible.
+
+Why minimize the number of backgrounds? First, there's the obvious reason that each individual image generated has an actual API cost to generate, incurred in subsequent steps. And this cost is often multiplied by the frequent need to re-generate (re-roll) backgrounds (and sprites too) to get better results. But the bigger issue (if a related one) is the problem of needing to be correct and consistent in all the visuals. The backgrounds (and sprites) we show to the viewer need to not contradict anything that's stated in the text, and they also need to not contradict each other. This difficulty increases roughly linearly with the number of different backgrounds, but quadratically amongst related background subsets: the more related in contents different backgrounds are (whether that be different rooms in the same house, an exterior vs interior shot of the same location, looking different directions in the same scene), the tougher consistency gets.
+
+So ideally we'd really like to have only one background per distinct location, and have relatively few distinct locations at that. Though of course, this mostly isn't possible: plenty of locations have multiple rooms or views, and locations can also flow together — you don't always "teleport" from one scene to the next in a novel. So we need to do the best we can at keeping backgrounds manageable while still having them capture the vibes of what's going on in the book at any given time (mostly). And for that, let's run down a whole ton of heuristics to follow:
+
+First off, backgrounds are like character identifiers in that they use lowercase letters and numbers, except that they can also additionally use hyphens. And hyphens should be used conceptually to group backgrounds based on location, either defining sublocations or variations on the same location. So for example in *Journey to the Center of the Earth*, a lot of time is spent in the professor's house, describing it from inside and from outside, and different rooms. Therefore, we don't want to call any background just `prof`, since it's not obvious what that word would refer to. So instead, we let `prof` be the prefix to group together the whole set of different backgrounds: `prof-wide` for the exterior shot, `prof-dining` for the dining room, `prof-entrance` for the entrance hall with the upstairs-leading staircase, `prof-axel` for Axel's room, and `prof-study` for the professor's study. Although actually: the professor's study is described in high detail, with many different items contained therein, which might be difficult to capture all in just one background, so we'll want both a main shot and a reverse shot for the study: `prof-study` and then `prof-study-grauben`, with the first one focused on the desk and minerology shelves, and the second focused on the portrait and mantle on the other side of the room. This is quite a few backgrounds for one location, and it's not even the most there might be. For example in the full pulp.txt metadata text for *Dorian Gray*, Dorian's urban estate is represented by all of `dorian-bedroom`, `dorian-entrance`, `dorian-entrance-night`, `dorian-gallery`, `dorian-library`, `dorian-library-night-fire`, `dorian-schoolroom`, `dorian-schoolroom-night`, `dorian-wide`, `dorian-wide-night`, and `dorian-wide-night-fog`; as well as the portrait-related backgrounds `dorian-library-picture`, `dorian-library-picture-closed`, `dorian-schoolroom-picture-young`, `dorian-schoolroom-picture-aging`, and `dorian-schoolroom-picture-old`. When many multiple backgrounds for the same overall location are needed, having them named in this chained way makes it easier to keep track of e.g., that `dorian-gallery` and `dorian-bedroom` are different rooms in the same overall building; that the daytime `dorian-wide` has both a nighttime variation and a nighttime+fog variation; and that `dorian-library` and `dorian-schoolroom` both have shot-reverse-shot setups looking away and towards the portrait, the portrait itself having subvariations based on the curtain being opened or closed or for for its age in the story. As we'll see later on, when we think of backgrounds (and the visuals in general) as vibes, such naming can help organize the overall vibes we're aiming for.
+
+Second, it helps to conceptually distinguish between background sublocation variations, background perspective variations, and background scene variations. Sublocation variations are like the different rooms in the same overall house, and there might need to be many of these. Whereas a perspective variation is like the case of the shot-reverse-shot, or of viewing the exterior of a place from multiple angles. While sublocation variations are pretty tricky to get right, since stuff like architectural consistency needs to be taken into account; perspective variations are *very* tricky to get right, since it can be almost impossible at times to get the image generators to keep all details consistent when an entire background needs to be redrawn while still representing the same contents. So sublocations should be minimized as-possible, which can involve not necessarily giving every room in a house its own background. Whereas perspective variations need to be even more aggressively minimized, with the number of shot-reverse-shot and other camera gimmicks kept to an absolute minimum, except where unavoidable. (And it *is* unavoidable in parts of e.g., *Dorian Gray*, where the picture is sometimes in the library, and sometimes not, and so there needs to be a shot of the library looking away from the wall where the picture might or might not be, to account for both cases, for reusability.) By contrast with sublocations and perspective variations though, scene variations can be a little more flexible. By scene variations, I mean changes that don't require redrawing an entire background, but rather just updating some specific part of it, to account for some partial change, whether physical or temporal. Most commonly, a background might need both a daytime and nighttime variation, either because it's an outside background, or because the scene includes an outside-facing window. This is relatively easy to account for, since it mostly just involves calling the image generator to update the sky to add dark hatchings (cross-hatching is the specific style these visual novels aim for, which again will need discussing in more detail later). And the convention here is to have daytime scenes have no suffix, but nighttime scenes add the `-night` suffix. And you can see above how this can be extended to account for nighttime+fog (`-night-fog`) or nighttime+fireplace (`-night-fire`). Or, in the case of your Dorian portrait, you have scene suffix variations on its again like `-young`, `-aging`, and `-old`, to indicate updating the portrait itself, while leaving the rest of the background as-is, mostly. Ideally, even scene variations can be minimized, since not even every physical change in a scene necessarily needs a different background. For example, commonly there might be a dining room that's alternatively empty and being eaten at, with courses/dishes that might change over the course of a scene. However, those are rarely the *focus* of the scene, and so they don't really warrant their own background, and it's generally fine if a dining table just has a few scattered generic period-accurate dishes or trinkets on it, leaving the reader/viewer to infer the rest of the changing happenings. That's just one category of example though, and whether or not scene changes warrant background scene variations will depend a lot on the specifics of the text and the intended vibe focus of the backgrounds aimed for, just keeping in mind the heuristic that capturing the most general version of a scene possible, while balancing the need to include detail, is desirable.
+
+Third, and related to above, not every last detail needs to be captured in a background. In describing a location, an author might mention many different things about it, but not every thing mentioned necessarily needs to end up showing up in the final background, as long as the main focus/idea/vibe of a background makes it in, and as long as the absence of an item doesn't create a contradiction between the visuals and text. (That is, let's say the author off-hand mentions a vase and a fireplace as both appearing in a room. If the final background includes the fireplace but not the vase, that might be okay, if the vase's position isn't ever described relative to the fireplace, and thus can just be assumed to be in the off-screen portion of a room — there's no way to show a room's *entire* contents in one background view, after all. But if the vase is described by the author as being next to the fireplace, then suddenly its not being there *would be a problem.) This can be extended more generally in a number of ways: For one, we can take great advantage of wide shots. An author might describe a character navigating their way through different streets and scenes through a city, which, if each given their own unique background, would blow up the number of interconnected backgrounds needed. But rather than do all that, we can just have one overall wide shot of the city, and as long as that doesn't contradict anything described, it can work as a general catch-all background for such transitions. The entrance hall for estates often serves this function for interior transitions between rooms of a house, when characters go through the halls or up-and-down stairs, or what-have-you — you can be smart in this way about thinking of how backgrounds can be reused across different contexts, as long as the overall vibe of the background works with those contexts. We can also take refuge in abstraction: a fully abstract background, after all, contradicts nothing about the text. If a character is dreaming of fleeting images, or moving while lost in thought, or describing action playing-out, or anything else that would otherwise require rapid background changes to capture exactly, having an abstract background named like `action` or `night` or `think` or `light` can be a sort of cop-out, though of course these should be used judicially, since it's better to capture a scene more concretely than less — it's just that sometimes it's basically practically impossible to capture a scene concretely in the VN format, in which case abstraction gets as close to preserving the vibe, if not every last visual detail, as possible. And related to abstraction, we have the concept of blurriness: later on, filters will be described, and the most common filter you'll see if the filter applying a blur of some pixels (most commonly, `blur(3px)`) to a background. Blurs are a great and versatile tool, because they can represent all sorts of different vibes within a background: motion, transition, thought, flashback, reflection, and so on. A common trick can go like this: let's say an author describes a character at location A, they quickly pass through locations B and C, and finally end up at location D. You start with location A as a background, unblurred, and then indicate motion away from A by blurring it when the author starts describing B. When the author describes C, switch to a blurred background of D, indicating motion towards D, and finally once they arrive at D, unblur it. In this way, you represent abstractly the motion between these places, without having to have individual backgrounds for intermediate locations that might only be touched on for a line or two each.
+
+Fourth, it's important to think in terms of vibes, and this is why I've already used the word many times above. At this stage in the VN-conversion process, where the task is only to create the pulp.txt metadata file, but not to actually yet generate any images, we can't actually know for sure what the final image products will look like. In the image generations, we might end up going through many different iterations before we hit one that looks good, doesn't contain any inaccurate details, and doesn't contain any period anachronisms. So for example, if we have a drawing room scene, it's less useful to think in terms of "This drawing room will end up having the following list of objects: o1, o2, o3,… oN" and more useful to think in terms of "This drawing room is described as having a window, so we'll need a nighttime variation. But the rest of the details can be deferred". The actual image generation process for backgrounds is actually a process of first converting vibes into prompts, based on the text, and them giving the prompts to an image generator. This is captured in the b-prompts-prompt.txt file, which shows an example of how prompts for *Journey to the Center of the Earth* were generated, using a second pass to go from general vibe to specific details. That file is useful to read in full, since it goes over some of the same heuristic considerations involved in the background generation process, but from the later perspective of already having the metadata established, and then at that point needing to convert that into detailed specifics of the cross-hatching style.
+
+Putting all this together, let's take a look at a specific snippet to show off the background changes in action:
+
+`
+Thus ended this memorable séance. That conversation threw me into a fever.
+b=prof-study
+
+I came out of my uncle’s study as if I had been stunned, and as if there was not air enough in all the streets of Hamburg to put me right again.
+f:b:prof-study=blur(3px)
+
+I therefore made for the banks of the Elbe, where the steamer lands her passengers, which forms the communication between the city and the Hamburg railway.
+b=hamburg-wide
+
+Was I convinced of the truth of what I had heard? Had I not bent under the iron rule of the Professor Liedenbrock?
+
+
+Was I to believe him in earnest in his intention to penetrate to the centre of this massive globe? Had I been listening to the mad speculations of a lunatic, or to the scientific conclusions of a lofty genius?
+
+
+Where did truth stop? Where did error begin?
+
+
+I was all adrift amongst a thousand contradictory hypotheses, but I could not lay hold of one.
+
+
+Yet I remembered that I had been convinced, although now my enthusiasm was beginning to cool down; but I felt a desire to start at once, and not to lose time and courage by calm reflection.
+
+
+I had at that moment quite courage enough to strap my knapsack to my shoulders and start.
+
+
+But I must confess that in another hour this unnatural excitement abated, my nerves became unstrung, and from the depths of the abysses of this earth I ascended to its surface again.
+x:axel=hat;b=light
+
+“It is quite absurd!” I cried, “there is no sense about it. No sensible young man should for a moment entertain such a proposal.”
+s=axel;e:axel=upset
+
+“The whole thing is nonexistent. I have had a bad night, I have been dreaming of horrors.”
+e:axel=annoyed
+
+But I had followed the banks of the Elbe and passed the town. After passing the port too, I had reached the Altona road.
+s=none;b=altona-road;f=fade
+`
+
+Here we see four different backgrounds in a relative short stretch of text, which is a rather higher rate than backgrounds usually change throughout the course of these converted VNs, but it makes this specific instance easier to analyze. We start in the professor's study: a concrete location. Then we need to move out of the study, which we kick off by first blurring the study background (again, more on filters in a bit), then moving to a more generic wide shot of Hamburg as-a-whole. As Axel continues wandering around in though, we move to a fully abstract `light` background, before finally getting back to a more specific location of a specific road, where a conversation ends up playing out. So afterwards, we're able to stick with the `altona-road` background for a while. And that works even though the characters start walking down the road while talking, since the background vibe there is a shot looking down the road, so we can visually accept motion in that background while sticking with it: again meeting the combination of capturing textual detail while still being the most generic version of what that scene requires. (It's also worth mentioning at this point that in these converted visual novels, the character sprites very rarely are shown in the backgrounds themselves — the sprites essentially always exist above the backgrounds, in the UI, as speaker sprites. It's not practical to update the background continually as characters move within it, which motion books are very wont to describe. Unlike in texts specifically designed to be visual novels, which rarely mention specific character positions, allowing you to assume the characters are standing upright and still while conversing, characters in books are much more often either sitting, or moving, or moving while sitting!)
+
+
+
+Moving on from backgrounds (sort of), the next background to consider is the (f)ilter tag. Filters are much easier conceptually to think through than backgrounds, although like background tags, when and where they're used is often heuristic- and vibe-based, and they're also perhaps somewhat more complicated in how they're defined.
+
+There are two modes filters operate in. First, they can be used like `f=<value>`, where they define a custom filter on the current slide. There are currently four different supported filters of this kind, although the first three — `f=hit` to make the screen temporarily blur for a second, `f=blood` to make the screen temporarily flash red for a second, and `f=lightning` to make the screen temporarily flash bright for a second — aren't used very often. The important one to think about if `f=fade`, which changes how one slide transitions to the next. The way these converted VNs display by default, text changes and speaker sprite changes are both instant — there's no animation to them. Background changes do have a brief fade, and this applies both when the background itself changes (e.g., `b=b1` -> `b=b2`) and when the active background filter changes (e.g., `f:b:b1=blur(3px)` -> e.g., `f:b:b1=blur(10px)`). Backgrounds have these filters by default to make their changes less sudden and distracting, whereas speakers change very frequently, and text changes every slide, and they both don't occupy the full view, so their instantaneous changes are acceptable for keeping the reading experience snappy. *But*: sometimes we do want the entire UI to smoothly transition for a second — fading to black and then fading back in on the new slide — which is exactly what `f=fade` does: you apply it to the slide you want to be faded into. `f=fade` is useful to apply in multiple cases: when there's a scene variation change within a background (e.g., the curtain coming up in *Dorian Gray*, going from `theatre-curtain` to `theatre-romeo-juliet`), when there's a background change that represents a sudden jump in time, and especially when there's a jump between backgrounds that involves going from one speaker to another, or a speaker to no speaker, or no speaker to a speaker, in a way that isn't meant to imply a continuous conversation.
+
+Still, `f=fade` should be used relatively sparingly compared to the the more common use of filters: background filters. These, applied like `f:b:altona-road=blur(3px)`, don't apply for just one slide, but rather continue to apply until either the underlying background changes (noting that if you go from b1 w/ filter to b2 and then back to b1 within the same chapter, the filter will stlil be on b1!), or a different filter is applied to the same background. Filters can be cleared by setting the filter to an empty string like `f:b:altona-road=`, and the filters can be any valid css filter, which includes applying multiple types at once, e.g.: `f:b:prof-entrance=blur(3px) brightness(85%)`. Brightness can sometimes be used to represent lighting changes, though this is generally less common and less desirable than having daytime vs nighttime variations, though sometimes the changes in lighting are for e.g., a character-held candle going out, which the brightness filter is better at representing. But in any case, blur is certainly the most common filter type, and is used all over. Whereas `f=fade` can be used to help over sudden jumps in scene or time, most cases involves a smoother passage of time or transition between location, which temporary blurring is better at less intrusively representing. Again, it's common to blur the background right before a background change, to blur the background during a flashback sequence, to blur a background to represent that the character is thinking about a location rather than actually being in that location, to blur the background to represent motion or action, and so on. Basically, it's a catch-all for any situation in which it should be represented to the viewer that the specifics of the currently shown background shouldn't be focused on temporarily, for whatever reason. In all these cases, the convention is that a normal blur should be 3px, but if extra contemplation or motion or whatever needs to be represented, a bigger effect of 5px or 10px or whatever can be used. The blur can in some cases be updated continuously slide-by-slide, increasing marginally with each, to represent things like falling asleep or getting drunk. But overall, the big thing when thinking through when to use filters is really all about thinking how they can be used as a sort of quasi-substitution for needing an additional background.
+
+
+
+Next tag, and moving onto the realm of sprites: the (a)ge tag. Although this one necessarily involves first discussing at a higher level the interplay between the (a)ge tag, e(x)tra tag, (e)expression tag, and (s)peaker tag.
+
+For backgrounds, there's a simple relationship between the background and the resulting image the visual novel needs. For `b=vane-sitting`, the visual novel's html will end up requesting `b-vane-sitting.avif`, so there's a one-to-one direct relationship there. Not so with sprites, where the resulting image file is made up of a combination of all the various sprite-related metadata tag modifiers. For example, the end result image file for a particular Henry sprite might be `c-henry-aold-xcig-xshooting-esmirking-s`, and this is made up of the combination of `a:henry=old`, `x:henry=cig,shooting`, `e:henry=smirking`, and `s=henry`. So as we start talking about the (a)ge tag first in particular, consider this is but one part of the overall sprite construction to follow.
+
+The age tag is used at a very high level to capture long-lasting changes to a character over the course of a text: changes that require a new set of character sprites to be generated for them. Most commonly, this is because they get older, like in *Dorian Gray*, where Henry, Basil, and James all age eighteen years. Therefore, all three get `a:<name>=young` tags beforehand and `a:<name>=old` tags afterwards. This is contrast to Dorian, who obviously doesn't age, and the rest of the cast, who are all either present only before the time skip or after the time skip — therefore, all the rest of those characters don't need any age modifiers. In fact, in *Journey to the Center of the Earth* and in many other books to convert, the age modifier is often not needed at all — there might not be any aging.
+
+However, the age modifier can also be used in non–strictly-aging contexts, such as for temporary flashbacks, and even for non—age-related contexts, such as other long-lasting changes. An example for that would be in *The Secret Garden*, where Mary and Colin are both given `a:<name>=sick` and `a:<name>=well` modifiers to represent their visually apparent character transformations. Those make sense even in that context, because of how the change represents a persistent change, independent of clothing or any other temporary modifier. Which brings us to…
+
+The e(x)tra tag, which represents temporary context changes for a character. Most often, this can be seen in characters going from hat-wearing to not e.g., `x:dorian=hat` and `x:dorian=`. There's a couple differences from the age tag to keep in mind in here.
+
+First off, we haven't discussed the (r)eset tag just yet, but the basic idea of it is that it's a mechanism of clearing out all temporary metadata to get a clean slate — and by contention, this is done at the start of each chapter. The reset clears out almost all metadata, except for (n)ame identifiers and the (a)ge tags, since those are assumed to be permanent until set again. Therefore, once a character's display name or character age is declared, it doesn't need to be re-declared at the start of each chapter. Whereas the extras, which usually represent some type of clothing change, can be assumed to be effectively reset with each chapter, and so they do need redeclaring if, for example, there's a chapter break in the middle of an outdoor scene, where a character needs to be continue wearing a hat both before and after.
+
+Also, while age tag can only declare one string, the extras (plural) can have multiple different values declared e.g., `x:dorian=fur,hat` or `x:dorian=hat,fur` — these get sorted alphabetically, so the resulting sprite image file would contain `-xfur-xhat` in either case. There's basically no reason you'd ever need multiple values on the age tag, but really even for the extras tag, it's rare you need multiple values there, either. In theory, you could define a value for each article of clothing mentioned — `x:char=hat,overcoat,cravat,coat,vest,…` — but in practice, like with backgrounds, it's more useful to think in terms of overall outfits and outfit vibes than it is to be over-specific — the idea should be about thinking through the minimum number of required different age and extras modifiers needed to represent all of the different outfits a character might have over the course of a text, balancing the number of values with the desire to make image generation intention clear.
+
+By convention, hatwear is always given an extra modifier when active: the generic `x:<name>=hat` works best, though if multiple different kinds of distinct hatwear for the same character come into play, distinguishing these with `x:<name>=bonnet` or `x:<name>=strawhat` or whatever works fine. But the reason we want to elevate hats to having this very obvious status is that, the way sprites are display in the VN UI — from the shoulders up — hats are the most obvious aspect of characters' changing outfits to a viewer, and it's therefore especially important that whenever a hat should be shown, the need to do so is obvious. And hats also change often, especially for male characters, coming on and off between outdoors and indoors very frequently. (Noting that these changes might not always be made explicit in the text itself, but we'll consider the necessary implied outfit changes based on etiquette considerations further down!) Contrast this with something like a suit coat: having `x:<name>=coat` for all the male characters would be overkill, because almost all the male characters in almost all of these public domain books can be assumed to be wearing a suit coat in most contexts. So when we think about what the default outfit a character should have — the one that the sprite should show when no modifiers are on — we should be considering what their most common outfit is, and that's probably the coat. Maybe they have a cravat, and maybe they have a tie, and maybe neither are explicitly specified, but those can be put in place as part of the later character sprite vibe-to-prompt step — see the c-prompts-prompt.txt file for such considerations and much more detail.
+
+So to determine what all extra tag modifiers we need, it's helpful to think in terms of what outfits should be considered *non-default* for a character. Perhaps they have some bedtime/sleeping scenes — those can be represented with `x:<name>=night`. Perhaps they should be smoking a cigar in a scene — `x:<name>=cigar`. Perhaps they need to have a backpack on: `x:<name>=pack`. Although it can get slightly tricky here, and this is where we need to start considering the best way to minimize sprite variations, just as sought to minimize the number of backgrounds. Take for instance, Axel's description of wearing a knapsack in *Journey to the Center of the Earth*. In his case, he's only ever wearing the knapsack in his outdoor scenes, and in his outdoor scenes, he's always implicitly wearing a hat; therefore, we don't technically need a distinct `pack` modifier, since we can just note as vibe that the `c-axel-xhat` base should also feature his knapsack. Course, both `x:axel=hat` and `x:axel=hat,pack` work equally fine, so long as the extra values remain consistent between chapters. Same goes for deciding whether to e.g., specify an overcoat along with a hat — `x:<name>=hat` vs `x:<name>=hat,overcoat` — sometimes this might be a good idea, and sometimes not. It would be necessary to differentiate the `hat` from `overcoat` modifier if there's any point where the character wears the hat but not the overcoat or the overcoat but the hat — whether this is applicable depends entirely on the text of the story.
+
+Now, in theory, a character might still have a number of different outfits — both explicit and implied — that might seemingly warrant a number of different extras tags. However, just as there were heuristics around the backgrounds, so too must we consider heuristics here:
+
+First off, we must keep in mind the visual style of these visual novels: literary-type cross-hatchings, with a normalized color palette that collapses down to a square 2-dimensional gradient between tans, light oranges, light browns, and black — meant to invoke the vibe of paper and physical book illustrations. Why is matters for thinking about sprites is that the color collapse means that we can sometimes ignore or cheat our way out of needing different clothing: a character might be described as wearing a green dress in one scene and a blue dress in another, but neither of those colors will actually show in the final visual product. Ergo, if there's no more specifics involved in describing physical differences between the two, they can be treated as one outfit! Of course, this doesn't always work, since the difference between a light-colored article of clothing and a dark-colored article of clothing will still be apparent in the resulting hatching density. So if the color description describes a white suit and a black suit, that would still warrant extra modifiers.
+
+But there's more ways we can collapse outfits: Remember that we're only really ever seeing these sprites from the waists-up, and mostly really only from the shoulders-up. Descriptions of shoes, therefore, can be completely ignored. Gloves are more interesting, since the ultimate character expression variations might feature some with the characters' hands held up and visible in some instances — scratching their chin or clutching at their neck — but the hands might be fully hidden in others. In general, it's a good idea to keep track of whether a character is wearing gloves or not, and include this as part of the sprite; *however*, if a character is described as fiddling with their gloves or pulling them off, it often doesn't warrant a full new set of sprites just to account for — in the final visual editing, only those sprites where the hands are hidden might be selected for those portions, effectively cheating the need to get the glove presence strictly correct. So for gloves, it's often best to just have the sprites have gloves if they should be wearing them *most* of the time, and not have them if they shouldn't *most* of the time, and usually this can be done without needing a whole `x:<name>=gloved` variation. Usually the gloves pair with other variations: like `x:<name>=hat> implies outdoors implies gloved. In some contexts. Depending on etiquette. And boy, is etiquette an important consideration:
+
+In the time periods occupied by public domain novels — the 1930s and prior — etiquette matters a lot. Again, this most obviously comes up in the form of hats. In basically all periods covered by these novels, gentlemen should have hats on outdoors, and not have them on indoors, and these outfit updates need to be reflected in the extras tag attributions even if the author doesn't mention them. Now, the specific types of hats might change, and there will always be some exceptions, but the general idea is what matters. Women's etiquette is of course more complicated and varied over the course of the Regency to Victorian to Jazz eras, and across different cultures, so the context and setting of the book needs to be taken into account when deciding when variations are needed. (And of course, no matter the etiquette, anything specified by the author takes precedence, even if it conflicts with standard etiquette.)
+
+Now, after emphasizing how important strict etiquette correctness is, let me backtrack somewhat on that by again describing how we can cheat it somewhat. The two ideas to keep in mind here are that 1. Not every technically correct etiquette change will be particularly obvious in the cross-hatching format and 2. Most readers probably won't even be aware of most of the specific rules of etiquette, beyond perhaps that hat thing. So, for example, in the Regency era, when the *Pride and Prejudice* visual novel was created, it didn't include any distinction between morning and evening dress. There was a distinction between indoor vs outdoor wear (e.g., bonnets), and between standard vs ballroom wear; though even that last distinction proved to be somewhat unnecessary for the male characters, with the differences not ending up being particularly apparent, therefore implying their absence wouldn't have hurt the visuals so badly. Such must be the considerations in mind when deciding how specific and how detailed to go on outfit changes: if there's a way for outfits to be visually combined, it's often best to do so. Whereas when the outfits are obviously necessarily different — either via author description or clear etiquette lines — extra modifiers should be used. Where to draw this line can sometimes be tricky, but often what's important is just picking an approach and being consistent at it, both over the course of the book and between characters.
+
+Lastly on the extras front, sometimes the tag can be used for things that aren't outfit changes, but represent some kind of other temporary change. For example, later on in *Journey to the Center of the Earth*, the professor is described as looking through a "glass" (telescope) for some number of dialogue lines, and so during that stretch, he got the `x:prof=glass` modifier. Later on, at the end of the book, the characters' clothing was in tatters, so the professor got an `x:prof=undressed` modifier. Axel's clothing was also in tatters, and the book also mentioned a beard grown at that point, so his modifier ended up being `x:axel=undressed,beard`. And so it goes with whatever other type of temporary modifier a character might have, where there needs to be an associated visual change. As a general rule, a character holding something doesn't by itself warrant any kind of sprite variation — it's only when the change is visible above their shoulders (e.g., holding it up to their eye) that extra modifiers in this context should be considered. But still: remember the idea of minimizing variations.
+
+
+
+This brings us to the last of the sprite-related tags: the (e)xpression tag. This is perhaps the most numerous in quantity tag that needs assignment, and results in the most number of image variations; however, it's conceptually much simpler than any of the above image-modifying tags.
+
+The idea is: a character's expression will change as they talk. There needs to be some metadata representation of that change. So, we simply assign in metadata like `e:sibyl=happy` or `e:henry=smirking` or `e:dorian=wary`. Such expressions only need assigning when a character is either talking or thinking, since those are the only times we'll see their sprites on-screen. Again in the abstract, there's a balance we wish to strike between the specificity of sprites and minimizing their number, but having a bunch of expression variations is in general much less of a concern that background variations of character age/extra variations. Expression variation batches are semi-automated, since once we have the base versions of a sprite for a given age/outfit/whatever, we can just loop through the set of expressions they need, use pre-prepared prompts for those expression updates (with a bit of injected randomness), and loop the generation across all the characters. This works fine, as long as the expression fall into a predetermined set of allowable emotions. This set is as follows:
+- neutral
+- happy
+- unhappy
+- angry
+- wary
+- nervous
+- upset
+- suspicious
+- confused
+- thinking
+- serious
+- smirking
+- weary
+- fearful
+- surprised
+- annoyed
+- scowling
+- excited
+- contemplative
+- curious
+- sadsmile
+- bored
+
+Now, although full automation is desirable, manual prompts can be added for expressions that don't strictly fall into this set. We don't want a lot of these, but sometimes expressions do take on something more unique that requires reaching for a more descriptive word or words. Sometimes this is just a matter of combining two expressions from the list e.g., `e:axel=curiouswary`. Other times a character might explicitly be noted as looking either to the side, or down, or up. In these cases, the convention is to tack on `look`, `lookdown`, and `lookup` respectively to the emotion e.g., `e:prof=annoyedlookdown`. And then sometimes a wholly unique descriptor is needed for certain special cases e.g., for Sam Spade in certain scenes in *The Maltese Falcon*: `e:spade=lewd`.
+
+Still, for the most part, it's best if most expressions come from the pre-prepared set, for two reasons: First, it's easier. And second, more than any other tag that needs generating, the expression tags are the ones that should be treated the most like heuristics as compared to what will actually end up being shown in the final visual novel product. What generally happens is: after the pulp.txt is generated, and the full set of images generated off that, the visual novel will be visually read and edited, and this will involve changing a lot of the expression tags. After all, the pipeline from `expression tag metadata vibe -> lossy semi-automated image generation -> final image` is inherently a kind of lossy one when it comes to the original intention vs the final product you get out. So the dialogue that seemed at pulp.txt–generating time to most accurately be captured by `e:axel=wary` might end up actually end up better represented by the concrete `c-axel-econtemplative-s.avif` image in the final edited product.
+
+Actually, this idea that the whole process is lossy and heuristic until we're dealing with the concrete final images kind of applies to all of the image-related metadata tags. It's just that, for all the other ones, changing those "vibes" after-the-fact is way harder, which is part of the reason why they're all so much more important to get correct. Whereas it's as easy as a button press in the visual editor to swap from one expression variation on a sprite to a different one, and this doesn't generally introduce any contradiction or inconsistency or need to re-generate, they way swapping out entire backgrounds or outfits would, after-the-fact. So, expressions should be assigned with some care, but not with as critical of focus.
+
+And one last consideration w/r/t expressions: again, unlike all the previous tags, expression variations make more sense to be numerous with than be conservative with. It's okay, and even desirable, to have a character's expression be updated on almost every slide at times, if that's how their expression should really change during a conversation. Expression variations can easily be reused between conversations (as long as the character outfit is reusable), so there's as much a sense of waste to it. Conversely, keeping a character's expression the same across multiple slides is fine, since the expression setting persists for a given character until changed, although note that in a snippet like this:
+
+`
+“What!” sharply replied the Professor,
+s=prof;e:prof=scowling
+
+“a translation! What should I do with a translation?”
+
+
+“This is the Icelandic original, in the magnificent idiomatic vernacular, which is both rich and simple, and admits of an infinite variety of grammatical combinations and verbal modifications.”
+e:prof=serious
+`
+
+Although it looks like there might only be two ultimate sprites generated here — `c-prof-escowling-s.avif` and `c-prof-eserious-s.avif` — there's actually a third generated as well for the second slide: `c-prof-escowling-s2.avif`. The Pulpifier does some internal processing on the expression sprites to help ensure that the on-screen character sprite changes with each slide, so the visuals don't ever look static, and it does this by allowing for multiple variations on the same expression. The exact details of how this works aren't particularly important — though Compiler.cs can be referred to — but the general idea is that there's some indirection possible between the sum of the sprite metadata tags set and the set of actual images that ends up being required by the visual novel. This will matter more when we start talking about running the Pulpifier and using its output to help guide the pulp.txt generation process, discussed further below.
+
+
+
+Next we'll consider the (m)odifier tag. This tag allows making changes to visual novel's compilation and display behaviors. It has six different options, but only four that are relevant for this stage in the editing process — `dialogue`, `nospeaker`, `break`, and `nospace` — with each of these acting as an independent flag that can be turned on. The way the tag works, you set one of these flags to turn on by adding e.g., `m=dialogue`, or you set multiple of them on like `m=break;m=nospace`. There are two ways of turning them off: First, you can either clear all active modifiers/flags later on by setting `m=`. Or second, you can set a set number of slides for the flag to be active on from the start like `m=break,1` — in this case, telling the `break` modifier to be active for the current slide, but them disable itself next. Most modifiers only need to be activated for a single slide, so the method of adding the second argument for the number of slides to remain active, and having it be set to 1, is usually the most common way to use the modifier tag. (Also note that, in order to prevent the modifier tag accidentally being left on, it's not allowed to remain on across multiple paragraphs, so it needs to be disabled one way or another before starting the next paragraph.)
+
+Getting to the flag specifics: `dialogue` and `nospeaker` both control display behaviors. The `dialogue` flag, when enabled, tells the UI to display all text within quotes as if they were dialogue — that is, bold them, even if a speaker or thinker isn't set. And that works well for avoiding having to set a speaker or thinker, if you want to have text be visually identifiable as dialogue without giving away who is doing the talking — not showing either a speaker sprite or the speaker display name. See the `“I am afraid it is not Harry, Mr. Gray,” answered a shrill voice.` line in dorian-pulp.txt, where `dialogue` is used to not give away who the "shrill voice" refers to. `nospeaker` is sort of similar, in that when active, it instructs the UI to hide the speaker sprite for any active speakers or thinkers, though the UI still shows their display name. So `nospeaker` is more appropriate when the speaker should be known, but for whatever reason their face shouldn't be visible. This is used in the `“My dear Axel?”` line of journey-pulp.txt when Gräuben is described as talking through a door, meaning that from Axel's perspective, he shouldn't be able to see her, though he would still know her voice.
+
+The other two flags — `break` and `nospace` — have to do with line processing. Earlier we talked about how by default, line breaks aren't allowed to be inserted after commas. The `break` flag is the mechanism by which this behavior can be overwritten, for commas or any other situation where line breaks are typically not allowed, but we want to insert one anyway. Here's some example usage:
+
+`
+“Yes, Herr Liedenbrock; the labours of MM. Olafsen and Povelsen, pursued by order of the king, the researches of Troïl, the scientific mission of MM. Gaimard and Robert on the French corvette *La Recherche*,”
+s=fridrikssen;m=break,1;e:fridrikssen=thinking
+
+“and lately the observations of scientific men who came in the *Reine Hortense*, have added materially to our knowledge of Iceland. But I assure you there is plenty left.”
+e:fridrikssen=contemplative
+
+“Do you think so?” said my uncle,
+s=prof;e:prof=curious;m=break,1
+
+pretending to look very modest, and trying to hide the curiosity that was flashing out of his eyes.
+s=
+`
+
+In this instance, we insert two breaks to split up two sentences via commas, for two different common reasons: In the first case, the first line of dialogue was simply rather long, and the "and" made for a more natural break point then the "But", even though the former is technically a sentence break. In the second case, it's an instance where we want to separate dialogue from non-dialogue. Here we can finally wrap up our discussion from way earlier about the timing of line breaks. In general, we want all dialogue lines to start out with the dialogue at the front, and then we want to keep any non-dialogue bits minimal at the end. If the non-dialogue bit is just something like "said Martha." or "he asked.", we can leave them attached, since those are short addendums, and although technically redundant with the visual novel's UI presentation, which shows who's speaking, we've already established that the text will remain unabridged. However, when there's a lot of extra non-dialogue bits added to either the end or the middle of a sentence, then we need to start considering how to best break up the sentence to to keep the dialogue at the beginning of every slide, while isolating non-dialogue to the greatest extent possible. So we'll often end up with snippets like this:
+
+`
+“Don’t mind him, my dear,” whispered Lady Agatha.
+s=agatha;e:agatha=contemplative
+
+“He never means anything that he says.”
+
+
+“When America was discovered,” said the Radical member﻿—
+s=burdon;e:burdon=serious;m=break;m=nospace
+
+and he began to give some wearisome facts.
+m=;s=;f:b:agatha-dining=blur(3px)
+`
+
+Here we can see how we split the first bit of dialogue by the Agatha character across two slides, so we don't have the somewhat long-looking "whispered Lady Agatha." non-dialogue portion wedged in the middle. And then for the Radical's dialogue, we keep the the "said…" part attached, but break off the action portion of the sentence to its own line. And there we can, along with the `break` flag, the final modifier flag — `m=nospace` — in action. By default, the Pulpifier will always combine lines within the same original paragraph via joining them with spaces. This works correctly for joining line breaks inserted after periods, colons, semicolons, commas, and so on. For em dashes don't have spaces around them, so its default behavior will try to join the sentence back together (to verify consistency with the original) like `“When America was discovered,” said the Radical member﻿— and he began to give some wearisome facts.`, which would be incorrect. So `nospace` just instructs the Pulpifier to not insert a space when rejoining the text for comparison against book.txt.
+
+Now, there's definitely some flexibility and necessary compromise in determining when exactly line breaks should be inserted when it comes to splitting dialogue — figuring out how to best make things look most natural. It's sometimes completely fine to have non-dialogue in the middle or somewhat non-dialogue bits tacked at the end of dialogue lines, if they don't end up visually looking intrusive:
+
+`
+“I have never known such a thing,” said Martha. “M. Liedenbrock is not at table!”
+s=martha;e:martha=confused
+
+“Who could have believed it?” I said, with my mouth full.
+s=axel;e:axel=boredeating
+
+“Something serious is going to happen,” said the servant, shaking her head.
+s=martha;e:martha=nervous
+`
+
+Again thinking heuristically, it's best about striking a balance of not over-chopping up sentences and paragraphs, with making sure non-dialogue portions are kept relatively short, especially those in the middle, and if they are longer, weighing in whether they have a relation to what's being spoken, or whether they represent a separate action. Thinking about the line breaks as going in places that divide different actions/locations/emotions/etc is a good way to think about how best to insert the line breaks in general, even for non-dialogue parts, since that ties into the placement of all the other metadata tags, like how to show backgrounds and background filters. 
+
+And lastly related to line breaks, and you may have already picked up on it by now, but we should mention the one exception for the rule about not modifying the original text: quotations. Typically in a book, when you have a speaker's dialogue spanning multiple paragraphs, you open a new starting quote with each new paragraph, and only close it on the last speaking paragraph. Such an approach wouldn't really look right in the visual novel format, nor would the approach of keeping the quotes exactly as-they-are from the book.txt file, since then you might have dialogue lines with no quotes at all, if they come from the middle of a larger paragraph of dialogue. Therefore, in the pulp.txt format, quotes should always be matched in their individual slide: that is, there should be a closing double-quote for every opening double-quote, and likewise for single quotes. So for an original book.txt snippet like:
+
+`
+“I think you are wrong, Basil, but I won’t argue with you. It is only the intellectually lost who ever argue. Tell me, is Dorian Gray very fond of you?”
+
+The painter considered for a few moments. “He likes me,” he answered after a pause; “I know he likes me. Of course I flatter him dreadfully. I find a strange pleasure in saying things to him that I know I shall be sorry for having said. As a rule, he is charming to me, and we sit in the studio and talk of a thousand things. Now and then, however, he is horribly thoughtless, and seems to take a real delight in giving me pain. Then I feel, Harry, that I have given away my whole soul to someone who treats it as if it were a flower to put in his coat, a bit of decoration to charm his vanity, an ornament for a summer’s day.”
+`
+
+The resulting pulp.txt might look like:
+
+`
+“I think you are wrong, Basil, but I won’t argue with you. It is only the intellectually lost who ever argue.”
+s=henry;e:henry=curious
+
+“Tell me, is Dorian Gray very fond of you?”
+
+
+The painter considered for a few moments.
+s=none
+
+“He likes me,” he answered after a pause;
+s=basil;e:basil=thinking
+
+“I know he likes me. Of course I flatter him dreadfully. I find a strange pleasure in saying things to him that I know I shall be sorry for having said.”
+
+
+“As a rule, he is charming to me, and we sit in the studio and talk of a thousand things. Now and then, however, he is horribly thoughtless, and seems to take a real delight in giving me pain.”
+e:basil=unhappy
+
+“Then I feel, Harry, that I have given away my whole soul to someone who treats it as if it were a flower to put in his coat, a bit of decoration to charm his vanity, an ornament for a summer’s day.”
+e:basil=weary
+`
+
+The number of quotes increase, but stay matched on a per-slide basis. And again, unlike a book-formatted book, where inserting more quotes would confuse who it talking by implying that the speaker is changing, in the visual novel format, we have the speaker sprite and display name visible (unless using one of the disabling flags), so there's never ambiguity about who's talking. So this kind of quote reworking can be safely done without loss of information. And likewise for nested quotes, comparing for example *A Study in Scarlet*'s book.txt:
+
+`
+“Nothing of the sort. I *knew* you came from Afghanistan. From long habit the train of thoughts ran so swiftly through my mind, that I arrived at the conclusion without being conscious of intermediate steps. There were such steps, however. The train of reasoning ran, ‘Here is a gentleman of a medical type, but with the air of a military man. Clearly an army doctor, then. He has just come from the tropics, for his face is dark, and that is not the natural tint of his skin, for his wrists are fair. He has undergone hardship and sickness, as his haggard face says clearly. His left arm has been injured. He holds it in a stiff and unnatural manner. Where in the tropics could an English army doctor have seen much hardship and got his arm wounded? Clearly in Afghanistan.’ The whole train of thought did not occupy a second. I then remarked that you came from Afghanistan, and you were astonished.”
+`
+
+To the pulp.txt:
+
+`
+“Nothing of the sort. I *knew* you came from Afghanistan.”
+s=holmes;e:holmes=neutral
+
+“From long habit the train of thoughts ran so swiftly through my mind, that I arrived at the conclusion without being conscious of intermediate steps. There were such steps, however.”
+
+
+“The train of reasoning ran, ‘Here is a gentleman of a medical type, but with the air of a military man. Clearly an army doctor, then.’”
+e:holmes=thinking
+
+“‘He has just come from the tropics, for his face is dark, and that is not the natural tint of his skin, for his wrists are fair. He has undergone hardship and sickness, as his haggard face says clearly.’”
+
+
+“‘His left arm has been injured. He holds it in a stiff and unnatural manner. Where in the tropics could an English army doctor have seen much hardship and got his arm wounded? Clearly in Afghanistan.’”
+e:holmes=curious
+
+“The whole train of thought did not occupy a second. I then remarked that you came from Afghanistan, and you were astonished.”
+e:holmes=smirking
+`
+
+But nested quotes bring us to the penultimate metadata tag, and perhaps the most complex, though also certainly the most rarely used: the (g)ödel tag. The "Gödel" name was chosen partly for fun, and partly because it started with the unused letter "g", when really the name "frame narrative" would have been more accurate, had "f" not already been taken. But the idea is of making the visual novel UI recursive, nesting one instance of it inside another — visualizing the frame — and by doing so, moving down one layer of dialogue.
+
+The reason for this is that, often in books, especially older public domain ones, storytelling can often be represented by long dialogue sequences — think *Heart of Darkness* — where the speaker himself becomes peripheral, and its the descriptions and inner single-quoted dialogue within the outer dialogue that really become the main focus. So the idea with (g) tag is that you activate it when a speaker is active, and it essentially then pushes the current speaker and current background onto a stack. You give it a new background like `g=theatre-wide-night`, and this becomes the background of inner visual novel UI, which then becomes the new "primary" UI where all new metadata tag updates apply, while the other UI remains frozen on the last active background and speaker it had, until the frame narrative is "popped" via `g=`. You can see this in the *Dorian* example:
+
+`
+“About half-past eight I passed by an absurd little theatre, with great flaring gas-jets and gaudy playbills.”
+g=theatre-wide-night
+
+“A hideous Jew, in the most amazing waistcoat I ever beheld in my life, was standing at the entrance, smoking a vile cigar.”
+
+
+“He had greasy ringlets, and an enormous diamond blazed in the centre of a soiled shirt.”
+
+
+“‘Have a box, my Lord?’ he said, when he saw me,”
+n:manager=?;s=manager;x:manager=hat,cigar;e:manager=smirking;m=break,1
+
+“and he took off his hat with an air of gorgeous servility.”
+s=
+
+“There was something about him, Harry, that amused me. He was such a monster. You will laugh at me, I know, but I really went in and paid a whole guinea for the stage-box.”
+
+
+“To the present day I can’t make out why I did so; and yet if I hadn’t—my dear Harry, if I hadn’t—I should have missed the greatest romance of my life.”
+f:b:theatre-wide-night=blur(3px)
+
+“I see you are laughing. It is horrid of you!”
+g=;e:dorian=scowling
+`
+
+Dorian Gray is the already set speaker at the beginning of this snippet, so entering the frame narrative, he becomes the outer speaker, and therefore it becomes not the text within double-quotes that counts as dialogue (and gets bolded), but the text within single-quotes. That's why `s=manager` is applied to that one line, and then once that line is over, `s=` sets the speaker back to nobody, because from the frame narrative perspective, there is no speaker at that point. And as you might imagine with the talk of pushing and popping, frame narratives can be nested, by adding another `g=<background>` to the "stack" before exiting the last one, at which point the dialogue starts pattern matching to triple-nested quotes. This actually has come up, though only once, in *A Study in Scarlet*. The (g) tag's usage in general is quite rare, and most books go by without ever needing to use it once. But, its usage is important in necessary in those books with long sequences of nested dialogue, or even non-nested dialogue where one speaker just speaks for so long that it becomes desirable to just temporarily treat them as the narrator. 
+
+
+
+Last on the metadata tag front is the (r)eset tag, and this one is pretty simple to explain, now that we've gone over all the others. In takes in one argument, a new background, and sets the current background to that, and basically just clears out all other metadata: the current speaker is set to no one, if there even was one. Likewise for the current thinker, any e(x)tra tags that might have been active, and (e)xpression tags that were active, and (f)ilters, and so on. The only two things that aren't reset are the (n)ame and (a)ge tags.
+
+By convention, every chapter (except the first) uses `r=title` as its first metadata tag assignment to reset the visual novel display to the title background and clear out anything that was happening before, and then moving into the actual background of the new chapter's scene on the next slide. The reset tag isn't usually used outside of chapter breaks, though doing so would be fine, even doing for different backgrounds, if a particularly long chapter would be best served by segmenting it into different functional pieces.
+
+
+
+And with that: all the metadata — tags and line breaks — should be fully explained. (That is, all the metadata that's relevant to this first task of the conversion process. There are more tags you might see if investigating the code itself, or looking at completed VN online examples, though I would discourage doing so to "jump ahead" — those other attributes are heavily involved in the final step of the process — the visual editing step — and worrying about them at this stage will more like likely than not lead to mistakes and confusion.)
+
+I've tried my best to explain all the heuristics at play in this text file's explanations and examples, though looking at how the edited results look in longer form in the `journey-pulp.txt` and `dorian-pulp.txt` examples is highly encouraged to get a better feel for how all the metadata aspects fit together in practice. Also definitely look at the `b-prompt-prompts.txt` and `c-prompt-prompts.txt` references for the additional image generation context and heuristics mentioned there for the subsequent conversion step.
+
+
+
+So now, let's finally discuss the process for actually generating the pulp.txt file. You will be provided a directory, and in it will be a full book.txt file for some public domain text, which shouldn't be edited, a metadata.json file for the Pulpifier tool's consumption, which file should also be left along, and finally the empty (except perhaps for the title line) pulp.txt file. At the start, you can see that running the `PulpifierCLI` tool against the book directory should result in an `Early pulp end.` exception, indicating that the pulp.txt file ends before the end of the book.txt (and at the beginning it should indicate the line numbers for the start of chapter 1), and the goal is to complete the pulp.txt in full, such that eventually the PulpifierCLI succeeds with no exceptions, printing back a `Validated *<book title>*.` message.
+
+In theory, given the book.txt file, the pulp.txt file could just be one-shot generated. But in practice, at least from the perspective of doing this process as human, it tended to be easier to go chapter-by-chapter, completing one chunk of the pulp.txt file at-a-time, and verifying that each chapter successfully "compiles" up to that point by frequently checking against the Pulpifier status. That is, once chapter one is done, running the Pulpifier should still show an `Early pulp end.` error message, but at that point it should point to the start of chapter 2 as being the early end point. Whereas if it's a different exception, then something went wrong with pulp.txt formatting for chapter 1, and that would need to be investigated and fixed. And then this process simply needs to be continued for all chapters until the actual end is reached.
+
+Along the way, the Pulpifier tool has an `-l` flag that will list out all of the images required by the visual novel based on the pulp.txt metadata up until the farthest point that the pulp.txt was able to be processed. So by running for example `p1 -l | grep -Eo "\sb-[^ ]+"`, you can see the list of backgrounds set in the metadata, which can act as a helpful reference for figuring out which have already been used and should be reused. Likewise running `p1 -l | grep -Eo " c-[^- ]+(-[ax][^- ]+)+?" | uniq` will show the list of characters + ages + extra modifiers used, helpful for keeping those usages consistent. (Running `p1 -l | grep -Eo "\sc-[^ ]+"` will show the full set of expression-varied sprites required, which is usually less useful in this first pulp.txt–populating step of the conversion process.) And depending on how you wish to read the book.txt file, you could also consider splitting it up by chapter using something like `mkdir chapters; cd chapters; csplit -z -f 'chapter_' -b '%02d.txt' ../book.txt '/^## /' '{*}'`, if perhaps that makes it easier to ingest. Though this could be completely unnecessary, depending on how you're able to read the book into your context. It is certainly important to consider the full context of the book when deciding what all backgrounds and other tags to assign, though of course the immediate context of any specific chapter is most important when creating the pulp.txt chunk for that specific chapter. At least for a human, there's often some back-and-forth in the process here, where sometimes it ends up being necessary to jump back to a previously edited chapter to tweak some of the metadata tags around, after thinking of a cleaner approach to the background or sprites or what-have-you based on later chapters' developments. But again, I defer to what works best for you in carrying out the task itself, so long as the end, the full book compiles and you judge that the resulting pulp.txt does a good job of following all of the documented heuristics.
+
+And remember that, at the end of pulp.txt–populating task, being just the first step in the conversion process, the Pulpifier `-l` flag will show a full set of images required, but they'll all be labeled as `(missing)`, because no actual `images/` directory will be set up yet. But that's fine — leave the actual image-generating and image-editing to the later steps. However, since we talked a lot about thinking through the vibe aspect of the image generation, it would probably be a good idea to also create some sort of vibes.txt file alongside pulp.txt, using the output of Pulpifier's `-l` to get the list of images required, and then include what vibes you think should be given to the eventual prompts to `b-prompts-prompt` and `c-prompts-prompt`, to translate those vibes into actual image prompts. You could work on building up this file while you build up the pulp.txt file. You should probably give every background a vibe, though not every single expression variation for every sprite will need one — just limiting the character vibes to just the character+age+extras bases would work fine.
+
+
+
+
+So with all that, and with the book.txt and its directory provided to you, go forth and complete pulp.txt! (And also remember that this process shouldn't require any internet searching or anything — the full book in its desired translation is provided to you, and that's the only real input you'll need.)
+
+
+
+
