@@ -5,7 +5,7 @@
 #b-right.ed { background-image: url(/vn/TheMysteriousAffairAtStyles/images/c-cynthia-xtennis-escowling-1.webp),url(/vn/TheMysteriousAffairAtStyles/images/c-alfred-ehowl-s.webp); }
 </style>
 
-<p>Public Domain Pulp's first fourteen visuals novels — from <i>Cup of Gold</i> to <i>Journey to the Center of the Earth</i> — were all made with same general five (primary) steps:</p>
+<p>Public Domain Pulp's first fourteen visuals novels — from <i>Cup of Gold</i> to <i>Journey to the Center of the Earth</i> — were all made with the same five overall steps:</p>
 
 <ol>
 <li>Have an LLM convert a <code>book.txt</code> file to a <code>pulp.txt</code> file, adding in line breaks, (n)ame identifiers, (s)peaker identifiers, and (e)xpression tags.</li>
@@ -15,71 +15,104 @@
 <li>Visually review and edit the final visual metadata.</li>
 </ol>
 
-<p>And from these steps, my plan was to create a matching "Converting Books Into Visual Novels" blog post documenting the process for each step. Easy enough.</p>
+<p>The specific approach to each step varied and improved with each new visual novel (involving a mostly-increasing number of many substeps!), but at a high-level, the five-step process remained roughly constant. So the plan then was always to have a five-part "Converting Books Into Visual Novels" series documenting each step with a blog post. Easy enough.</p>
 
-<p>Or perhaps not so easy, since it turns out detailed technical writing is hard, and there were many additional substeps that warranted documentation (Part 0, Part 0.5, and Part 2±0.5), and also the subprocesses involved in each particular step kept evolving over time — each new visual novel has been a learning experience for engineering better results and better process efficiency. The end result being: as of right now, only the Part 1 step has been fully documented as a blog post, with Part 2 still being a draft. And both are, to some extent, essentially already obsolete!</p>
+<p>Except that now, going into visual novel #15 (<i>Fathers and Sons</i>) — and with the <a href="/blog/2026-03-20">Part 1 post</a> being the only main-entry post so far to escape the draft phase — the five-step approach's fixedness is already starting to unravel.</p>
 
-<p>LLMs' contextual intelligence has progressed wonderfully in the past year, such that what was impossible in January is now very much possible here in October. The whole reasoning behind separating Parts 1 and 2 of the conversion process was that LLMs were formerly capable of processing only a restricted subset of the metadata tags in initial <code>book.txt</code>-to-<code>pulp.txt</code> conversion step and that trying to get them to produce all the pre-visual metadata all at once would only waste time: it would be too inconsistent to be usable across a book-length text.</p>
 
-<p>But not so any more. LLMs have gotten much more capable (and agentic), such that the new five step process is looking to turn into this:</p>
+
+<h2>Spooky Scary LLMs</h2>
+
+<p>LLMs' contextual intelligence has progressed terrifically in the past year. Scarily so, perhaps even. But from the perspective of book-processing, the change is all positive, since what was impossible in January is now very much possible here in October.</p>
+
+<p>The reasoning (at the time) behind separating Parts 1 and 2 of the original conversion process was that AIs (at the time) were not smart enough to handle populating the full set of (pre-visual) <code>pulp.txt</code> metadata sufficiently correctly. Their output would include so many mistakes that a human would end up having to spend <i>more</i> time cleaning up those mistakes than they would have spent in the counterfactual of just populating the metadata themselves by hand.</p>
+
+</p>And this was true at the time, at least from my testing, at least for most of the types of metadata required by <code>pulp.txt</code>. But importantly, the LLMs were still good enough at processing a limited subset of the metadata. Therefore, rather than populate all the metadata in one pass, we have two separate steps: Part 1, where the LLM does its initial limited pass; and Part 2, where the human does their complete pass, building off the LLM's work.</p>
+
+<p>And those conclusions held true for all of nine months or so, but in the past month, the LLMs seem to have undergone a critical step-change towards being more contextual, more agentic, and most important: more smarter. Arrogant human that I was, I thought I could blog-document faster than the LLMs could render by blogs obsolete. But it turns out: no.</p>
+
+
+
+<h2>The New Process?</h2>
+
+<p>So if Parts 1 and 2 are now combinable, which they seem to be, the five-step process turns into something more like this:</p>
 
 <ol>
 <li>Have an LLM convert a <code>book.txt</code> file to a <code>pulp.txt</code> file, adding in line breaks and all types of tag metadata that can be set prior to the visual edit.</li>
-<li>Quickly review and tweak the outputted <code>pulp.txt</code> by hand.</li>
+<li>Review and tweak the outputted <code>pulp.txt</code> by hand?</li>
 <li>Generate the sprite set (as determined by the prior metadata).</li>
 <li>Generate the background set (as determined by the prior metadata).</li>
 <li>Visually review and edit the final visual metadata.</li>
 </ol>
 
-<p>So now I'm mulling over these questions: Is it worth it to finish and publish the Part 2 draft? Do I go back and fully rewrite the Part 1 post to create Part 1 (v2)? In the time it takes me to rewrite Parts 1 and 2, will the whole process change <i>again</i> from further hands-on experience and further LLM intelligence progress? Should I just jump ahead and write up Parts 3, 4, and 5, which haven't yet quite so fundamentally changed, while waiting for the dust to settle on Parts 1 and 2?</p>
+<p>…With the long-term necessity of the second step being unclear. Certainly it <i>has</i> been necessary so far in the ongoing conversion of <i>Fathers and Sons</i>, where the LLM still indeed did make many mistakes that needed fixing. But of course, this was only the first such attempt at this newer streamlined approach, and I can only see the LLMs' initial outputs getting better over time (both from being smarter and from better prompting).</p>
 
-<p>I wish documentation was less time-consuming such that I could manifest all the disjointed ideas in my head into a well-written cohesive written structure, without loss of informational value. Then I wouldn't feel so bad about documentating and re-documentating and re-versioning repeated blog posts!</p>
+<p>Will the LLMs ever reach a state of making <i>no</i> mistakes? Perhaps, perhaps not. And even in that hypothetical state, there <i>could</i> still be benefits from having the human-driven edit pass in the loop. But it seems increasingly dubious to claim that having the separate human-driven Part 2 pass will <i>always</i> be a worthwhile tradeoff (in a world constrained by finite time and attention).</p>
 
-<p>But until LLMs can extract thoughts for all their informational contents, I think I'm improvise. So what follows will be a very short, very high-level explanation of the current conversion process, with the current set of prompts being used, but without any guarantee of granular detail or reproducibility or consistency going forward.</p>
+<p>Still, for now, <i>some</i> version of the Part 2 step still seems necessary, even with its narrowing scope when compared to the original process. So, thinking in terms of what the new process looks like <i>right now</i>, the changes raise some documentation-related questions:</p>
+
+<p>Is it worth it to finish and publish the existing (old process) Part 2 draft, or should it just be rewritten from scratch?</p>
+
+<p>Does the existing Part 1 post need to be fully rewritten, or should a new Part 1 (v2) post just be published alongside?</p>
+
+<p>Is it even worth it to rewrite Parts 1 and 2 now with the looming threat of the further process changes still so unclear?</p>
+
+<p>Should the documentation just skip ahead to writing the less-likely-to-fundamentally-change steps: Parts 3, 4, and 5?</p>
+
+<p>Would that technical documentation was easier such that I could teleport all the disjointed ideas and heuristics in my head into my text editor in neatly organized fashion, <i>without loss of information</i> (i.e., <i>not</i> just asking an LLM to write it up for me), I wouldn't mind having a series of semi-redundant posts: Part 1, Part 1 (v2), Part 2, Part 2 (v2), Part 1 (v3), etc. But, for the time being, process-posting is still hard and too time-consuming.</p>
+
+<p>So, as stopgap, I think the best approach (for now) is just to quickly write up at a high level, without getting lost in difficult things like <i>details</i>, what the current (for now) process looks like. (Without guarantees that this is what it will <i>continue</i> to look like!)</p>
+
+
+
 
 <h2>1. The LLM Creates pulp.txt</h2>
 
 <p>The previous version of this step (documented as <a href="/blog/2026-03-20">Converting Books Into Visual Novels Part 1: The First Edit — Creating the Starter pulp.txt</a>) involved breaking a book into chapters, feeding each chapter individually into Gemini 3.1 Pro, having it create its limited subset of the metadata, then rebuilding the chapter parts all back into one file, fixing up the many compiler errors created from Gemini's various goofs.</p>
 
-<p>The updated process is conceptually simpler: we can feed the entire book all at once to GPT-6 Astra via Codex, where it can invoke the Pulpifier compiler directly to iteratively build the entire pulp.txt file, where it can handle populating a much larger subset of the metadata, including those tags I had previously declared that an LLM <i>shouldn't</i> be involved with setting: (b)ackgrounds and (a)ages and e(x)tras and so on.</p>
+<p>The updated process is conceptually simpler: we can feed the entire book all at once to GPT-6 Astra via Codex, where it can invoke the Pulpifier compiler directly to iteratively build the entire <code>pulp.txt</code> file, where it can handle populating a much larger subset of the metadata, including previously un-automated tags like (b)ackgrounds and (a)ages and e(x)tras and so on.</p>
 
-<p>The full prompt given to Astra is <a href="https://github.com/JohnQPulp/CreativeCommonsContent/tree/main/reference/pulp-prompt.txt">pulp-prompt.txt</a>, and it actually contains a lot of the same explanations, heuristics, and example that were going to go into the eventual Part 2 blog post. Except that, since it's written as an LLM prompt, it's rather less readable from a human perspective that would I'd ever publish under a "Blog" banner. (Not that my actual blog-writing abilities are that much better, but at least in this context, I follow the rules of paragraph breaks, if nothing else.)</p>
+<p>The full prompt given to Astra is <a href="https://github.com/JohnQPulp/CreativeCommonsContent/tree/main/reference/pulp-prompt.txt">pulp-prompt.txt</a>, which contains much of the same explanations, heuristics, and examples that <i>would</i> go into a Part 2 blog post, if ever written. The catch being that <code>pulp-prompt.txt</code> is written for an LLM audience, not a human one, and so it's rather less readable than one might want. Still, the main ideas are in there, just not with trivial formatting flair like paragraph breaks.</p>
 
 
 <h2>2. The Human Edits pulp.txt</h2>
 
-<p>The previous version of this step also involved re-reading through the book via <code>pulp.txt</code>, except that now, instead of having to assign all the backgrounds and sprite modifiers and so forth, the human (me!) can just review what the LLM put down, making tweaks and metadata edits as-needed.</p>
+<p>The previous version of this step also involved re-reading through the book via <code>pulp.txt</code>, except that now, instead of having to assign all the backgrounds and sprite modifiers and so forth, the human (me!) can just review what the LLM put down, making tweaks and metadata edits as-needed. And currently, numerous editing fixes still are very much needed:</p>
 
-<p>Perhaps in the far future of say, ten more months from now, a human-led review won't even be needed. Just have the LLMs — smarter LLMs, and more LLMs.</p>
+<p>The full set of heuristics the human (me!) has in his head (my head!) is still imperfectly communicated in <code>pulp-prompt.txt</code>, and so even though current-gen LLMs already seem strictly more intelligent than current-gen humans (e.g., me!), they still end up constrained by the stupid human's inability (my inability!) to fully formulate thoughts into instructions.</p>
 
-<p>But for now, having a human in the loop still seems useful in practice, if nothing else than because the full set of heuristics the human (me!) has in his head (my head!) is still imperfectly communicated in <code>pulp-prompt.txt</code>, and so even a perfectly smart LLM might fail to produce perfect results if constrained by the stupid human's inability (my inability!) to fully formulate their thoughts into instructions.</p>
+<p>But in the future? Who knows. If the LLMs could learn to mind-read, that would help matters tremendously.</p>
+
 
 <h2>3. Generate The Sprite Set</h2>
 
-<p>This has two substeps: first creating the image prompts, and then running the prompts against a prompt generator (and iterating). But even though this overall process hasn't fundamentally changed since the beginning of the site, the specifics of it have also changed from the recent LLM intelligence improvements.</p>
+<p>This previously had two substeps: first creating the image prompts, and then running the prompts against a prompt generator (and iterating). But even this has also changed from the recent LLM intelligence improvements:</p>
 
-<p>Instead of going [human-written prompt -> AI-generated images], the process has become, roughly: [human-written vibes -> LLM-written prompts -> AI-generated images]. Which may sound like making the process unnecessarily longer and more convoluted for no reason, but this was a change motivated again by all the past experience around process efficiency and end-result quality, which adding this extra LLM-processing substep <i>can</i> actually help with.</p>
+<p>Instead of going [human-written prompt -> AI-generated images], the process has become, roughly: [human-written vibes -> LLM-written prompts -> AI-generated images]. This makes the process more convoluted, but still somehow better in practice. The reasoning behind <i>why</i> it's better would require writing up the full Part 3 documentation blog post, so I'll just it leave it at linking the current image-prompting–prompting prompt <a href="https://github.com/JohnQPulp/CreativeCommonsContent/tree/main/reference/c-prompts-prompt.txt">c-prompts-prompt.txt</a>. (Not the prompt that generates <i>images</i>, but the prompt that generates <i>image prompts</i>.)</p>
 
-<p>It's hard to fully explain why and how without writing up the full Part 3 documentation blog post, so I'll just it leave it at again pasting in the image-prompting–prompting prompt <a href="https://github.com/JohnQPulp/CreativeCommonsContent/tree/main/reference/c-prompts-prompt.txt">c-prompts-prompt.txt</a> that's fed to the LLM. Again, there's a lot of heuristics and imperfectly formulated explanation in there that can help give an idea of the overall goals of the step, but they're all again written for the LLM and not for the human.</p>
+<p>Having the LLM generate the prompts used by the other AI to generate the images still doesn't yet obviate the need for <i>a lot</o> of prompt tweaking and re-rolling from the human. But, the heuristics for all that will have to wait. (If not made obsolete prior to being written.)</p>
 
 
 <h2>4. Generate The Background Set</h2>
 
-<p>At a high level, there are basically the same considerations that go into this step as the previous. We want backgrounds, and we need the image generator to create them, and we need prompts to feed to the image generator, and it ultimately ends up easier and better to have the LLM write the prompts based off of human-written vibes than to human-write the prompts themselves.</p>
+<p>Similar to the sprite-generation step: Here we want backgrounds, and we need the image generator to create them, and we need prompts to feed to the image generator, and it ultimately ends up easier and better to have the LLM write the prompts based off of human-written vibes than to human-write the prompts themselves. See the corresponding LLM instructions in <a href="https://github.com/JohnQPulp/CreativeCommonsContent/tree/main/reference/b-prompts-prompt.txt">b-prompts-prompt.txt</a>.</p>
 
-<p>The corresponding LLM instructions are in <a href="https://github.com/JohnQPulp/CreativeCommonsContent/tree/main/reference/b-prompts-prompt.txt">b-prompts-prompt.txt</a>, with more corresponding heuristics and concepts-of-a-blog-post contained therein.</p>
+<p>Backgrounds are a gigantic pain, and this step is a gigantic pain, and the reasons why it's all so painful are at least partially already explained in the <a href="/blog/2026-03-09">Text and Image Contradictions</a> blog post. But again: there's no time to get into the weeds of the dozens and dozens of iterations that can comprise a single background.</p>
 
 
 <h2>5. Visually Edit the Visual Novel</h2>
 
-<p>Of the five steps, this is the one that has changed least from the recent LLM intelligence improvements. Fundamentally, the human still needs to read through the VN, as a VN, and determine, as human, whether the VN looks good from a human perspective, making edits as-needed.</p>
+<p>Of the five steps, this is the one that has changed least from the recent LLM intelligence improvements. Fundamentally, the human still needs to read/play through the visual novel and check that it looks good, from a human perspective, making visual edits as-needed. This step seems the least likely to ever be fully automatable via an AI, which means it will probably take only 20 months to automate instead of 10.</p>
 
-<p>There's a lot more that goes into it than that, and so <i>eventually</i> this will need to be a blog post, but I fear it may take some time to get through all the preliminary explanations required from Parts 1-4.</p>
+<p>In any case, there's <i>a lot</i> of heuristics that go into this final visual edit, and none of them are written up yet, and they also kind of require first documenting all previous processes' heuristics, so except the full Part 5 blog post sometime next decade.</p>
 
 
-<h2>The End (of the current process)</h2>
+<h2>The End!</h2>
 
-<p>And that's it! Follow the above five poorly explained steps, and you too will be able to convert any book of your own into a visual novel in no time!</p>
+<p>And that's it — converting any book into a visual novel is a simple as following the above five poorly explained steps.</p>
 
-<p>For more details, simply wait for the documentation posts no doubt to follow: "Part 2 (Draft)", "Part 1 (v2)", "Part 2 (v2)", "Part 1 (v3)", "Part 1.5 (v?)", "Part 1 (v4)", …</p>
+<p>For more details, consider inventing a device to freeze technological progress for long enough such that a coherent process could be documented in full.</p>
+
+
+
 
